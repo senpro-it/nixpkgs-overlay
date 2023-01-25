@@ -40,7 +40,7 @@ let cfg = config.senpro; in {
           '';
         };
         minio = {
-          password = {
+          password = mkOption {
             type = types.str;
             default = "6e57eac19a0978b574bdc12b16b92aa3abd2ba8283d891ec4a3046ff6da8f3c0";
             example = "6c3c18d7c7f1a95af2dee9949582b55ba3e3361118f600b0c9d518d6d217e597";
@@ -48,7 +48,7 @@ let cfg = config.senpro; in {
               Password for the accessing the minio data storage. 
             '';
           };
-          adminConsoleURL = {
+          adminConsoleURL = mkOption {
             type = types.str;
             default = "admin.minio.local";
             example = "admin.minio.example.com";
@@ -56,7 +56,7 @@ let cfg = config.senpro; in {
               Admin console URL of minio. URL should point to the fully qualified, publicly accessible URL. Don't provide protocol, SSL is hardcoded.
             '';
           };
-          uploadBucketURL = {
+          uploadBucketURL = mkOption {
             type = types.str;
             default = "minio.local";
             example = "minio.example.com";
@@ -66,7 +66,7 @@ let cfg = config.senpro; in {
           };
         };
         postgres = {
-          password = {
+          password = mkOption {
             type = types.str;
             default = "19ca4fb81ae676c2f4b46fe03688348b0aa0ce160360e72856ccc8e45cc2009b";
             example = "ed2fca67ff7730576ea626b63b0cf7d313450a934f651562c18bd6d8f035fb89";
