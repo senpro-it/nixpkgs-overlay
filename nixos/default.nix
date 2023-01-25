@@ -201,6 +201,7 @@ let cfg = config.senpro; in {
             REDIS_URL = "redis://outline-redis:6379";
             URL = "https://${cfg.oci-containers.outline.publicURL}";
             PORT = "3000";
+            FORCE_HTTPS = "false";
             AWS_ACCESS_KEY_ID = "minio";
             AWS_REGION = "eu-west-1";
             AWS_SECRET_ACCESS_KEY = "${cfg.oci-containers.outline.minio.password}";
