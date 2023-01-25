@@ -82,6 +82,7 @@ let cfg = config.senpro; in {
   config = {
     services.traefik = {
       enable = true;
+      group = "podman";
       staticConfigOptions = {
         entryPoints = {
           http2-tcp = {
@@ -102,6 +103,11 @@ let cfg = config.senpro; in {
         experimental = {
           http3 = true;
         };
+        providers = {
+          docker = {
+            endpoint = "unix:///run/podman/podman.sock";
+          };
+        };
       };
       dynamicConfigOptions = {
         http = {
@@ -119,28 +125,28 @@ let cfg = config.senpro; in {
               };
             };
           };
-          routers = lib.mkIf (cfg.oci-containers != {}) (lib.mkMerge [
-            (lib.mkIf cfg.oci-containers.outline.enable {
-              outline = {
-                rule = "Host(`${cfg.oci-containers.outline.publicURL}`)";
-                service = "outline";
-                entryPoints = [ "https2-tcp" ];
-                tls = true;
-              };
-            })
-          ]);
-          services = lib.mkIf (cfg.oci-containers != {}) (lib.mkMerge [
-            (lib.mkIf cfg.oci-containers.outline.enable {
-              outline = {
-                loadBalancer = {
-                  passHostHeader = true;
-                  servers = [
-                    { url = "http://outline:3000"; }
-                  ];
-                };
-              };
-            })
-          ]);
+#          routers = lib.mkIf (cfg.oci-containers != {}) (lib.mkMerge [
+#            (lib.mkIf cfg.oci-containers.outline.enable {
+#              outline = {
+#                rule = "Host(`${cfg.oci-containers.outline.publicURL}`)";
+#                service = "outline";
+#                entryPoints = [ "https2-tcp" ];
+#                tls = true;
+#              };
+#            })
+#          ]);
+#          services = lib.mkIf (cfg.oci-containers != {}) (lib.mkMerge [
+#            (lib.mkIf cfg.oci-containers.outline.enable {
+#              outline = {
+#                loadBalancer = {
+#                  passHostHeader = true;
+#                  servers = [
+#                    { url = "http://outline:3000"; }
+#                  ];
+#                };
+#              };
+#            })
+#          ]);
         };
         tls = {
           options = {
@@ -172,14 +178,8 @@ let cfg = config.senpro; in {
               --gateway 10.90.0.1 --subnet 10.90.0.0/16 proxy
           '';
       };
-      "podman-network-outline" = lib.mkIf cfg.oci-containers.outline.enable {
-        serviceConfig.Type = "oneshot";
-          wantedBy = [ "podman-outline.service" ];
-          script = ''
-            ${pkgs.podman}/bin/podman network inspect outline > /dev/null 2>&1 || ${pkgs.podman}/bin/podman network create outline
-          '';
-      };
     };
+    virtualisation.podman.dockerSocket.enable = true;
     virtualisation.oci-containers.containers = lib.mkIf (cfg.oci-containers != {}) (lib.mkMerge [
       (lib.mkIf cfg.oci-containers.outline.enable {
         outline = {
@@ -192,7 +192,17 @@ let cfg = config.senpro; in {
             "outline-redis"
             "outline-postgres"
           ];
-          extraOptions = [ "--net=proxy" ];
+          extraOptions = [
+            "--net=proxy"
+            "--label=traefik.enable=true"
+            "--label=traefik.http.routers.outline.tls=true"
+            "--label=traefik.http.routers.outline.entrypoints=https2-tcp"
+#            "--label=traefik.http.routers.outline.tls.certresolver=letsEncrypt"
+            "--label=traefik.http.routers.outline.service=outline"
+#            "--label=traefik.http.routers.outline.middlewares=httpsSec@file"
+            "--label=traefik.http.routers.outline.rule=Host(`${cfg.oci-containers.outline.publicURL}`)"
+            "--label=traefik.http.services.outline.loadBalancer.server.port=3000"
+          ];
           environment = {
             SECRET_KEY = "${cfg.oci-containers.outline.secret}";
             UTILS_SECRET = "${cfg.oci-containers.outline.utils_secret}";
