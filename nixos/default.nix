@@ -209,7 +209,7 @@ let cfg = config.senpro; in {
           environment = {
             MINIO_ROOT_USER = "minio";
             MINIO_ROOT_PASSWORD = "${cfg.oci-containers.outline.minio.password}";
-            MINIO_BROWSER_REDIRECT_URL = "${cfg.oci-containers.outline.minio.adminConsoleURL}";
+            MINIO_BROWSER_REDIRECT_URL = "https://${cfg.oci-containers.outline.minio.adminConsoleURL}";
           };
           volumes = [ "outline-minio:/data" ];
         };
