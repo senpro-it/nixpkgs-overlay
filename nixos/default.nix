@@ -186,7 +186,7 @@ let cfg = config.senpro; in {
           image = "docker.io/outlinewiki/outline:latest";
           autoStart = true;
           user = "root";
-          cmd = [ "sh" "-c" ''yarn sequelize:migrate --env=production-ssl-disabled && yarn start --env=production-ssl-disabled'' ];
+          cmd = [ "yarn" "start" "--env=production-ssl-disabled" ];
           dependsOn = [
             "outline-minio"
             "outline-redis"
