@@ -168,7 +168,8 @@ let cfg = config.senpro; in {
         serviceConfig.Type = "oneshot";
           wantedBy = [ "traefik.service" ];
           script = ''
-            ${pkgs.podman}/bin/podman network inspect proxy > /dev/null 2>&1 || ${pkgs.podman}/bin/podman network create --gateway 10.90.0.1 --subnet 10.90.0.0/16 proxy
+            ${pkgs.podman}/bin/podman network inspect proxy > /dev/null 2>&1 || ${pkgs.podman}/bin/podman network create --ipv6 --gateway fd01::1 --subnet fd01::/80 \
+              --gateway 10.90.0.1 --subnet 10.90.0.0/16 proxy
           '';
       };
       "podman-network-outline" = lib.mkIf cfg.oci-containers.outline.enable {
@@ -189,12 +190,12 @@ let cfg = config.senpro; in {
             "outline-redis"
             "outline-postgres"
           ];
-          extraOptions = [ "--net=outline,proxy" ];
+          extraOptions = [ "--net=proxy" ];
           environment = {
             SECRET_KEY = "${cfg.oci-containers.outline.secret}";
             UTILS_SECRET = "${cfg.oci-containers.outline.utils_secret}";
             PGSSLMODE = "disable";
-            DATABASE_URL = "postgres://outline:${cfg.oci-containers.outline.postgres.password}@outline-postgres.dns.podman:5432/outline";
+            DATABASE_URL = "postgres://outline:${cfg.oci-containers.outline.postgres.password}@outline-postgres:5432/outline";
             REDIS_URL = "redis://outline-redis:6379";
             URL = "https://${cfg.oci-containers.outline.publicURL}";
             PORT = "3000";
@@ -212,7 +213,7 @@ let cfg = config.senpro; in {
           image = "quay.io/minio/minio:latest";
           autoStart = true;
           cmd = [ "server" "/data" "--console-address" ":9001" ];
-          extraOptions = [ "--net=outline" ];
+          extraOptions = [ "--net=proxy" ];
           environment = {
             MINIO_ROOT_USER = "minio";
             MINIO_ROOT_PASSWORD = "${cfg.oci-containers.outline.minio.password}";
@@ -223,12 +224,12 @@ let cfg = config.senpro; in {
         outline-redis = {
           image = "docker.io/library/redis:latest";
           autoStart = true;
-          extraOptions = [ "--net=outline" ];
+          extraOptions = [ "--net=proxy" ];
         };
         outline-postgres = {
           image = "docker.io/library/postgres:latest";
           autoStart = true;
-          extraOptions = [ "--net=outline" ];
+          extraOptions = [ "--net=proxy" ];
           environment = {
             POSTGRES_DB = "outline";
             POSTGRES_USER = "outline";
