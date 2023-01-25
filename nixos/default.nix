@@ -119,6 +119,28 @@ let cfg = config.senpro; in {
               };
             };
           };
+          routers = lib.mkIf (cfg.oci-containers != {}) (lib.mkMerge [
+            (lib.mkIf cfg.oci-containers.outline.enable {
+              outline = {
+                rule = "Host(`${cfg.oci-containers.outline.publicURL}`)";
+                service = "outline";
+                entryPoints = [ "https2-tcp" ];
+                tls = true;
+              };
+            })
+          ]);
+          services = lib.mkIf (cfg.oci-containers != {}) (lib.mkMerge [
+            (lib.mkIf cfg.oci-containers.outline.enable {
+              outline = {
+                loadBalancer = {
+                  passHostHeader = true;
+                  servers = [
+                    { url = "http://outline:3000"; }
+                  ];
+                };
+              };
+            })
+          ]);
         };
         tls = {
           options = {
