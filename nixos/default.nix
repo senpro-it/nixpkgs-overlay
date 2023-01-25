@@ -181,7 +181,7 @@ let cfg = config.senpro; in {
           };
         };
         outline-minio = {
-          image = "docker.io/minio/minio:latest";
+          image = "quay.io/minio/minio:latest";
           autoStart = true;
           cmd = [ "server" "/data" "--console-address" ":9001" ];
           environment = {
