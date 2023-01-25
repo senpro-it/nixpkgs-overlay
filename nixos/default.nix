@@ -172,6 +172,13 @@ let cfg = config.senpro; in {
               --gateway 10.90.0.1 --subnet 10.90.0.0/16 proxy
           '';
       };
+      "podman-network-outline" = lib.mkIf cfg.oci-containers.outline.enable {
+        serviceConfig.Type = "oneshot";
+          wantedBy = [ "podman-outline.service" ];
+          script = ''
+            ${pkgs.podman}/bin/podman network inspect outline > /dev/null 2>&1 || ${pkgs.podman}/bin/podman network create outline
+          '';
+      };
     };
     virtualisation.oci-containers.containers = lib.mkIf (cfg.oci-containers != {}) (lib.mkMerge [
       (lib.mkIf cfg.oci-containers.outline.enable {
@@ -183,7 +190,7 @@ let cfg = config.senpro; in {
             "outline-redis"
             "outline-postgres"
           ];
-          extraOptions = [ "--net=proxy" ];
+          extraOptions = [ "--net=outline,proxy" ];
           environment = {
             SECRET_KEY = "${cfg.oci-containers.outline.secret}";
             UTILS_SECRET = "${cfg.oci-containers.outline.utils_secret}";
@@ -206,6 +213,7 @@ let cfg = config.senpro; in {
           image = "quay.io/minio/minio:latest";
           autoStart = true;
           cmd = [ "server" "/data" "--console-address" ":9001" ];
+          extraOptions = [ "--net=outline" ];
           environment = {
             MINIO_ROOT_USER = "minio";
             MINIO_ROOT_PASSWORD = "${cfg.oci-containers.outline.minio.password}";
@@ -216,10 +224,12 @@ let cfg = config.senpro; in {
         outline-redis = {
           image = "docker.io/library/redis:latest";
           autoStart = true;
+          extraOptions = [ "--net=outline" ];
         };
         outline-postgres = {
           image = "docker.io/library/postgres:latest";
           autoStart = true;
+          extraOptions = [ "--net=outline" ];
           environment = {
             POSTGRES_DB = "outline";
             POSTGRES_USER = "outline";
