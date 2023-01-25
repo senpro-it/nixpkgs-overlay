@@ -141,6 +141,16 @@ let cfg = config.senpro; in {
         };
       };
     };
+    systemd.services = {
+      "podman-network-proxy" = {
+        serviceConfig.Type = "oneshot";
+          wantedBy = [ "traefik.service" ];
+          script = ''
+            ${pkgs.podman}/bin/podman network inspect proxy > /dev/null 2>&1 || ${pkgs.podman}/bin/podman network create --ipv6 --gateway fd01::1 --subnet fd01::/80 \
+              --gateway 10.90.0.1 --subnet 10.90.0.0/16 proxy
+          '';
+      };
+    };
     virtualisation.oci-containers.containers = lib.mkIf (cfg.oci-containers != {}) (lib.mkMerge [
       (lib.mkIf cfg.oci-containers.outline.enable {
         outline = {
@@ -163,7 +173,7 @@ let cfg = config.senpro; in {
             AWS_ACCESS_KEY_ID = "minio";
             AWS_REGION = "eu-west-1";
             AWS_SECRET_ACCESS_KEY = "${cfg.oci-containers.outline.minio.password}";
-            AWS_S3_UPLOAD_BUCKET_URL = "${cfg.oci-containers.outline.minio.uploadBucketURL}";
+            AWS_S3_UPLOAD_BUCKET_URL = "https://${cfg.oci-containers.outline.minio.uploadBucketURL}";
             AWS_S3_UPLOAD_BUCKET_NAME = "outline";
             AWS_S3_UPLOAD_MAX_SIZE = "26214400";
             AWS_S3_FORCE_PATH_STYLE = "true";
@@ -186,7 +196,7 @@ let cfg = config.senpro; in {
           autoStart = true;
         };
         outline-postgres = {
-          image = "docker.io/library/redis:latest";
+          image = "docker.io/library/postgres:latest";
           autoStart = true;
           environment = {
             POSTGRES_DB = "outline";
