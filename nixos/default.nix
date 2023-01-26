@@ -75,6 +75,48 @@ let cfg = config.senpro; in {
             '';
           };
         };
+        smtp = {
+          host = mkOption {
+            type = types.str;
+            default = "mail.local";
+            example = "mail.example.com";
+            description = ''
+              FQDN of the SMTP mail server for sending mails.
+            '';
+          };
+          port = mkOption {
+            type = types.port;
+            default = 465;
+            example = 587;
+            description = ''
+              TCP port which outline will use to connect to the mail server.
+            '';
+          };
+          from = mkOption {
+            type = types.str;
+            default = "outline@mail.local";
+            example = "example@example.com";
+            description = ''
+              SMTP FROM address outline will send with.
+            '';
+          };
+          user = mkOption {
+            type = types.str;
+            default = "user";
+            example = "example@example.com";
+            description = ''
+              SMTP user outline will use to login.
+            '';
+          };
+          password = mkOption {
+            type = types.str;
+            default = "Unn8QwQqKN42kzR6ZRRlMNfv1L9J0WerTz00bw8eSZVdA84N0cJ1IFUr52EwQniN";
+            example = "AJD7mmpqEApBCcDMqMH1fGdzc96JAlyBuqgXumFfhzmAevvyPhxRkfyVT33F4vUk";
+            description = ''
+              Password of the SMTP user outline will use to login.
+            '';
+          };
+        };
       };
     };
   };
@@ -220,6 +262,11 @@ let cfg = config.senpro; in {
             AWS_S3_UPLOAD_MAX_SIZE = "26214400";
             AWS_S3_FORCE_PATH_STYLE = "true";
             AWS_S3_ACL = "private";
+            SMTP_HOST = "${cfg.oci-containers.outline.smtp.host}";
+            SMTP_PORT = "${toString cfg.oci-containers.outline.smtp.port}";
+            SMTP_USERNAME = "${cfg.oci-containers.outline.smtp.user}";
+            SMTP_PASSWORD = "${cfg.oci-containers.outline.smtp.password}";
+            SMTP_FROM_EMAIL = "${cfg.oci-containers.outline.smtp.from}";
           };
         };
         outline-minio = {
