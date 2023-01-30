@@ -122,7 +122,7 @@ let cfg = config.senpro; in {
   };
 
   config = {
-    services.traefik = {
+    services.traefik = lib.mkIf (cfg.oci-containers != {}) {
       enable = true;
       group = "podman";
       staticConfigOptions = {
@@ -189,7 +189,7 @@ let cfg = config.senpro; in {
         };
       };
     };
-    systemd.services = {
+    systemd.services = lib.mkIf (cfg.oci-containers != {}) {
       "podman-network-proxy" = {
         serviceConfig.Type = "oneshot";
           wantedBy = [ "traefik.service" ];
