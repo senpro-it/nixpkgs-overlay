@@ -92,6 +92,29 @@ let cfg = config.senpro; in {
             '';
           };
         };
+        sonicwall = {
+          enable = mkEnableOption ''
+            Whether to enable the SonicWall monitoring via SNMP.
+          '';
+          agents = mkOption {
+            type = types.listOf types.str;
+            default = [];
+            example = literalExpression ''
+              [ "udp://192.168.178.1:161" ]
+            '';
+            description = lib.mdDoc ''
+              List of agents to monitor. Please look at the [documentation](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/snmp/README.md) for further information about formatting.
+            '';
+          };
+          community = mkOption {
+            type = types.str;
+            default = "public";
+            example = "public";
+            description = lib.mdDoc ''
+              Community string used SNMPv2c. Actually SNMPv2 and so community string is mandatory.
+            '';
+          };
+        };
         sophos = {
           sg = {
             enable = mkEnableOption ''
@@ -267,6 +290,47 @@ let cfg = config.senpro; in {
                 {
                   name = "qnap.volume";
                   oid = "QTS-MIB::volumeTable";
+                }
+              ];
+            })
+            (lib.mkIf cfg.telegraf.devices.sonicwall.enable {
+              name = "sonicwall";
+              path = [ "/srv/snmp/mibs" ];
+              agents = cfg.telegraf.devices.sonicwall.agents;
+              timeout = "20s";
+              version = 2;
+              community = "${cfg.telegraf.devices.sonicwall.community}";
+              retries = 5;
+              field = [
+                {
+                  name = "contact";
+                  oid = "SNMPv2-MIB::sysContact.0";
+                }
+                {
+                  name = "description";
+                  oid = "SNMPv2-MIB::sysDescr.0";
+                }
+                {
+                  name = "hostname";
+                  oid = "SNMPv2-MIB::sysName.0";
+                }
+                {
+                  name = "model";
+                  oid = "SNWL-COMMON-MIB::snwlSysModel.0";
+                }
+                {
+                  name = "uptime";
+                  oid = "SNMPv2-MIB::sysUpTime.0";
+                }
+              ];
+            table = [
+                {
+                  name = "sonicwall.interfaces";
+                  oid = "IF-MIB::ifTable";
+                }
+                {
+                  name = "sonicwall.ip_addresses";
+                  oid = "IP-MIB::ipAddrTable";
                 }
               ];
             })
