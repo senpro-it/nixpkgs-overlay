@@ -3,6 +3,7 @@
 {
 
   imports = [
+    ./telegraf
     ./oci-containers
   ];
 
