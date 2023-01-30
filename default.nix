@@ -1,5 +1,5 @@
 { pkgs ? import <nixpkgs> { } }:
 
 {
-  modules = import ./modules; # NixOS modules
+  modules = import ./nixos; # NixOS modules
 }
