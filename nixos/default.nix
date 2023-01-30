@@ -239,7 +239,6 @@ let cfg = config.senpro; in {
             "--label=traefik.enable=true"
             "--label=traefik.http.routers.outline.tls=true"
             "--label=traefik.http.routers.outline.entrypoints=https2-tcp"
-#            "--label=traefik.http.routers.outline.tls.certresolver=letsEncrypt"
             "--label=traefik.http.routers.outline.service=outline"
 #            "--label=traefik.http.routers.outline.middlewares=httpsSec@file"
             "--label=traefik.http.routers.outline.rule=Host(`${cfg.oci-containers.outline.publicURL}`)"
@@ -273,7 +272,20 @@ let cfg = config.senpro; in {
           image = "quay.io/minio/minio:latest";
           autoStart = true;
           cmd = [ "server" "/data" "--console-address" ":9001" ];
-          extraOptions = [ "--net=proxy" ];
+          extraOptions = [
+            "--net=proxy"
+            "--label=traefik.enable=true"
+            "--label=traefik.http.routers.outline-minio.tls=true"
+            "--label=traefik.http.routers.outline-minio.entrypoints=https2-tcp"
+            "--label=traefik.http.routers.outline-minio.service=outline-minio"
+            "--label=traefik.http.routers.outline-minio.rule=Host(`${cfg.oci-containers.outline.minio.uploadBucketURL}`)"
+            "--label=traefik.http.services.outline-minio.loadBalancer.server.port=9000"
+            "--label=traefik.http.routers.outline-minio-console.tls=true"
+            "--label=traefik.http.routers.outline-minio-console.entrypoints=https2-tcp"
+            "--label=traefik.http.routers.outline-minio-console.service=outline-minio-console"
+            "--label=traefik.http.routers.outline-minio-console.rule=Host(`${cfg.oci-containers.outline.minio.adminConsoleURL}`)"
+            "--label=traefik.http.services.outline-minio-console.loadBalancer.server.port=9001"
+          ];
           environment = {
             MINIO_ROOT_USER = "minio";
             MINIO_ROOT_PASSWORD = "${cfg.oci-containers.outline.minio.password}";
