@@ -140,6 +140,32 @@ let cfg = config.senpro; in {
             };
           };
         };
+        synology = {
+          nas = {
+            enable = mkEnableOption ''
+              Whether to enable the Synology NAS monitoring via SNMP.
+            '';
+            agents = mkOption {
+              type = types.listOf types.str;
+              default = [];
+              example = literalExpression ''
+                [ "udp://192.168.178.1:161" ]
+              '';
+              description = lib.mdDoc ''
+                List of agents to monitor. Please look at the [documentation](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/snmp/README.md) for further information about formatting.
+              '';
+            };
+            community = mkOption {
+              type = types.str;
+              default = "public";
+              example = "public";
+              description = lib.mdDoc ''
+                Community string used SNMPv2c. Actually SNMPv2 and so community string is mandatory.
+              '';
+            };
+          };
+        };
+
       };
     };
   };
@@ -377,6 +403,59 @@ let cfg = config.senpro; in {
                 {
                   name = "sophos.sg.storage";
                   oid = "HOST-RESOURCES-MIB::hrStorageTable";
+                }
+              ];
+            })
+            (lib.mkIf cfg.telegraf.devices.synology.nas.enable {
+              name = "synology.nas";
+              path = [ "/srv/snmp/mibs" ];
+              agents = cfg.telegraf.devices.synology.nas.agents;
+              timeout = "20s";
+              version = 2;
+              community = "${cfg.telegraf.devices.sonicwall.community}";
+              retries = 5;
+              field = [
+                {
+                  name = "contact";
+                  oid = "SNMPv2-MIB::sysContact.0";
+                }
+                {
+                  name = "description";
+                  oid = "SNMPv2-MIB::sysDescr.0";
+                }
+                {
+                  name = "hostname";
+                  oid = "SNMPv2-MIB::sysName.0";
+                }
+                {
+                  name = "model";
+                  oid = "SYNOLOGY-SYSTEM-MIB::modelName.0";
+                }
+                {
+                  name = "uptime";
+                  oid = "SNMPv2-MIB::sysUpTime.0";
+                }
+                {
+                  name = "serial_number";
+                  oid = "SYNOLOGY-SYSTEM-MIB::serialNumber.0";
+                }
+                {
+                  name = "fw_version";
+                  oid = "SYNOLOGY-SYSTEM-MIB::version.0";
+                }
+                {
+                  name = "fw_up_available";
+                  oid = "SYNOLOGY-SYSTEM-MIB::upgradeAvailable.0";
+                }
+              ];
+            table = [
+                {
+                  name = "synology.nas.disk";
+                  oid = "SYNOLOGY-DISK-MIB::diskTable";
+                }
+                {
+                  name = "synology.nas.raid";
+                  oid = "SYNOLOGY-RAID-MIB::raidTable";
                 }
               ];
             })
