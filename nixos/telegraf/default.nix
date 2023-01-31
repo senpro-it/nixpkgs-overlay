@@ -450,6 +450,11 @@ let cfg = config.senpro; in {
               ];
             table = [
                 {
+                  name = "synology.nas.cpu";
+                  oid = "HOST-RESOURCES-MIB::hrProcessorTable";
+                  index_as_tag = true;
+                }
+                {
                   name = "synology.nas.disk";
                   oid = "SYNOLOGY-DISK-MIB::diskTable";
                 }
