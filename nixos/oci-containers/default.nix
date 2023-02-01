@@ -307,6 +307,9 @@ let cfg = config.senpro; in {
         experimental = {
           http3 = true;
         };
+        log = {
+          level = "DEBUG";
+        };
         providers = {
           docker = {
             endpoint = "unix:///run/podman/podman.sock";
@@ -359,6 +362,19 @@ let cfg = config.senpro; in {
             ${pkgs.podman}/bin/podman network inspect proxy > /dev/null 2>&1 || ${pkgs.podman}/bin/podman network create --ipv6 --gateway fd01::1 --subnet fd01::/80 \
               --gateway 10.90.0.1 --subnet 10.90.0.0/16 proxy
           '';
+      };
+      "podman-vaultwarden-healthcheck" = lib.mkIf cfg.oci-containers.vaultwarden.enable {
+        serviceConfig.Type = "oneshot";
+          script = ''
+            ${pkgs.podman}/bin/podman healthcheck run vaultwarden
+          '';
+      };
+    };
+    systemd.timers."podman-vaultwarden-healthcheck" = lib.mkIf cfg.oci-containers.vaultwarden.enable {
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnCalendar = "*:0/1";
+        Unit = "podman-vaultwarden-healthcheck.service";
       };
     };
     virtualisation.oci-containers.containers = lib.mkIf (cfg.oci-containers != {}) (lib.mkMerge [
@@ -560,14 +576,19 @@ let cfg = config.senpro; in {
             "--label=traefik.http.routers.vaultwarden.entrypoints=https2-tcp"
             "--label=traefik.http.routers.vaultwarden.service=vaultwarden"
             "--label=traefik.http.routers.vaultwarden.rule=Host(`${cfg.oci-containers.vaultwarden.publicURL}`)"
-            "--label=traefik.http.services.vaultwarden.loadBalancer.server.port=80"
+            "--label=traefik.http.services.vaultwarden.loadBalancer.server.port=8000"
             "--label=traefik.http.routers.vaultwarden-websocket.tls=true"
             "--label=traefik.http.routers.vaultwarden-websocket.entrypoints=https2-tcp"
             "--label=traefik.http.routers.vaultwarden-websocket.service=vaultwarden-websocket"
             "--label=traefik.http.routers.vaultwarden-websocket.rule=Host(`${cfg.oci-containers.vaultwarden.publicURL}`) && Path(`/notifications/hub`)"
             "--label=traefik.http.services.vaultwarden-websocket.loadBalancer.server.port=3012"
+            "--healthcheck-retries=10"
+            "--healthcheck-interval=60s"
+            "--healthcheck-start-period=1m"
+            "--healthcheck-command=curl http://localhost:8000/alive || exit 1"
           ];
           environment = {
+            ROCKET_PORT = "8000";
             ORG_EVENTS_ENABLED = "true";
             ORG_GROUPS_ENABLED = "true";
             HIBP_API_KEY = "${cfg.oci-containers.vaultwarden.hibpApiKey}";
