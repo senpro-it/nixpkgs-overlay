@@ -260,6 +260,14 @@ let cfg = config.senpro; in {
               Display name of the SMTP FROM address.
             '';
           };
+          tlsPolicy = mkOption {
+            type = types.enum [ "force_tls" "starttls" "off" ];
+            default = "force_tls";
+            description = ''
+              Whether vaultwarden should use implicit or explicit TLS or not use TLS encryption at all.
+              See <https://github.com/dani-garcia/vaultwarden/wiki/SMTP-configuration> for further explanations about the possible values.
+            '';
+          };
         };
       };
     };
@@ -554,7 +562,7 @@ let cfg = config.senpro; in {
             SMTP_PORT = "${toString cfg.vaultwarden.smtp.port}";
             SMTP_FROM = "${cfg.vaultwarden.smtp.from}";
             SMTP_FROM_NAME = "${cfg.vaultwarden.smtp.displayName}";
-            SMTP_SECURITY = "${cfg.vaultwarden.smtp.security}";
+            SMTP_SECURITY = "${cfg.vaultwarden.smtp.tlsPolicy}";
             SMTP_USERNAME = "${cfg.vaultwarden.smtp.username}";
             SMTP_PASSWORD = "${cfg.vaultwarden.smtp.password}";
             WEBSOCKET_ENABLED = "true";
