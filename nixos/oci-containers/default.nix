@@ -561,6 +561,11 @@ let cfg = config.senpro; in {
             "--label=traefik.http.routers.vaultwarden.service=vaultwarden"
             "--label=traefik.http.routers.vaultwarden.rule=Host(`${cfg.oci-containers.vaultwarden.publicURL}`)"
             "--label=traefik.http.services.vaultwarden.loadBalancer.server.port=80"
+            "--label=traefik.http.routers.vaultwarden-websocket.tls=true"
+            "--label=traefik.http.routers.vaultwarden-websocket.entrypoints=https2-tcp"
+            "--label=traefik.http.routers.vaultwarden-websocket.service=vaultwarden-websocket"
+            "--label=traefik.http.routers.vaultwarden-websocket.rule=Host(`${cfg.oci-containers.vaultwarden.publicURL}`) && Path(`/notifications/hub`)"
+            "--label=traefik.http.services.vaultwarden-websocket.loadBalancer.server.port=3012"
           ];
           environment = {
             ORG_EVENTS_ENABLED = "true";
