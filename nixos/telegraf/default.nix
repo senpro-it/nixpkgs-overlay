@@ -172,7 +172,7 @@ let cfg = config.senpro; in {
 
   config = {
 
-    services.telegraf = {
+    services.telegraf = lib.mkIf (cfg.telegraf != {}) {
       enable = true;
       extraConfig = {
         agent = {
