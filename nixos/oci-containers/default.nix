@@ -315,6 +315,16 @@ let cfg = config.senpro; in {
             endpoint = "unix:///run/podman/podman.sock";
           };
         };
+        certificatesResolvers = {
+          letsEncrypt = {
+            acme = {
+              storage = "/var/lib/traefik/acme.json";
+              httpChallenge = {
+                entryPoint = "http2-tcp";
+              };
+            };
+          };
+        };
       };
       dynamicConfigOptions = {
         http = {
@@ -573,6 +583,7 @@ let cfg = config.senpro; in {
             "--net=proxy"
             "--label=traefik.enable=true"
             "--label=traefik.http.routers.vaultwarden.tls=true"
+            "--label=traefik.http.routers.vaultwarden.tls.certresolver=letsEncrypt"
             "--label=traefik.http.routers.vaultwarden.entrypoints=https2-tcp"
             "--label=traefik.http.routers.vaultwarden.service=vaultwarden"
             "--label=traefik.http.routers.vaultwarden.rule=Host(`${cfg.oci-containers.vaultwarden.publicURL}`)"
