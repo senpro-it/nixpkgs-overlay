@@ -6,6 +6,9 @@ let cfg = config.senpro; in {
 
   options.senpro = {
     telegraf = {
+      enable = mkEnableOption ''
+        Whether to enable the telegraf monitoring agent.
+      '';
       config = {
         output = {
           influxdb_v2 = {
@@ -172,7 +175,7 @@ let cfg = config.senpro; in {
 
   config = {
 
-    services.telegraf = lib.mkIf (cfg.telegraf != {}) {
+    services.telegraf = lib.mkIf cfg.telegraf.enable {
       enable = true;
       extraConfig = {
         agent = {
