@@ -138,7 +138,7 @@ let cfg = config.senpro; in {
             default = "19ca4fb81ae676c2f4b46fe03688348b0aa0ce160360e72856ccc8e45cc2009b";
             example = "ed2fca67ff7730576ea626b63b0cf7d313450a934f651562c18bd6d8f035fb89";
             description = ''
-              Password for the accessing the PostgreSQL database. 
+              Password for the user accessing the PostgreSQL database. 
             '';
           };
         };
@@ -202,6 +202,16 @@ let cfg = config.senpro; in {
           description = ''
             API key for vaultwarden to connect to HIBP (haveibeenpwned.com).
           '';
+        };
+        postgres = {
+          password = mkOption {
+            type = types.str;
+            default = "ymjnfiatqpbjiqgd97nl9mb5dyjoldeh4b6lsp63veahp2wjpq6nhkafd3p59ph4";
+            example = "ymjnfiatqpbjiqgd97nl9mb5dyjoldeh4b6lsp63veahp2wjpq6nhkafd3p59ph4";
+            description = ''
+              Password for accessing the PostgreSQL database. 
+            '';
+          };
         };
         publicURL = mkOption {
           type = types.str;
