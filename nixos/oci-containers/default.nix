@@ -667,7 +667,7 @@ let cfg = config.senpro; in {
             SMTP_PASSWORD = "${cfg.oci-containers.vaultwarden.smtp.password}";
             WEBSOCKET_ENABLED = "true";
             ADMIN_TOKEN = "${cfg.oci-containers.vaultwarden.adminToken}";
-            DATABASE_URL = "postgresql://vaultwarden:${cfg.oci-containers.vaultwarden.postgres.password}@vaultwarden-postgres:5432/vaultwarden";
+            DATABASE_URL = "mysql://vaultwarden:${cfg.oci-containers.vaultwarden.mariadb.password}@vaultwarden-mariadb/vaultwarden";
           };
           volumes = [ "vaultwarden-data:/data" ];
         };
