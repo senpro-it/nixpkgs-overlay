@@ -512,6 +512,7 @@ let cfg = config.senpro; in {
             GF_AUTH_GENERIC_OAUTH_AUTH_URL = "https://${cfg.oci-containers.grafana.keycloak.provider}/realms/${cfg.oci-containers.grafana.keycloak.realm}/protocol/openid-connect/auth";
             GF_AUTH_GENERIC_OAUTH_TOKEN_URL = "https://${cfg.oci-containers.grafana.keycloak.provider}/realms/${cfg.oci-containers.grafana.keycloak.realm}/protocol/openid-connect/token";
             GF_AUTH_GENERIC_OAUTH_API_URL = "https://${cfg.oci-containers.grafana.keycloak.provider}/realms/${cfg.oci-containers.grafana.keycloak.realm}/protocol/openid-connect/userinfo";
+            GF_AUTH_GENERIC_OAUTH_TLS_SKIP_VERIFY_INSECURE = "true";
             GF_SERVER_ROOT_URL = "https://${cfg.oci-containers.grafana.rootURL}";
             GF_PANELS_DISABLE_SANITIZE_HTML = "true";
             GF_FEATURE_TOGGLES_ENABLE = "internationalization";
