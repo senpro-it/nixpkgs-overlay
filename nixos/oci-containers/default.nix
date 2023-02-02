@@ -533,7 +533,7 @@ let cfg = config.senpro; in {
             "--label=traefik.http.routers.grafana-influxdb.entrypoints=https2-tcp"
             "--label=traefik.http.routers.grafana-influxdb.service=grafana-influxdb"
             "--label=traefik.http.routers.grafana-influxdb.rule=Host(`${cfg.oci-containers.grafana.influxdb.publicURL}`)"
-            "--label=traefik.http.services.outline-minio.loadBalancer.server.port=8086"
+            "--label=traefik.http.services.grafana-influxdb.loadBalancer.server.port=8086"
           ];
           volumes = [
             "grafana-influxdb:/etc/influxdb2"
