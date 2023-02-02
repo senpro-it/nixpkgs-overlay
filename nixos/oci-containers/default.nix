@@ -614,6 +614,9 @@ let cfg = config.senpro; in {
         vaultwarden = {
           image = "docker.io/vaultwarden/server:latest";
           autoStart = true;
+          dependsOn = [
+            "vaultwarden-postgres"
+          ];
           extraOptions = [
             "--net=proxy"
             "--label=traefik.enable=true"
@@ -622,7 +625,7 @@ let cfg = config.senpro; in {
             "--label=traefik.http.routers.vaultwarden.entrypoints=https2-tcp"
             "--label=traefik.http.routers.vaultwarden.service=vaultwarden"
             "--label=traefik.http.routers.vaultwarden.rule=Host(`${cfg.oci-containers.vaultwarden.publicURL}`)"
-            "--label=traefik.http.services.vaultwarden.loadBalancer.server.port=8000"
+            "--label=traefik.http.services.vaultwarden.loadBalancer.server.port=80"
             "--label=traefik.http.routers.vaultwarden-websocket.tls=true"
             "--label=traefik.http.routers.vaultwarden-websocket.entrypoints=https2-tcp"
             "--label=traefik.http.routers.vaultwarden-websocket.service=vaultwarden-websocket"
@@ -631,11 +634,9 @@ let cfg = config.senpro; in {
             "--healthcheck-retries=10"
             "--healthcheck-interval=60s"
             "--healthcheck-start-period=1m"
-            "--healthcheck-command=curl http://localhost:8000/alive || exit 1"
+            "--healthcheck-command=curl http://localhost:80/alive || exit 1"
           ];
           environment = {
-            ROCKET_PORT = "8000";
-            ORG_GROUPS_ENABLED = "true";
             HIBP_API_KEY = "${cfg.oci-containers.vaultwarden.hibpApiKey}";
             DOMAIN = "https://${cfg.oci-containers.vaultwarden.publicURL}";
             SIGNUPS_ALLOWED = "false";
