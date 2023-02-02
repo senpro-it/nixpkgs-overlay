@@ -6,9 +6,14 @@ let cfg = config.senpro; in {
 
   options.senpro = {
     oci-containers = {
-      grafana = {
+      homer = {
         enable = mkEnableOption ''
           Whether to enable the homer container stack.
+        '';
+      };
+      grafana = {
+        enable = mkEnableOption ''
+          Whether to enable the grafana container stack.
         '';
         rootURL = mkOption {
           type = types.str;
@@ -187,7 +192,7 @@ let cfg = config.senpro; in {
       };
       vaultwarden = {
         enable = mkEnableOption ''
-          Whether to enable the homer container stack.
+          Whether to enable the vaultwarden container stack.
         '';
         adminToken = mkOption {
           type = types.str;
@@ -338,9 +343,6 @@ let cfg = config.senpro; in {
         };
         experimental = {
           http3 = true;
-        };
-        log = {
-          level = "DEBUG";
         };
         providers = {
           docker = {
@@ -633,7 +635,6 @@ let cfg = config.senpro; in {
           ];
           environment = {
             ROCKET_PORT = "8000";
-            ORG_EVENTS_ENABLED = "true";
             ORG_GROUPS_ENABLED = "true";
             HIBP_API_KEY = "${cfg.oci-containers.vaultwarden.hibpApiKey}";
             DOMAIN = "https://${cfg.oci-containers.vaultwarden.publicURL}";
