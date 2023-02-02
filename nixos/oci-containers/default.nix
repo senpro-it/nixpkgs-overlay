@@ -208,6 +208,24 @@ let cfg = config.senpro; in {
             API key for vaultwarden to connect to HIBP (haveibeenpwned.com).
           '';
         };
+        mariadb = {
+          password = mkOption {
+            type = types.str;
+            default = "tqRD58vxHIZXlRPelUqSCloiBVN3XMAvtQLmt2t4RP21hHlcH4ooJLRUKc3Ywy6x";
+            example = "isWDkwROM9fmYjdZZmnQy8lGE8Wv9D6rjlxgCxOy7sJ6c61OkNudy6EwvifAcFxy";
+            description = ''
+              Password for accessing the MariaDB database. 
+            '';
+          };
+          rootPassword = mkOption {
+            type = types.str;
+            default = "el6UtF1ACSfqeTLia7YZ2jTynuYmUQaiVvxedBf5gfPfkZriVk4sDmWhglvClABz";
+            example = "z9QcJv83WYshZzVFhrEC9W0RcCYhSABDS9Be3lpPPrcq9g7k7a6BaLWTe9CL0EG5";
+            description = ''
+              Root password for the MariaDB database. 
+            '';
+          };
+        };
         postgres = {
           password = mkOption {
             type = types.str;
@@ -652,6 +670,20 @@ let cfg = config.senpro; in {
             DATABASE_URL = "postgresql://vaultwarden:${cfg.oci-containers.vaultwarden.postgres.password}@vaultwarden-postgres:5432/vaultwarden";
           };
           volumes = [ "vaultwarden-data:/data" ];
+        };
+        vaultwarden-mariadb = {
+          image = "docker.io/library/mariadb:latest";
+          autoStart = true;
+          extraOptions = [
+            "--net=proxy"
+          ];
+          environment = {
+            MARIADB_DATABASE = "vaultwarden";
+            MARIADB_USER = "vaultwarden";
+            MARIADB_PASSWORD = "${cfg.oci-containers.vaultwarden.mariadb.password}";
+            MARIADB_ROOT_PASSWORD = "${cfg.oci-containers.vaultwarden.mariadb.rootPassword}";
+          };
+          volumes = [ "vaultwarden-mariadb-data:/var/lib/mysql" ];
         };
         vaultwarden-postgres = {
           image = "docker.io/library/postgres:latest";
