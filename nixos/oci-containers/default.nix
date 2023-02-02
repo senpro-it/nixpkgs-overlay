@@ -31,6 +31,16 @@ let cfg = config.senpro; in {
             Public URL for grafana. URL should point to the fully qualified, publicly accessible URL. Don't provide protocol, SSL is hardcoded. Subfolders are allowed.
           '';
         };
+        influxdb = {
+          publicURL = mkOption {
+            type = types.str;
+            default = "influxdb.local";
+            example = "influxdb.example.com";
+            description = ''
+              URL of the InfluxDB instance. Don't provide protocol, SSL is hardcoded.
+            '';
+          };
+        };
         keycloak = {
           provider = mkOption {
             type = types.str;
@@ -47,6 +57,15 @@ let cfg = config.senpro; in {
             description = ''
               Realm to use for authentication against Keycloak.
             '';
+          };
+          client = {
+            secret = mkOption {
+              type = types.str;
+              example = "eofodff-sddsdwefdf-wefdswdff-dwsdfdds";
+              description = ''
+                Client secret for authentication against Keycloak.
+              '';
+            };
           };
         };
       };
@@ -259,8 +278,8 @@ let cfg = config.senpro; in {
         };
         publicURL = mkOption {
           type = types.str;
-          default = "grafana.local";
-          example = "grafana.example.com";
+          default = "vaultwarden.local";
+          example = "vaultwarden.example.com";
           description = ''
             Public URL for vaultwarden. URL should point to the fully qualified, publicly accessible URL. Don't provide protocol, SSL is hardcoded. Subfolders are allowed.
           '';
@@ -477,18 +496,18 @@ let cfg = config.senpro; in {
             "--label=traefik.http.routers.grafana.entrypoints=https2-tcp"
             "--label=traefik.http.routers.grafana.service=grafana"
             "--label=traefik.http.routers.grafana.rule=Host(`${cfg.oci-containers.grafana.rootURL}`)"
-            "--label=traefik.http.services.outline.loadBalancer.server.port=3000"
+            "--label=traefik.http.services.grafana.loadBalancer.server.port=3000"
           ];
           environment = {
-            GF_USERS_ALLOW_SIGN_UP = "true";
+            GF_USERS_ALLOW_SIGN_UP = "false";
             GF_USERS_AUTO_ASSIGN_ORG = "true";
             GF_USERS_AUTO_ASSIGN_ORG_ROLE = "Viewer";
             GF_AUTH_DISABLE_LOGIN_FORM = "true";
             GF_AUTH_GENERIC_OAUTH_ENABLED = "true";
             GF_AUTH_GENERIC_OAUTH_NAME = "OAuth2";
             GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP = "false";
-            GF_AUTH_GENERIC_OAUTH_CLIENT_ID = "";
-            GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET = "";
+            GF_AUTH_GENERIC_OAUTH_CLIENT_ID = "grafana";
+            GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET = "${cfg.oci-containers.grafana.keycloak.client.secret}";
             GF_AUTH_GENERIC_OAUTH_SCOPES = "email profile offline_access roles";
             GF_AUTH_GENERIC_OAUTH_AUTH_URL = "https://${cfg.oci-containers.grafana.keycloak.provider}/realms/${cfg.oci-containers.grafana.keycloak.realm}/protocol/openid-connect/auth";
             GF_AUTH_GENERIC_OAUTH_TOKEN_URL = "https://${cfg.oci-containers.grafana.keycloak.provider}/realms/${cfg.oci-containers.grafana.keycloak.realm}/protocol/openid-connect/token";
