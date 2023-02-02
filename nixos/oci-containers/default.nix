@@ -6,10 +6,18 @@ let cfg = config.senpro; in {
 
   options.senpro = {
     oci-containers = {
-      homer = {
+      heimdall = {
         enable = mkEnableOption ''
-          Whether to enable the homer container stack.
+          Whether to enable the heimdall container stack.
         '';
+        publicURL = mkOption {
+          type = types.str;
+          default = "heimdall.local";
+          example = "heimdall.example.com";
+          description = ''
+            Public URL for heimdall. URL should point to the fully qualified, publicly accessible URL. Don't provide protocol, SSL is hardcoded. Subfolders are allowed.
+          '';
+        };
       };
       grafana = {
         enable = mkEnableOption ''
@@ -188,6 +196,19 @@ let cfg = config.senpro; in {
               Password of the SMTP user outline will use to login.
             '';
           };
+        };
+      };
+      unifi-controller = {
+        enable = mkEnableOption ''
+          Whether to enable the unifi-controller pod.
+        '';
+        publicURL = mkOption {
+          type = types.str;
+          default = "unifi-controller.local";
+          example = "unifi-controller.example.com";
+          description = ''
+            Public URL for unifi-controller. URL should point to the fully qualified, publicly accessible URL. Don't provide protocol, SSL is hardcoded. Subfolders are allowed.
+          '';
         };
       };
       vaultwarden = {
@@ -499,6 +520,29 @@ let cfg = config.senpro; in {
           ];
         };
       })
+      (lib.mkIf cfg.oci-containers.heimdall.enable {
+        heimdall = {
+          image = "lscr.io/linuxserver/heimdall:latest";
+          autoStart = true;
+          extraOptions = [
+            "--net=proxy"
+            "--label=traefik.enable=true"
+            "--label=traefik.http.routers.heimdall.tls=true"
+            "--label=traefik.http.routers.heimdall.entrypoints=https2-tcp"
+            "--label=traefik.http.routers.heimdall.service=heimdall"
+            "--label=traefik.http.routers.heimdall.rule=Host(`${cfg.oci-containers.heimdall.publicURL}`)"
+            "--label=traefik.http.services.heimdall.loadBalancer.server.port=80"
+          ];
+          environment = {
+            PUID = "1000";
+            PGID = "1000";
+            TZ = "Europe/Berlin";
+          };
+          volumes = [
+            "heimdall:/config"
+          ];
+        };
+      })
       (lib.mkIf cfg.oci-containers.keycloak.enable {
         keycloak = {
           image = "quay.io/keycloak/keycloak:latest";
@@ -626,6 +670,36 @@ let cfg = config.senpro; in {
             POSTGRES_PASSWORD = "${cfg.oci-containers.outline.postgres.password}";
           };
           volumes = [ "outline-postgres-data:/var/lib/postgresql/data" ];
+        };
+      })
+      (lib.mkIf cfg.oci-containers.unifi-controller.enable {
+        unifi-controller = {
+          image = "lscr.io/linuxserver/unifi-controller:latest";
+          autoStart = true;
+          extraOptions = [
+            "--net=proxy"
+            "--label=traefik.enable=true"
+            "--label=traefik.http.routers.unifi-controller.tls=true"
+            "--label=traefik.http.routers.unifi-controller.entrypoints=https2-tcp"
+            "--label=traefik.http.routers.unifi-controller.service=unifi-controller"
+            "--label=traefik.http.routers.unifi-controller.rule=Host(`${cfg.oci-containers.unifi-controller.publicURL}`)"
+            "--label=traefik.http.services.unifi-controller.loadBalancer.server.port=8443"
+            "--label=traefik.http.services.unifi-controller.loadBalancer.serversTransport=unifi-controller"
+            "--label=traefik.http.serversTransports.unifi-controller.serverName=${cfg.oci-containers.unifi-controller.publicURL}"
+            "--label=traefik.http.serversTransports.unifi-controller.insecureSkipVerify: true"
+          ];
+          ports = [
+            "1900:1900/udp" "3478:3478/udp" "6789:6789/tcp" "8080:8080/tcp" "10001:10001/udp"
+          ];
+          environment = {
+            PUID = "1000";
+            PGID = "1000";
+            MEM_LIMIT = "1024M";
+            MEM_STARTUP = "1024M";
+          };
+          volumes = [
+            "unifi-controller:/config"
+          ];
         };
       })
       (lib.mkIf cfg.oci-containers.vaultwarden.enable {
