@@ -39,7 +39,7 @@ let cfg = config.senpro; in {
       };
       keycloak = {
         enable = mkEnableOption ''
-          Whether to enable the homer container stack.
+          Whether to enable the keycloak container stack.
         '';
         admin = {
           username = mkOption {
@@ -61,10 +61,10 @@ let cfg = config.senpro; in {
         };
         publicURL = mkOption {
           type = types.str;
-          default = "grafana.local";
-          example = "grafana.example.com";
+          default = "keycloak.local";
+          example = "keycloak.example.com";
           description = ''
-            Public URL for grafana. URL should point to the fully qualified, publicly accessible URL. Don't provide protocol, SSL is hardcoded. Subfolders are allowed.
+            Public URL for keycloak. URL should point to the fully qualified, publicly accessible URL. Don't provide protocol, SSL is hardcoded. Subfolders are allowed.
           '';
         };
         postgres = {
@@ -281,10 +281,42 @@ let cfg = config.senpro; in {
         };
       };
     };
+    traefik = {
+      enable = mkEnableOption ''
+          Whether to enable the traefik reverse proxy.
+      '';
+      localCertificates = mkOption {
+        type = with types; listOf (submodule {
+          options = {
+            certFile = mkOption {
+              type = types.str;
+              example = "/var/lib/traefik/cert/example.crt";
+              description = lib.mdDoc "Path to the public key.";
+            };
+            keyFile = mkOption {
+              type = types.str;
+              example = "/var/lib/traefik/cert/example.key";
+              description = lib.mdDoc "Path to the private key.";
+            };
+          };
+        });
+        example = literalExpression ''
+          {
+            localCertificates = [
+              { certFile = "/var/lib/traefik/cert/example.crt"; keyFile = "/var/lib/traefik/cert/example.key"; }
+            ];
+          }
+        '';
+        description = lib.mdDoc ''
+          Using this option you canc provide local certificates to Traefik.
+          Please look at the [documentation](https://doc.traefik.io/traefik/https/tls/#certificates-definition) for further information.
+        '';
+      };
+    };
   };
 
   config = {
-    services.traefik = lib.mkIf (cfg.oci-containers != {}) {
+    services.traefik = lib.mkIf cfg.traefik.enable {
       enable = true;
       group = "podman";
       staticConfigOptions = {
@@ -361,6 +393,7 @@ let cfg = config.senpro; in {
               minVersion = "VersionTLS12";
             };
           };
+          certificates = cfg.traefik.localCertificates;
         };
       };
     };
