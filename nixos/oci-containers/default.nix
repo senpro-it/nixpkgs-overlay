@@ -68,6 +68,56 @@ let cfg = config.senpro; in {
             };
           };
         };
+        smtp = {
+          host = mkOption {
+            type = types.str;
+            default = "mail.local";
+            example = "mail.example.com";
+            description = ''
+              FQDN of the SMTP mail server for sending mails.
+            '';
+          };
+          port = mkOption {
+            type = types.port;
+            default = 465;
+            example = 587;
+            description = ''
+              TCP port which grafana will use to connect to the mail server.
+            '';
+          };
+          from = mkOption {
+            type = types.str;
+            default = "grafana@mail.local";
+            example = "grafana@example.com";
+            description = ''
+              SMTP FROM address grafana will send with.
+            '';
+          };
+          username = mkOption {
+            type = types.str;
+            default = "user";
+            example = "grafana@example.com";
+            description = ''
+              SMTP user grafana will use to login.
+            '';
+          };
+          password = mkOption {
+            type = types.str;
+            default = "G34KFIYurjmi22ZJLpPkhx3DotdYDmj5W2mN0kRSQHoyeAPPp8eOL3Dxfw54XPnt";
+            example = "V6nlydlhsY71giivyzhIqvNpUBqthWRG4rvtHSsj9Ijn4XUsobDHCeRoZJukaJIa";
+            description = ''
+              Password of the SMTP user grafana will use to login.
+            '';
+          };
+          displayName = mkOption {
+            type = types.str;
+            default = "Grafana";
+            example = "Grafana";
+            description = ''
+              Display name of the SMTP FROM address.
+            '';
+          };
+        };
       };
       keycloak = {
         enable = mkEnableOption ''
@@ -517,6 +567,12 @@ let cfg = config.senpro; in {
             GF_SERVER_ROOT_URL = "https://${cfg.oci-containers.grafana.rootURL}";
             GF_PANELS_DISABLE_SANITIZE_HTML = "true";
             GF_FEATURE_TOGGLES_ENABLE = "internationalization";
+            GF_SMTP_ENABLED = "true";
+            GF_SMTP_HOST = "${cfg.oci-containers.grafana.smtp.host}:${toString cfg.oci-containers.grafana.smtp.port}";
+            GF_SMTP_USER = "${cfg.oci-containers.grafana.smtp.username}";
+            GF_SMTP_PASSWORD = "${cfg.oci-containers.grafana.smtp.password}";
+            GF_SMTP_FROM_NAME = "${cfg.oci-containers.grafana.smtp.displayName}";
+            GF_SMTP_FROM_ADDRESS = "${cfg.oci-containers.grafana.smtp.from}";
           };
           volumes = [
             "grafana:/etc/grafana/provisioning"
