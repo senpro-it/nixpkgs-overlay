@@ -186,7 +186,7 @@ let cfg = config.senpro; in {
           snmp = [
             (lib.mkIf cfg.telegraf.devices.aruba.switch.enable {
               name = "aruba.switch";
-              path = [ "/srv/snmp/mibs" ];
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
               agents = cfg.telegraf.devices.aruba.switch.agents;
               timeout = "20s";
               version = 2;
@@ -223,7 +223,7 @@ let cfg = config.senpro; in {
             })
             (lib.mkIf cfg.telegraf.devices.qnap.enable {
               name = "qnap";
-              path = [ "/srv/snmp/mibs" ];
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
               agents = cfg.telegraf.devices.qnap.agents;
               timeout = "20s";
               version = 2;
@@ -324,7 +324,7 @@ let cfg = config.senpro; in {
             })
             (lib.mkIf cfg.telegraf.devices.sonicwall.enable {
               name = "sonicwall";
-              path = [ "/srv/snmp/mibs" ];
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
               agents = cfg.telegraf.devices.sonicwall.agents;
               timeout = "20s";
               version = 2;
@@ -365,7 +365,7 @@ let cfg = config.senpro; in {
             })
             (lib.mkIf cfg.telegraf.devices.sophos.sg.enable {
               name = "sophos.sg";
-              path = [ "/srv/snmp/mibs" ];
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
               agents = cfg.telegraf.devices.sophos.sg.agents;
               timeout = "20s";
               version = 2;
@@ -411,7 +411,7 @@ let cfg = config.senpro; in {
             })
             (lib.mkIf cfg.telegraf.devices.synology.nas.enable {
               name = "synology.nas";
-              path = [ "/srv/snmp/mibs" ];
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
               agents = cfg.telegraf.devices.synology.nas.agents;
               timeout = "20s";
               version = 2;
