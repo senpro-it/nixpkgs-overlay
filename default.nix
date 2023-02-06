@@ -1,5 +1,5 @@
-{ pkgs ? import <nixpkgs> { } }:
+self: super:
 
 {
-  modules = import ./nixos; # NixOS modules
+  mib-library = super.callPackage ./nixpkgs/mib-library { };
 }
