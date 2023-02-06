@@ -62,13 +62,61 @@ let cfg = config.senpro; in {
                 List of agents to monitor. Please look at the [documentation](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/snmp/README.md) for further information about formatting.
               '';
             };
-            community = mkOption {
-              type = types.str;
-              default = "public";
-              example = "public";
-              description = lib.mdDoc ''
-                Community string used SNMPv2c. Actually SNMPv2 and so community string is mandatory.
-              '';
+            snmpRFCv3 = {
+              authentication = {
+                protocol = mkOption {
+                  type = types.enum [ "MD5" "SHA" "SHA224" "SHA256" "SHA384" "SHA512" ];
+                  default = "MD5";
+                  example = "SHA";
+                  description = lib.mdDoc ''
+                    Authentication protocol used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+                password = mkOption {
+                  type = types.str;
+                  default = "7ecLyz7SWeDmzhZtgXFPRBuFofzpdhW0eXIt3yIYfrSpWGMJrEqfZws8OKPAQiJW";
+                  example = "kyM3JvtVY1BNodkxX9ac9MWbuyZPrBtsbL2phRemqqS3j7KL7nk93FJvM8WPTBJt";
+                  description = lib.mdDoc ''
+                    Password used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+              };
+              privacy = {
+                protocol = mkOption {
+                  type = types.enum [ "DES" "AES" "AES192" "AES192C" "AES256" "AES256C" ];
+                  default = "MD5";
+                  example = "SHA";
+                  description = lib.mdDoc ''
+                    Privacy protocol used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+                password = mkOption {
+                  type = types.str;
+                  default = "f3KZGL7C3s1J59JJ0AtI8p6A0PqfzJgdVOzixgyMil9UfCjZPSDBPIW3JoD14djr";
+                  example = "qTovtQJcmFGcafQDrUS888TkzoaNPkEkWSG2WNBwtba09C9O8zSobcOHhvaN4siL";
+                  description = lib.mdDoc ''
+                    Password used by SNMPv3 to protect to connectiont to the agent.
+                  '';
+                };
+              };
+              security = {
+                level = mkOption {
+                  type = types.enum [ "noAuthNoPriv" "authNoPriv" "authPriv" ];
+                  default = "authPriv";
+                  example = "authPriv";
+                  description = lib.mdDoc ''
+                    Security level for SNMPv3. Look at the [documentation](https://snmp.com/snmpv3/snmpv3_intro.shtml) for further information.
+                  '';
+                };
+                username = mkOption {
+                  type = types.str;
+                  default = "monitor";
+                  example = "monitor";
+                  description = lib.mdDoc ''
+                    Username for SNMPv3. Also known as `Security Name`.
+                  '';
+                };
+              };
             };
           };
         };
@@ -86,13 +134,61 @@ let cfg = config.senpro; in {
               List of agents to monitor. Please look at the [documentation](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/snmp/README.md) for further information about formatting.
             '';
           };
-          community = mkOption {
-            type = types.str;
-            default = "public";
-            example = "public";
-            description = lib.mdDoc ''
-              Community string used SNMPv2c. Actually SNMPv2 and so community string is mandatory.
-            '';
+          snmpRFCv3 = {
+            authentication = {
+              protocol = mkOption {
+                type = types.enum [ "MD5" "SHA" "SHA224" "SHA256" "SHA384" "SHA512" ];
+                default = "MD5";
+                example = "SHA";
+                description = lib.mdDoc ''
+                  Authentication protocol used by SNMPv3 to authenticate at the agent.
+                '';
+              };
+              password = mkOption {
+                type = types.str;
+                default = "7ecLyz7SWeDmzhZtgXFPRBuFofzpdhW0eXIt3yIYfrSpWGMJrEqfZws8OKPAQiJW";
+                example = "kyM3JvtVY1BNodkxX9ac9MWbuyZPrBtsbL2phRemqqS3j7KL7nk93FJvM8WPTBJt";
+                description = lib.mdDoc ''
+                  Password used by SNMPv3 to authenticate at the agent.
+                '';
+              };
+            };
+            privacy = {
+              protocol = mkOption {
+                type = types.enum [ "DES" "AES" "AES192" "AES192C" "AES256" "AES256C" ];
+                default = "MD5";
+                example = "SHA";
+                description = lib.mdDoc ''
+                  Privacy protocol used by SNMPv3 to authenticate at the agent.
+                '';
+              };
+              password = mkOption {
+                type = types.str;
+                default = "f3KZGL7C3s1J59JJ0AtI8p6A0PqfzJgdVOzixgyMil9UfCjZPSDBPIW3JoD14djr";
+                example = "qTovtQJcmFGcafQDrUS888TkzoaNPkEkWSG2WNBwtba09C9O8zSobcOHhvaN4siL";
+                description = lib.mdDoc ''
+                  Password used by SNMPv3 to protect to connectiont to the agent.
+                '';
+              };
+            };
+            security = {
+              level = mkOption {
+                type = types.enum [ "noAuthNoPriv" "authNoPriv" "authPriv" ];
+                default = "authPriv";
+                example = "authPriv";
+                description = lib.mdDoc ''
+                  Security level for SNMPv3. Look at the [documentation](https://snmp.com/snmpv3/snmpv3_intro.shtml) for further information.
+                '';
+              };
+              username = mkOption {
+                type = types.str;
+                default = "monitor";
+                example = "monitor";
+                description = lib.mdDoc ''
+                  Username for SNMPv3. Also known as `Security Name`.
+                '';
+              };
+            };
           };
         };
         sonicwall = {
@@ -109,13 +205,61 @@ let cfg = config.senpro; in {
               List of agents to monitor. Please look at the [documentation](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/snmp/README.md) for further information about formatting.
             '';
           };
-          community = mkOption {
-            type = types.str;
-            default = "public";
-            example = "public";
-            description = lib.mdDoc ''
-              Community string used SNMPv2c. Actually SNMPv2 and so community string is mandatory.
-            '';
+          snmpRFCv3 = {
+            authentication = {
+              protocol = mkOption {
+                type = types.enum [ "MD5" "SHA" "SHA224" "SHA256" "SHA384" "SHA512" ];
+                default = "MD5";
+                example = "SHA";
+                description = lib.mdDoc ''
+                  Authentication protocol used by SNMPv3 to authenticate at the agent.
+                '';
+              };
+              password = mkOption {
+                type = types.str;
+                default = "7ecLyz7SWeDmzhZtgXFPRBuFofzpdhW0eXIt3yIYfrSpWGMJrEqfZws8OKPAQiJW";
+                example = "kyM3JvtVY1BNodkxX9ac9MWbuyZPrBtsbL2phRemqqS3j7KL7nk93FJvM8WPTBJt";
+                description = lib.mdDoc ''
+                  Password used by SNMPv3 to authenticate at the agent.
+                  '';
+              };
+            };
+            privacy = {
+              protocol = mkOption {
+                type = types.enum [ "DES" "AES" "AES192" "AES192C" "AES256" "AES256C" ];
+                default = "MD5";
+                example = "SHA";
+                description = lib.mdDoc ''
+                  Privacy protocol used by SNMPv3 to authenticate at the agent.
+                '';
+              };
+              password = mkOption {
+                type = types.str;
+                default = "f3KZGL7C3s1J59JJ0AtI8p6A0PqfzJgdVOzixgyMil9UfCjZPSDBPIW3JoD14djr";
+                example = "qTovtQJcmFGcafQDrUS888TkzoaNPkEkWSG2WNBwtba09C9O8zSobcOHhvaN4siL";
+                description = lib.mdDoc ''
+                  Password used by SNMPv3 to protect to connectiont to the agent.
+                '';
+              };
+            };
+            security = {
+              level = mkOption {
+                type = types.enum [ "noAuthNoPriv" "authNoPriv" "authPriv" ];
+                default = "authPriv";
+                example = "authPriv";
+                description = lib.mdDoc ''
+                  Security level for SNMPv3. Look at the [documentation](https://snmp.com/snmpv3/snmpv3_intro.shtml) for further information.
+                '';
+              };
+              username = mkOption {
+                type = types.str;
+                default = "monitor";
+                example = "monitor";
+                description = lib.mdDoc ''
+                  Username for SNMPv3. Also known as `Security Name`.
+                '';
+              };
+            };
           };
         };
         sophos = {
@@ -133,13 +277,61 @@ let cfg = config.senpro; in {
                 List of agents to monitor. Please look at the [documentation](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/snmp/README.md) for further information about formatting.
               '';
             };
-            community = mkOption {
-              type = types.str;
-              default = "public";
-              example = "public";
-              description = lib.mdDoc ''
-                Community string used SNMPv2c. Actually SNMPv2 and so community string is mandatory.
-              '';
+            snmpRFCv3 = {
+              authentication = {
+                protocol = mkOption {
+                  type = types.enum [ "MD5" "SHA" "SHA224" "SHA256" "SHA384" "SHA512" ];
+                  default = "MD5";
+                  example = "SHA";
+                  description = lib.mdDoc ''
+                    Authentication protocol used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+                password = mkOption {
+                  type = types.str;
+                  default = "7ecLyz7SWeDmzhZtgXFPRBuFofzpdhW0eXIt3yIYfrSpWGMJrEqfZws8OKPAQiJW";
+                  example = "kyM3JvtVY1BNodkxX9ac9MWbuyZPrBtsbL2phRemqqS3j7KL7nk93FJvM8WPTBJt";
+                  description = lib.mdDoc ''
+                    Password used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+              };
+              privacy = {
+                protocol = mkOption {
+                  type = types.enum [ "DES" "AES" "AES192" "AES192C" "AES256" "AES256C" ];
+                  default = "MD5";
+                  example = "SHA";
+                  description = lib.mdDoc ''
+                    Privacy protocol used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+                password = mkOption {
+                  type = types.str;
+                  default = "f3KZGL7C3s1J59JJ0AtI8p6A0PqfzJgdVOzixgyMil9UfCjZPSDBPIW3JoD14djr";
+                  example = "qTovtQJcmFGcafQDrUS888TkzoaNPkEkWSG2WNBwtba09C9O8zSobcOHhvaN4siL";
+                  description = lib.mdDoc ''
+                    Password used by SNMPv3 to protect to connectiont to the agent.
+                  '';
+                };
+              };
+              security = {
+                level = mkOption {
+                  type = types.enum [ "noAuthNoPriv" "authNoPriv" "authPriv" ];
+                  default = "authPriv";
+                  example = "authPriv";
+                  description = lib.mdDoc ''
+                    Security level for SNMPv3. Look at the [documentation](https://snmp.com/snmpv3/snmpv3_intro.shtml) for further information.
+                  '';
+                };
+                username = mkOption {
+                  type = types.str;
+                  default = "monitor";
+                  example = "monitor";
+                  description = lib.mdDoc ''
+                    Username for SNMPv3. Also known as `Security Name`.
+                  '';
+                };
+              };
             };
           };
         };
@@ -158,13 +350,61 @@ let cfg = config.senpro; in {
                 List of agents to monitor. Please look at the [documentation](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/snmp/README.md) for further information about formatting.
               '';
             };
-            community = mkOption {
-              type = types.str;
-              default = "public";
-              example = "public";
-              description = lib.mdDoc ''
-                Community string used SNMPv2c. Actually SNMPv2 and so community string is mandatory.
-              '';
+            snmpRFCv3 = {
+              authentication = {
+                protocol = mkOption {
+                  type = types.enum [ "MD5" "SHA" "SHA224" "SHA256" "SHA384" "SHA512" ];
+                  default = "MD5";
+                  example = "SHA";
+                  description = lib.mdDoc ''
+                    Authentication protocol used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+                password = mkOption {
+                  type = types.str;
+                  default = "7ecLyz7SWeDmzhZtgXFPRBuFofzpdhW0eXIt3yIYfrSpWGMJrEqfZws8OKPAQiJW";
+                  example = "kyM3JvtVY1BNodkxX9ac9MWbuyZPrBtsbL2phRemqqS3j7KL7nk93FJvM8WPTBJt";
+                  description = lib.mdDoc ''
+                    Password used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+              };
+              privacy = {
+                protocol = mkOption {
+                  type = types.enum [ "DES" "AES" "AES192" "AES192C" "AES256" "AES256C" ];
+                  default = "MD5";
+                  example = "SHA";
+                  description = lib.mdDoc ''
+                    Privacy protocol used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+                password = mkOption {
+                  type = types.str;
+                  default = "f3KZGL7C3s1J59JJ0AtI8p6A0PqfzJgdVOzixgyMil9UfCjZPSDBPIW3JoD14djr";
+                  example = "qTovtQJcmFGcafQDrUS888TkzoaNPkEkWSG2WNBwtba09C9O8zSobcOHhvaN4siL";
+                  description = lib.mdDoc ''
+                    Password used by SNMPv3 to protect to connectiont to the agent.
+                  '';
+                };
+              };
+              security = {
+                level = mkOption {
+                  type = types.enum [ "noAuthNoPriv" "authNoPriv" "authPriv" ];
+                  default = "authPriv";
+                  example = "authPriv";
+                  description = lib.mdDoc ''
+                    Security level for SNMPv3. Look at the [documentation](https://snmp.com/snmpv3/snmpv3_intro.shtml) for further information.
+                  '';
+                };
+                username = mkOption {
+                  type = types.str;
+                  default = "monitor";
+                  example = "monitor";
+                  description = lib.mdDoc ''
+                    Username for SNMPv3. Also known as `Security Name`.
+                  '';
+                };
+              };
             };
           };
         };
@@ -189,8 +429,13 @@ let cfg = config.senpro; in {
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
               agents = cfg.telegraf.devices.aruba.switch.agents;
               timeout = "20s";
-              version = 2;
-              community = "${cfg.telegraf.devices.aruba.switch.community}";
+              version = 3;
+              sec_level = "${cfg.telegraf.devices.aruba.switch.snmpRFCv3.security.level}";
+              sec_name = "${cfg.telegraf.devices.aruba.switch.snmpRFCv3.security.username}";
+              auth_protocol = "${cfg.telegraf.devices.aruba.switch.snmpRFCv3.authentication.protocol}";
+              auth_password = "${cfg.telegraf.devices.aruba.switch.snmpRFCv3.authentication.password}";
+              priv_protocol = "${cfg.telegraf.devices.aruba.switch.snmpRFCv3.privacy.protocol}";
+              priv_password = "${cfg.telegraf.devices.aruba.switch.snmpRFCv3.privacy.password}";
               retries = 5;
               field = [
                 {
@@ -226,8 +471,13 @@ let cfg = config.senpro; in {
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
               agents = cfg.telegraf.devices.qnap.agents;
               timeout = "20s";
-              version = 2;
-              community = "${cfg.telegraf.devices.qnap.community}";
+              version = 3;
+              sec_level = "${cfg.telegraf.devices.aruba.switch.snmpRFCv3.security.level}";
+              sec_name = "${cfg.telegraf.devices.qnap.snmpRFCv3.security.username}";
+              auth_protocol = "${cfg.telegraf.devices.qnap.snmpRFCv3.authentication.protocol}";
+              auth_password = "${cfg.telegraf.devices.qnap.snmpRFCv3.authentication.password}";
+              priv_protocol = "${cfg.telegraf.devices.qnap.snmpRFCv3.privacy.protocol}";
+              priv_password = "${cfg.telegraf.devices.qnap.snmpRFCv3.privacy.password}";
               retries = 5;
               field = [
                 {
@@ -327,8 +577,13 @@ let cfg = config.senpro; in {
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
               agents = cfg.telegraf.devices.sonicwall.agents;
               timeout = "20s";
-              version = 2;
-              community = "${cfg.telegraf.devices.sonicwall.community}";
+              version = 3;
+              sec_level = "${cfg.telegraf.devices.sonicwall.snmpRFCv3.security.level}";
+              sec_name = "${cfg.telegraf.devices.sonicwall.snmpRFCv3.security.username}";
+              auth_protocol = "${cfg.telegraf.devices.sonicwall.snmpRFCv3.authentication.protocol}";
+              auth_password = "${cfg.telegraf.devices.sonicwall.snmpRFCv3.authentication.password}";
+              priv_protocol = "${cfg.telegraf.devices.sonicwall.snmpRFCv3.privacy.protocol}";
+              priv_password = "${cfg.telegraf.devices.sonicwall.snmpRFCv3.privacy.password}";
               retries = 5;
               field = [
                 {
@@ -368,8 +623,13 @@ let cfg = config.senpro; in {
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
               agents = cfg.telegraf.devices.sophos.sg.agents;
               timeout = "20s";
-              version = 2;
-              community = "${cfg.telegraf.devices.sophos.sg.community}";
+              version = 3;
+              sec_level = "${cfg.telegraf.devices.sophos.sg.snmpRFCv3.security.level}";
+              sec_name = "${cfg.telegraf.devices.sophos.sg.snmpRFCv3.security.username}";
+              auth_protocol = "${cfg.telegraf.devices.sophos.sg.snmpRFCv3.authentication.protocol}";
+              auth_password = "${cfg.telegraf.devices.sophos.sg.snmpRFCv3.authentication.password}";
+              priv_protocol = "${cfg.telegraf.devices.sophos.sg.snmpRFCv3.privacy.protocol}";
+              priv_password = "${cfg.telegraf.devices.sophos.sg.snmpRFCv3.privacy.password}";
               retries = 5;
               field = [
                 {
@@ -414,8 +674,13 @@ let cfg = config.senpro; in {
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
               agents = cfg.telegraf.devices.synology.nas.agents;
               timeout = "20s";
-              version = 2;
-              community = "${cfg.telegraf.devices.sonicwall.community}";
+              version = 3;
+              sec_level = "${cfg.telegraf.devices.synology.nas.snmpRFCv3.security.level}";
+              sec_name = "${cfg.telegraf.devices.synology.nas.snmpRFCv3.security.username}";
+              auth_protocol = "${cfg.telegraf.devices.synology.nas.snmpRFCv3.authentication.protocol}";
+              auth_password = "${cfg.telegraf.devices.synology.nas.snmpRFCv3.authentication.password}";
+              priv_protocol = "${cfg.telegraf.devices.synology.nas.snmpRFCv3.privacy.protocol}";
+              priv_password = "${cfg.telegraf.devices.synology.nas.snmpRFCv3.privacy.password}";
               retries = 5;
               field = [
                 {
