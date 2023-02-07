@@ -188,6 +188,33 @@ let cfg = config.senpro; in {
             Public URL for outline. URL should point to the fully qualified, publicly accessible URL. Don't provide protocol, SSL is hardcoded. Subfolders are allowed.
           '';
         };
+        keycloak = {
+          provider = mkOption {
+            type = types.str;
+            default = "keycloak.local";
+            example = "keycloak.example.com";
+            description = ''
+              URL of the Keycloak OpenID provider. Don't provide protocol, SSL is hardcoded.
+            '';
+          };
+          realm = mkOption {
+            type = types.str;
+            default = "master";
+            example = "grafana";
+            description = ''
+              Realm to use for authentication against Keycloak.
+            '';
+          };
+          client = {
+            secret = mkOption {
+              type = types.str;
+              example = "eofodff-sddsdwefdf-wefdswdff-dwsdfdds";
+              description = ''
+                Client secret for authentication against Keycloak.
+              '';
+            };
+          };
+        };
         minio = {
           password = mkOption {
             type = types.str;
@@ -704,6 +731,14 @@ let cfg = config.senpro; in {
             SMTP_USERNAME = "${cfg.oci-containers.outline.smtp.username}";
             SMTP_PASSWORD = "${cfg.oci-containers.outline.smtp.password}";
             SMTP_FROM_EMAIL = "${cfg.oci-containers.outline.smtp.from}";
+            OIDC_CLIENT_ID = "outline";
+            OIDC_CLIENT_SECRET = "${cfg.oci-containers.outline.keycloak.client.secret}";
+            OIDC_AUTH_URI = "https://${cfg.oci-containers.outline.keycloak.provider}/realms/${cfg.oci-containers.outline.keycloak.realm}/protocol/openid-connect/auth";
+            OIDC_TOKEN_URI = "https://${cfg.oci-containers.outline.keycloak.provider}/realms/${cfg.oci-containers.outline.keycloak.realm}/protocol/openid-connect/token";
+            OIDC_USERINFO_URI = "https://${cfg.oci-containers.outline.keycloak.provider}/realms/${cfg.oci-containers.outline.keycloak.realm}/protocol/openid-connect/userinfo";
+            OIDC_USERNAME_CLAIM = "email";
+            OIDC_DISPLAY_NAME = "Keycloak";
+            OIDC_SCOPES = "openid profile email";
           };
         };
         outline-minio = {
