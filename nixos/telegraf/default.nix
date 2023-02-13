@@ -62,58 +62,14 @@ let cfg = config.senpro; in {
                 List of agents to monitor. Please look at the [documentation](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/snmp/README.md) for further information about formatting.
               '';
             };
-            snmpRFCv3 = {
-              authentication = {
-                protocol = mkOption {
-                  type = types.enum [ "MD5" "SHA" "SHA224" "SHA256" "SHA384" "SHA512" ];
-                  default = "MD5";
-                  example = "SHA";
-                  description = lib.mdDoc ''
-                    Authentication protocol used by SNMPv3 to authenticate at the agent.
-                  '';
-                };
-                password = mkOption {
+            snmpRFCv2 = {
+              community = {
+                name = mkOption {
                   type = types.str;
-                  default = "7ecLyz7SWeDmzhZtgXFPRBuFofzpdhW0eXIt3yIYfrSpWGMJrEqfZws8OKPAQiJW";
-                  example = "kyM3JvtVY1BNodkxX9ac9MWbuyZPrBtsbL2phRemqqS3j7KL7nk93FJvM8WPTBJt";
+                  default = "public";
+                  example = "public";
                   description = lib.mdDoc ''
-                    Password used by SNMPv3 to authenticate at the agent.
-                  '';
-                };
-              };
-              privacy = {
-                protocol = mkOption {
-                  type = types.enum [ "DES" "AES" "AES192" "AES192C" "AES256" "AES256C" ];
-                  default = "MD5";
-                  example = "SHA";
-                  description = lib.mdDoc ''
-                    Privacy protocol used by SNMPv3 to authenticate at the agent.
-                  '';
-                };
-                password = mkOption {
-                  type = types.str;
-                  default = "f3KZGL7C3s1J59JJ0AtI8p6A0PqfzJgdVOzixgyMil9UfCjZPSDBPIW3JoD14djr";
-                  example = "qTovtQJcmFGcafQDrUS888TkzoaNPkEkWSG2WNBwtba09C9O8zSobcOHhvaN4siL";
-                  description = lib.mdDoc ''
-                    Password used by SNMPv3 to protect to connectiont to the agent.
-                  '';
-                };
-              };
-              security = {
-                level = mkOption {
-                  type = types.enum [ "noAuthNoPriv" "authNoPriv" "authPriv" ];
-                  default = "authPriv";
-                  example = "authPriv";
-                  description = lib.mdDoc ''
-                    Security level for SNMPv3. Look at the [documentation](https://snmp.com/snmpv3/snmpv3_intro.shtml) for further information.
-                  '';
-                };
-                username = mkOption {
-                  type = types.str;
-                  default = "monitor";
-                  example = "monitor";
-                  description = lib.mdDoc ''
-                    Username for SNMPv3. Also known as `Security Name`.
+                    Community string used by SNMPv2 to authenticate at the agent.
                   '';
                 };
               };
@@ -429,13 +385,8 @@ let cfg = config.senpro; in {
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
               agents = cfg.telegraf.devices.aruba.switch.agents;
               timeout = "20s";
-              version = 3;
-              sec_level = "${cfg.telegraf.devices.aruba.switch.snmpRFCv3.security.level}";
-              sec_name = "${cfg.telegraf.devices.aruba.switch.snmpRFCv3.security.username}";
-              auth_protocol = "${cfg.telegraf.devices.aruba.switch.snmpRFCv3.authentication.protocol}";
-              auth_password = "${cfg.telegraf.devices.aruba.switch.snmpRFCv3.authentication.password}";
-              priv_protocol = "${cfg.telegraf.devices.aruba.switch.snmpRFCv3.privacy.protocol}";
-              priv_password = "${cfg.telegraf.devices.aruba.switch.snmpRFCv3.privacy.password}";
+              version = 2;
+              community = "${cfg.telegraf.devices.aruba.switch.snmpRFCv2.community.name}";
               retries = 5;
               field = [
                 {
