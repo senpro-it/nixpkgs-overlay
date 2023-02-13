@@ -48,6 +48,77 @@ let cfg = config.senpro; in {
       };
       devices = {
         aruba = {
+          mobility-gateway = {
+            enable = mkEnableOption ''
+              Whether to enable the Aruba Mobility Gateway monitoring via SNMP.
+            '';
+            agents = mkOption {
+              type = types.listOf types.str;
+              default = [];
+              example = literalExpression ''
+                [ "udp://192.168.178.1:161" ]
+              '';
+              description = lib.mdDoc ''
+                List of agents to monitor. Please look at the [documentation](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/snmp/README.md) for further information about formatting.
+              '';
+            };
+            snmpRFCv3 = {
+              authentication = {
+                protocol = mkOption {
+                  type = types.enum [ "MD5" "SHA" "SHA224" "SHA256" "SHA384" "SHA512" ];
+                  default = "MD5";
+                  example = "SHA";
+                  description = lib.mdDoc ''
+                    Authentication protocol used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+                password = mkOption {
+                  type = types.str;
+                  default = "yzL9sHgeYf5NJzaeAB73014M7XrY6Aagj8UhrHbePfCfxBa99uLzVrGC8ywhfW97";
+                  example = "VJQUpLCLGniEDVGK8Q0oPS9Yf0xObE7m8aCDK4FR7Kzzh47MD2ZQy0dVtTkDeKBd";
+                  description = lib.mdDoc ''
+                    Password used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+              };
+              privacy = {
+                protocol = mkOption {
+                  type = types.enum [ "DES" "AES" "AES192" "AES192C" "AES256" "AES256C" ];
+                  default = "MD5";
+                  example = "SHA";
+                  description = lib.mdDoc ''
+                    Privacy protocol used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+                password = mkOption {
+                  type = types.str;
+                  default = "qNMR7yeaIyQ8HKfRCZU8UW5AdKM6P56UALUeYATENOn4dX3nezXELwmLgpuMWKS2";
+                  example = "GO61HVwspXO514vbzZiV3IwGeBnSZsjHoBaHbJU4JgEaznJ4AdVTy0wzwpzgNffz";
+                  description = lib.mdDoc ''
+                    Password used by SNMPv3 to protect to connectiont to the agent.
+                  '';
+                };
+              };
+              security = {
+                level = mkOption {
+                  type = types.enum [ "noAuthNoPriv" "authNoPriv" "authPriv" ];
+                  default = "authPriv";
+                  example = "authPriv";
+                  description = lib.mdDoc ''
+                    Security level for SNMPv3. Look at the [documentation](https://snmp.com/snmpv3/snmpv3_intro.shtml) for further information.
+                  '';
+                };
+                username = mkOption {
+                  type = types.str;
+                  default = "monitor";
+                  example = "monitor";
+                  description = lib.mdDoc ''
+                    Username for SNMPv3. Also known as `Security Name`.
+                  '';
+                };
+              };
+            };
+          };
           switch = {
             enable = mkEnableOption ''
               Whether to enable the Aruba switch monitoring via SNMP.
@@ -380,6 +451,45 @@ let cfg = config.senpro; in {
         };
         inputs = {
           snmp = [
+            (lib.mkIf cfg.telegraf.devices.aruba.mobility-gateway.enable {
+              name = "aruba.mobility-gateway";
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
+              agents = cfg.telegraf.devices.aruba.mobility-gateway.agents;
+              timeout = "20s";
+              version = 3;
+              sec_level = "${cfg.telegraf.devices.aruba.mobility-gateway.snmpRFCv3.security.level}";
+              sec_name = "${cfg.telegraf.devices.aruba.mobility-gateway.snmpRFCv3.security.username}";
+              auth_protocol = "${cfg.telegraf.devices.aruba.mobility-gateway.snmpRFCv3.authentication.protocol}";
+              auth_password = "${cfg.telegraf.devices.aruba.mobility-gateway.snmpRFCv3.authentication.password}";
+              priv_protocol = "${cfg.telegraf.devices.aruba.mobility-gateway.snmpRFCv3.privacy.protocol}";
+              priv_password = "${cfg.telegraf.devices.aruba.mobility-gateway.snmpRFCv3.privacy.password}";
+              retries = 5;
+              field = [
+                {
+                  name = "contact";
+                  oid = "SNMPv2-MIB::sysContact.0";
+                }
+                {
+                  name = "description";
+                  oid = "SNMPv2-MIB::sysDescr.0";
+                }
+                {
+                  name = "hostname";
+                  oid = "SNMPv2-MIB::sysName.0";
+                }
+                {
+                  name = "uptime";
+                  oid = "SNMPv2-MIB::sysUpTime.0";
+                }
+              ];
+              table = [
+                {
+                  name = "aruba.mobility-gateway.access_points";
+                  oid = "WLSX-WLAN-MIB::wlsxWlanAPTable";
+                  index_as_tag = true;
+                }
+              ];
+            })
             (lib.mkIf cfg.telegraf.devices.aruba.switch.enable {
               name = "aruba.switch";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
