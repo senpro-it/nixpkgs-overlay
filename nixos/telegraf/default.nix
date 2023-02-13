@@ -52,15 +52,33 @@ let cfg = config.senpro; in {
             enable = mkEnableOption ''
               Whether to enable the Aruba Mobility Gateway monitoring via SNMP.
             '';
-            agents = mkOption {
-              type = types.listOf types.str;
-              default = [];
-              example = literalExpression ''
-                [ "udp://192.168.178.1:161" ]
+            hostMonitoring = {
+              agents = mkOption {
+                type = types.listOf types.str;
+                default = [];
+                example = literalExpression ''
+                  [ "udp://192.168.178.1:161" ]
+                '';
+                description = lib.mdDoc ''
+                  List of agents (explicit hosts) to monitor. Please look at the [documentation](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/snmp/README.md) for further information about formatting.
+                '';
+              };
+            };
+            apMonitoring = {
+              enable = mkEnableOption ''
+                Whether to enable the Aruba Mobility Gateway access point monitoring via SNMP.
               '';
-              description = lib.mdDoc ''
-                List of agents to monitor. Please look at the [documentation](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/snmp/README.md) for further information about formatting.
-              '';
+              agents = mkOption {
+                type = types.listOf types.str;
+                default = [];
+                example = literalExpression ''
+                  [ "udp://192.168.178.1:161" ]
+                '';
+                description = lib.mdDoc ''
+                  List of agents to monitor the access point. Please provide here the VRRP IP address, if you have configured redundancy. Otherwise you can provide the same agent IP address as under the `hostMonitoring` option.
+                  Please look at the [documentation](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/snmp/README.md) for further information about formatting.
+                '';
+              };
             };
             snmpRFCv3 = {
               authentication = {
@@ -452,9 +470,9 @@ let cfg = config.senpro; in {
         inputs = {
           snmp = [
             (lib.mkIf cfg.telegraf.devices.aruba.mobility-gateway.enable {
-              name = "aruba.mobility-gateway";
+              name = "aruba.mobility-gateway.host";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.telegraf.devices.aruba.mobility-gateway.agents;
+              agents = cfg.telegraf.devices.aruba.mobility-gateway.hostMonitoring.agents;
               timeout = "20s";
               version = 3;
               sec_level = "${cfg.telegraf.devices.aruba.mobility-gateway.snmpRFCv3.security.level}";
@@ -485,7 +503,33 @@ let cfg = config.senpro; in {
               ];
               table = [
                 {
-                  name = "aruba.mobility-gateway.access_points";
+                  name = "aruba.mobility-gateway.host.memory";
+                  oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtMemoryTable";
+                  inherit_tags = [ "hostname" ];
+                }
+                {
+                  name = "aruba.mobility-gateway.host.processor";
+                  oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtProcessorTable";
+                  inherit_tags = [ "hostname" ];
+                }
+              ];
+            })
+            (lib.mkIf cfg.telegraf.devices.aruba.mobility-gateway.apMonitoring.enable {
+              name = "aruba.mobility-gateway.ap";
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
+              agents = cfg.telegraf.devices.aruba.mobility-gateway.apMonitoring.agents;
+              timeout = "20s";
+              version = 3;
+              sec_level = "${cfg.telegraf.devices.aruba.mobility-gateway.snmpRFCv3.security.level}";
+              sec_name = "${cfg.telegraf.devices.aruba.mobility-gateway.snmpRFCv3.security.username}";
+              auth_protocol = "${cfg.telegraf.devices.aruba.mobility-gateway.snmpRFCv3.authentication.protocol}";
+              auth_password = "${cfg.telegraf.devices.aruba.mobility-gateway.snmpRFCv3.authentication.password}";
+              priv_protocol = "${cfg.telegraf.devices.aruba.mobility-gateway.snmpRFCv3.privacy.protocol}";
+              priv_password = "${cfg.telegraf.devices.aruba.mobility-gateway.snmpRFCv3.privacy.password}";
+              retries = 5;
+              table = [
+                {
+                  name = "aruba.mobility-gateway.ap.info";
                   oid = "WLSX-WLAN-MIB::wlsxWlanAPTable";
                   index_as_tag = true;
                   field = [
