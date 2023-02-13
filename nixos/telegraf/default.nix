@@ -488,13 +488,49 @@ let cfg = config.senpro; in {
                   oid = "SNMPv2-MIB::sysContact.0";
                 }
                 {
+                  name = "cpuModel";
+                  oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtProcessorModel.0";
+                }
+                {
+                  name = "cpuTotal";
+                  oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtTotalCpu.0";
+                }
+                {
+                  name = "cpuUsedPercent";
+                  oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtCpuUsedPercent.0";
+                }
+                {
                   name = "description";
                   oid = "SNMPv2-MIB::sysDescr.0";
                 }
                 {
+                  name = "fwVersion";
+                  oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtSwVersion.0";
+                }
+                {
                   name = "hostname";
-                  oid = "SNMPv2-MIB::sysName.0";
+                  oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtHostname.0";
                   is_tag = true;
+                }
+                {
+                  name = "hwVersion";
+                  oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtHwVersion.0";
+                }
+                {
+                  name = "memoryUsedPercent";
+                  oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtMemoryUsedPercent.0";
+                }
+                {
+                  name = "model";
+                  oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtModelName.0";
+                }
+                {
+                  name = "packetLossPercent";
+                  oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtMemoryUsedPercent.0";
+                }
+                {
+                  name = "serialNumber";
+                  oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtSerialNumber.0";
                 }
                 {
                   name = "uptime";
