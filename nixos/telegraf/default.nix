@@ -476,6 +476,7 @@ let cfg = config.senpro; in {
                 {
                   name = "hostname";
                   oid = "SNMPv2-MIB::sysName.0";
+                  is_tag = true;
                 }
                 {
                   name = "uptime";
@@ -487,6 +488,12 @@ let cfg = config.senpro; in {
                   name = "aruba.mobility-gateway.access_points";
                   oid = "WLSX-WLAN-MIB::wlsxWlanAPTable";
                   index_as_tag = true;
+                  field = [
+                    {
+                      oid = "WLSX-WLAN-MIB::wlanAPName";
+                      is_tag = true;
+                    }
+                  ];
                 }
               ];
             })
