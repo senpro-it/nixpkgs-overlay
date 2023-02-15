@@ -929,6 +929,7 @@ let cfg = config.senpro; in {
                 {
                   name = "hostname";
                   oid = "SFOS-FIREWALL-MIB::sfosDeviceName.0";
+                  is_tag = true;
                 }
                 {
                   name = "memoryCapacity";
