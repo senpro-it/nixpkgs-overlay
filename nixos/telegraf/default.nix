@@ -956,10 +956,12 @@ let cfg = config.senpro; in {
                 {
                   name = "sophos.xg.interfaces";
                   oid = "IF-MIB::ifTable";
+                  inherit_tags = [ "hostname" ];
                 }
                 {
                   name = "sophos.xg.ipAddresses";
                   oid = "IP-MIB::ipAddrTable";
+                  inherit_tags = [ "hostname" ];
                 }
               ];
             })
