@@ -562,7 +562,6 @@ let cfg = config.senpro; in {
         grafana = {
           image = "docker.io/grafana/grafana:latest";
           autoStart = true;
-          user = "104:104";
           dependsOn = [
             "grafana-influxdb"
           ];

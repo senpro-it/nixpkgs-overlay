@@ -1060,8 +1060,8 @@ let cfg = config.senpro; in {
                   oid = "SFOS-FIREWALL-MIB::sfosImap4Service.0";
                 }
                 {
-                  name = "serviceIP";
-                  oid = "SFOS-FIREWALL-MIB::sfosIPService.0";
+                  name = "serviceIPS";
+                  oid = "SFOS-FIREWALL-MIB::sfosIPSService.0";
                 }
                 {
                   name = "serviceIPSec";
