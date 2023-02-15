@@ -379,6 +379,77 @@ let cfg = config.senpro; in {
               };
             };
           };
+          xg = {
+            enable = mkEnableOption ''
+              Whether to enable the Sophos XG(S) monitoring via SNMP.
+            '';
+            agents = mkOption {
+              type = types.listOf types.str;
+              default = [];
+              example = literalExpression ''
+                [ "udp://192.168.178.1:161" ]
+              '';
+              description = lib.mdDoc ''
+                List of agents to monitor. Please look at the [documentation](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/snmp/README.md) for further information about formatting.
+              '';
+            };
+            snmpRFCv3 = {
+              authentication = {
+                protocol = mkOption {
+                  type = types.enum [ "MD5" "SHA" "SHA224" "SHA256" "SHA384" "SHA512" ];
+                  default = "MD5";
+                  example = "SHA";
+                  description = lib.mdDoc ''
+                    Authentication protocol used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+                password = mkOption {
+                  type = types.str;
+                  default = "7ecLyz7SWeDmzhZtgXFPRBuFofzpdhW0eXIt3yIYfrSpWGMJrEqfZws8OKPAQiJW";
+                  example = "kyM3JvtVY1BNodkxX9ac9MWbuyZPrBtsbL2phRemqqS3j7KL7nk93FJvM8WPTBJt";
+                  description = lib.mdDoc ''
+                    Password used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+              };
+              privacy = {
+                protocol = mkOption {
+                  type = types.enum [ "DES" "AES" "AES192" "AES192C" "AES256" "AES256C" ];
+                  default = "MD5";
+                  example = "SHA";
+                  description = lib.mdDoc ''
+                    Privacy protocol used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+                password = mkOption {
+                  type = types.str;
+                  default = "f3KZGL7C3s1J59JJ0AtI8p6A0PqfzJgdVOzixgyMil9UfCjZPSDBPIW3JoD14djr";
+                  example = "qTovtQJcmFGcafQDrUS888TkzoaNPkEkWSG2WNBwtba09C9O8zSobcOHhvaN4siL";
+                  description = lib.mdDoc ''
+                    Password used by SNMPv3 to protect to connectiont to the agent.
+                  '';
+                };
+              };
+              security = {
+                level = mkOption {
+                  type = types.enum [ "noAuthNoPriv" "authNoPriv" "authPriv" ];
+                  default = "authPriv";
+                  example = "authPriv";
+                  description = lib.mdDoc ''
+                    Security level for SNMPv3. Look at the [documentation](https://snmp.com/snmpv3/snmpv3_intro.shtml) for further information.
+                  '';
+                };
+                username = mkOption {
+                  type = types.str;
+                  default = "monitor";
+                  example = "monitor";
+                  description = lib.mdDoc ''
+                    Username for SNMPv3. Also known as `Security Name`.
+                  '';
+                };
+              };
+            };
+          };
         };
         synology = {
           nas = {
@@ -814,6 +885,80 @@ let cfg = config.senpro; in {
                 {
                   name = "sophos.sg.storage";
                   oid = "HOST-RESOURCES-MIB::hrStorageTable";
+                }
+              ];
+            })
+            (lib.mkIf cfg.telegraf.devices.sophos.xg.enable {
+              name = "sophos.xg";
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
+              agents = cfg.telegraf.devices.sophos.xg.agents;
+              timeout = "20s";
+              version = 3;
+              sec_level = "${cfg.telegraf.devices.sophos.xg.snmpRFCv3.security.level}";
+              sec_name = "${cfg.telegraf.devices.sophos.xg.snmpRFCv3.security.username}";
+              auth_protocol = "${cfg.telegraf.devices.sophos.xg.snmpRFCv3.authentication.protocol}";
+              auth_password = "${cfg.telegraf.devices.sophos.xg.snmpRFCv3.authentication.password}";
+              priv_protocol = "${cfg.telegraf.devices.sophos.xg.snmpRFCv3.privacy.protocol}";
+              priv_password = "${cfg.telegraf.devices.sophos.xg.snmpRFCv3.privacy.password}";
+              retries = 5;
+              field = [
+                {
+                  name = "contact";
+                  oid = "SNMPv2-MIB::sysContact.0";
+                }
+                {
+                  name = "description";
+                  oid = "SNMPv2-MIB::sysDescr.0";
+                }
+                {
+                  name = "deviceType";
+                  oid = "SFOS-FIREWALL-MIB::sfosDeviceType.0";
+                }
+                {
+                  name = "diskCapacity";
+                  oid = "SFOS-FIREWALL-MIB::sfosDiskCapacity.0";
+                }
+                {
+                  name = "diskPercentUsage";
+                  oid = "SFOS-FIREWALL-MIB::sfosDiskPercentUsage.0";
+                }
+                {
+                  name = "fwVersion";
+                  oid = "SFOS-FIREWALL-MIB::sfosDeviceFWVersion.0";
+                }
+                {
+                  name = "hostname";
+                  oid = "SFOS-FIREWALL-MIB::sfosDeviceName.0";
+                }
+                {
+                  name = "memoryCapacity";
+                  oid = "SFOS-FIREWALL-MIB::sfosMemoryCapacity.0";
+                }
+                {
+                  name = "memoryPercentUsage";
+                  oid = "SFOS-FIREWALL-MIB::sfosMemoryPercentUsage.0";
+                }
+                {
+                  name = "swapCapacity";
+                  oid = "SFOS-FIREWALL-MIB::sfosSwapCapacity.0";
+                }
+                {
+                  name = "swapPercentUsage";
+                  oid = "SFOS-FIREWALL-MIB::sfosSwapPercentUsage.0";
+                }
+                {
+                  name = "uptime";
+                  oid = "SFOS-FIREWALL-MIB::sfosUpTime.0";
+                }
+              ];
+              table = [
+                {
+                  name = "sophos.xg.interfaces";
+                  oid = "IF-MIB::ifTable";
+                }
+                {
+                  name = "sophos.xg.ipAddresses";
+                  oid = "IP-MIB::ipAddrTable";
                 }
               ];
             })
