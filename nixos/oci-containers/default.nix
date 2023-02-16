@@ -31,6 +31,16 @@ let cfg = config.senpro; in {
             Public URL for grafana. URL should point to the fully qualified, publicly accessible URL. Don't provide protocol, SSL is hardcoded. Subfolders are allowed.
           '';
         };
+        alertmanager = {
+          publicURL = mkOption {
+            type = types.str;
+            default = "alertmanager.local";
+            example = "alertmanager.example.com";
+            description = ''
+              URL of the alertmanager instance. Don't provide protocol, SSL is hardcoded.
+            '';
+          };
+        };
         influxdb = {
           publicURL = mkOption {
             type = types.str;
@@ -602,6 +612,22 @@ let cfg = config.senpro; in {
           volumes = [
             "grafana:/etc/grafana/provisioning"
             "grafana-data:/var/lib/grafana"
+          ];
+        };
+        grafana-alertmanager = {
+          image = "ghcr.io/senpro-it/alertmanager:main";
+          autoStart = true;
+          extraOptions = [
+            "--net=proxy"
+            "--label=traefik.enable=true"
+            "--label=traefik.http.routers.grafana-alertmanager.tls=true"
+            "--label=traefik.http.routers.grafana-alertmanager.entrypoints=https2-tcp"
+            "--label=traefik.http.routers.grafana-alertmanager.service=grafana-alertmanager"
+            "--label=traefik.http.routers.grafana-alertmanager.rule=Host(`${cfg.oci-containers.grafana.alertmanager.publicURL}`)"
+            "--label=traefik.http.services.grafana-alertmanager.loadBalancer.server.port=9093"
+          ];
+          volumes = [
+            "grafana-alertmanager-data:/alertmanager"
           ];
         };
         grafana-influxdb = {
