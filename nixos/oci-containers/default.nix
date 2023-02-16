@@ -812,20 +812,8 @@ let cfg = config.senpro; in {
         unifi-controller = {
           image = "lscr.io/linuxserver/unifi-controller:latest";
           autoStart = true;
-          extraOptions = [
-            "--net=proxy"
-            "--label=traefik.enable=true"
-            "--label=traefik.http.routers.unifi-controller.tls=true"
-            "--label=traefik.http.routers.unifi-controller.entrypoints=https2-tcp"
-            "--label=traefik.http.routers.unifi-controller.service=unifi-controller"
-            "--label=traefik.http.routers.unifi-controller.rule=Host(`${cfg.oci-containers.unifi-controller.publicURL}`)"
-            "--label=traefik.http.services.unifi-controller.loadBalancer.server.port=8443"
-            "--label=traefik.http.services.unifi-controller.loadBalancer.serversTransport=unifi-controller"
-            "--label=traefik.http.serversTransports.unifi-controller.serverName=${cfg.oci-containers.unifi-controller.publicURL}"
-            "--label=traefik.http.serversTransports.unifi-controller.insecureSkipVerify: true"
-          ];
           ports = [
-            "1900:1900/udp" "3478:3478/udp" "6789:6789/tcp" "8080:8080/tcp" "10001:10001/udp"
+            "1900:1900/udp" "3478:3478/udp" "6789:6789/tcp" "8080:8080/tcp" "8443:8443/tcp" "10001:10001/udp"
           ];
           environment = {
             PUID = "1000";
