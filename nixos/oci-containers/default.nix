@@ -830,8 +830,8 @@ let cfg = config.senpro; in {
           environment = {
             PUID = "1000";
             PGID = "1000";
-            MEM_LIMIT = "1024M";
-            MEM_STARTUP = "1024M";
+            MEM_LIMIT = "1024";
+            MEM_STARTUP = "1024";
           };
           volumes = [
             "unifi-controller:/config"
