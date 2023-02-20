@@ -236,6 +236,79 @@ let cfg = config.senpro; in {
             };
           };
         };
+        schneider-electric = {
+          apc = {
+            enable = mkEnableOption ''
+              Whether to enable the Schneider Electric APC monitoring via SNMP.
+            '';
+            agents = mkOption {
+              type = types.listOf types.str;
+              default = [];
+              example = literalExpression ''
+                [ "udp://192.168.178.1:161" ]
+              '';
+              description = lib.mdDoc ''
+                List of agents to monitor. Please look at the [documentation](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/snmp/README.md) for further information about formatting.
+              '';
+            };
+            snmpRFCv3 = {
+              authentication = {
+                protocol = mkOption {
+                  type = types.enum [ "MD5" "SHA" "SHA224" "SHA256" "SHA384" "SHA512" ];
+                  default = "MD5";
+                  example = "SHA";
+                  description = lib.mdDoc ''
+                    Authentication protocol used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+                password = mkOption {
+                  type = types.str;
+                  default = "55efh4eQ6cEhlkdMy0ilnKRnaE9wlQbsZZu1ykZLbiqUmMfmEZjsA5ZRKr8FwfF0";
+                  example = "RwYnBVLtIMHWYMhUzkv9UzIES6bKuarQ60cW6MORhOJwKuTaaxjXsMndzuSgV5Nr";
+                  description = lib.mdDoc ''
+                    Password used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+              };
+              privacy = {
+                protocol = mkOption {
+                  type = types.enum [ "DES" "AES" "AES192" "AES192C" "AES256" "AES256C" ];
+                  default = "MD5";
+                  example = "SHA";
+                  description = lib.mdDoc ''
+                    Privacy protocol used by SNMPv3 to authenticate at the agent.
+                  '';
+                };
+                password = mkOption {
+                  type = types.str;
+                  default = "9X3LPmK6AhFeB6YkkZPxq3LEksXBhXu41RgrygPjyYDuV4kARrYwOMpCiii6O79l";
+                  example = "yuwGPtf1Ky67OnqfFAw56XUae9MnxOqQSFNER9seMbyJz4qb4vL9sSWARJ2bu1Jt";
+                  description = lib.mdDoc ''
+                    Password used by SNMPv3 to protect to connectiont to the agent.
+                  '';
+                };
+              };
+              security = {
+                level = mkOption {
+                  type = types.enum [ "noAuthNoPriv" "authNoPriv" "authPriv" ];
+                  default = "authPriv";
+                  example = "authPriv";
+                  description = lib.mdDoc ''
+                    Security level for SNMPv3. Look at the [documentation](https://snmp.com/snmpv3/snmpv3_intro.shtml) for further information.
+                  '';
+                };
+                username = mkOption {
+                  type = types.str;
+                  default = "monitor";
+                  example = "monitor";
+                  description = lib.mdDoc ''
+                    Username for SNMPv3. Also known as `Security Name`.
+                  '';
+                };
+              };
+            };
+          };
+        };
         sonicwall = {
           enable = mkEnableOption ''
             Whether to enable the SonicWall monitoring via SNMP.
@@ -788,6 +861,158 @@ let cfg = config.senpro; in {
                 {
                   name = "qnap.volume";
                   oid = "QTS-MIB::volumeTable";
+                }
+              ];
+            })
+            (lib.mkIf cfg.telegraf.devices.schneider-electric.apc.enable {
+              name = "schneider-electric.apc";
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
+              agents = cfg.telegraf.devices.schneider-electric.apc.agents;
+              timeout = "20s";
+              version = 3;
+              sec_level = "${cfg.telegraf.devices.schneider-electric.apc.snmpRFCv3.security.level}";
+              sec_name = "${cfg.telegraf.devices.schneider-electric.apc.snmpRFCv3.security.username}";
+              auth_protocol = "${cfg.telegraf.devices.schneider-electric.apc.snmpRFCv3.authentication.protocol}";
+              auth_password = "${cfg.telegraf.devices.schneider-electric.apc.snmpRFCv3.authentication.password}";
+              priv_protocol = "${cfg.telegraf.devices.schneider-electric.apc.snmpRFCv3.privacy.protocol}";
+              priv_password = "${cfg.telegraf.devices.schneider-electric.apc.snmpRFCv3.privacy.password}";
+              retries = 5;
+              field = [
+                {
+                  name = "batteryActualVoltage";
+                  oid = "PowerNet-MIB::upsAdvBatteryActualVoltage.0";
+                }
+                {
+                  name = "batteryCapacity";
+                  oid = "PowerNet-MIB::upsAdvBatteryCapacity.0";
+                }
+                {
+                  name = "batteryNumOfBattPacks";
+                  oid = "PowerNet-MIB::upsAdvBatteryNumOfBattPacks.0";
+                }
+                {
+                  name = "batteryRunTimeRemaining";
+                  oid = "PowerNet-MIB::upsAdvBatteryRunTimeRemaining.0";
+                }
+                {
+                  name = "batteryReplaceDate";
+                  oid = "PowerNet-MIB::upsBasicBatteryLastReplaceDate.0";
+                }
+                {
+                  name = "batteryReplaceIndicator";
+                  oid = "PowerNet-MIB::upsAdvBatteryReplaceIndicator.0";
+                }
+                {
+                  name = "batteryStatus";
+                  oid = "PowerNet-MIB::upsBasicBatteryStatus.0";
+                }
+                {
+                  name = "batteryTemeperature";
+                  oid = "PowerNet-MIB::upsAdvBatteryTemperature.0";
+                }
+                {
+                  name = "batteryTimeON";
+                  oid = "PowerNet-MIB::upsBasicBatteryTimeOnBattery.0";
+                }
+                {
+                  name = "configNumDevices";
+                  oid = "PowerNet-MIB::upsBasicConfigNumDevices.0";
+                }
+                {
+                  name = "firmwareRevision";
+                  oid = "PowerNet-MIB::upsAdvIdentFirmwareRevision.0";
+                }
+                {
+                  name = "hostname";
+                  oid = "PowerNet-MIB::upsBasicIdentName.0";
+                  is_tag = true;
+                }
+                {
+                  name = "inputFrequency";
+                  oid = "PowerNet-MIB::upsHighPrecInputFrequency.0";
+                  conversion = "float(1)";
+                }
+                {
+                  name = "inputLineFailCause";
+                  oid = "PowerNet-MIB::upsAdvInputLineFailCause.0";
+                }
+                {
+                  name = "inputLineVoltage";
+                  oid = "PowerNet-MIB::upsHighPrecInputLineVoltage.0";
+                  conversion = "float(1)";
+                }
+                {
+                  name = "inputLineVoltageMin";
+                  oid = "PowerNet-MIB::upsHighPrecInputMinLineVoltage.0";
+                  conversion = "float(1)";
+                }
+                {
+                  name = "inputLineVoltageMax";
+                  oid = "PowerNet-MIB::upsHighPrecInputMaxLineVoltage.0";
+                  conversion = "float(1)";
+                }
+                {
+                  name = "model";
+                  oid = "PowerNet-MIB::upsBasicIdentModel.0";
+                }
+                {
+                  name = "outputStatus";
+                  oid = "PowerNet-MIB::upsBasicOutputStatus.0";
+                }
+                {
+                  name = "outputCurrent";
+                  oid = "PowerNet-MIB::upsHighPrecOutputLoad.0";
+                  conversion = "float(1)";
+                }
+                {
+                  name = "outputFrequency";
+                  oid = "PowerNet-MIB::upsHighPrecOutputFrequency.0";
+                  conversion = "float(1)";
+                }
+                {
+                  name = "outputLoad";
+                  oid = "PowerNet-MIB::upsHighPrecOutputLoad.0";
+                  conversion = "float(1)";
+                }
+                {
+                  name = "outputVoltage";
+                  oid = "PowerNet-MIB::upsHighPrecOutputVoltage.0";
+                  conversion = "float(1)";
+                }
+                {
+                  name = "serialNumber";
+                  oid = "PowerNet-MIB::upsAdvIdentSerialNumber.0";
+                }
+                {
+                  name = "testCalibrationLastRunning";
+                  oid = "PowerNet-MIB::upsAdvTestCalibrationDate.0";
+                }
+                {
+                  name = "testCalibrationLastSuccessful";
+                  oid = "PowerNet-MIB::upsAdvTestCalibrationLastSuccessfulDate.0";
+                }
+                {
+                  name = "testCalibrationResults";
+                  oid = "PowerNet-MIB::upsAdvTestCalibrationResults.0";
+                }
+                {
+                  name = "testDiagnosticsLastRunning";
+                  oid = "PowerNet-MIB::upsAdvTestLastDiagnosticsDate.0";
+                }
+                {
+                  name = "testDiagnosticsResults";
+                  oid = "PowerNet-MIB::upsAdvTestDiagnosticsResults.0";
+                }
+                {
+                  name = "testDiagnosticsSchedule";
+                  oid = "PowerNet-MIB::upsAdvTestDiagnosticSchedule.0";
+                }
+              ];
+              table = [
+                {
+                  name = "schneider-electric.apc.configDevice";
+                  oid = "PowerNet-MIB::upsBasicConfigDeviceTable";
+                  inherit_tags = [ "hostname" ];
                 }
               ];
             })
