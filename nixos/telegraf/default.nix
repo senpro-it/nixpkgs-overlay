@@ -774,62 +774,63 @@ let cfg = config.senpro; in {
               field = [
                 {
                   name = "hostname";
-                  oid = "QTS-MIB::hostname.0";
+                  oid = "SNMPv2-MIB::sysName.0";
+                  is_tag = true;
                 }
                 {
-                  name = "cpu_used";
+                  name = "cpuUsed";
                   oid = "QTS-MIB::systemCPU-Usage.0";
                 }
                 {
-                  name = "cpu_temp";
+                  name = "cpuTemperature";
                   oid = "QTS-MIB::cpuTemperature.0";
                 }
                 {
-                  name = "disk_count";
+                  name = "diskCount";
                   oid = "QTS-MIB::diskCount.0";
                 }
                 {
-                  name = "mem_free";
+                  name = "memFree";
                   oid = "QTS-MIB::systemFreeMem.0";
                 }
                 {
-                  name = "mem_used";
+                  name = "memUsed";
                   oid = "QTS-MIB::systemUsedMemory.0";
                 }
                 {
-                  name = "mem_total";
+                  name = "memTotal";
                   oid = "QTS-MIB::systemTotalMem.0";
                 }
                 {
-                  name = "raid_count";
+                  name = "raidCount";
                   oid = "QTS-MIB::raidCount.0";
                 }
                 {
-                  name = "system_model";
+                  name = "systemModel";
                   oid = "QTS-MIB::systemModel.0";
                 }
                 {
-                  name = "system_temp";
+                  name = "systemTemperature";
                   oid = "QTS-MIB::systemTemperature.0";
                 }
                 {
-                  name = "system_power";
+                  name = "systemPower";
                   oid = "QTS-MIB::sysPowerStatus.0";
                 }
                 {
-                  name = "system_uptime";
+                  name = "systemUptime";
                   oid = "QTS-MIB::sysUptime.0";
                 }
                 {
-                  name = "serial_number";
+                  name = "serialNumber";
                   oid = "QTS-MIB::serialNumber.0";
                 }
                 {
-                  name = "fw_version";
+                  name = "firmwareVersion";
                   oid = "QTS-MIB::firmwareVersion.0";
                 }
                 {
-                  name = "fw_up_available";
+                  name = "firmwareUpdateAvailable";
                   oid = "QTS-MIB::firmwareUpgradeAvailable.0";
                 }
               ];
@@ -837,30 +838,37 @@ let cfg = config.senpro; in {
                 {
                   name = "qnap.disk";
                   oid = "QTS-MIB::diskTable";
+                  inherit_tags = [ "hostname" ];
                 }
                 {
                   name = "qnap.interfaces";
                   oid = "NAS-MIB::systemIfTable";
+                  inherit_tags = [ "hostname" ];
                 }
                 {
                   name = "qnap.lun";
                   oid = "QTS-MIB::lunTable";
+                  inherit_tags = [ "hostname" ];
                 }
                 {
                   name = "qnap.raid";
                   oid = "QTS-MIB::raidTable";
+                  inherit_tags = [ "hostname" ];
                 }
                 {
                   name = "qnap.system_fan";
                   oid = "QTS-MIB::systemFanTable";
+                  inherit_tags = [ "hostname" ];
                 }
                 {
                   name = "qnap.target";
                   oid = "QTS-MIB::targeTable";
+                  inherit_tags = [ "hostname" ];
                 }
                 {
                   name = "qnap.volume";
                   oid = "QTS-MIB::volumeTable";
+                  inherit_tags = [ "hostname" ];
                 }
               ];
             })
@@ -907,7 +915,7 @@ let cfg = config.senpro; in {
                   oid = "PowerNet-MIB::upsBasicBatteryStatus.0";
                 }
                 {
-                  name = "batteryTemeperature";
+                  name = "batteryTemperature";
                   oid = "PowerNet-MIB::upsAdvBatteryTemperature.0";
                 }
                 {
