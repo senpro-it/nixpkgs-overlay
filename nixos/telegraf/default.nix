@@ -1375,6 +1375,7 @@ let cfg = config.senpro; in {
                 {
                   name = "hostname";
                   oid = "SNMPv2-MIB::sysName.0";
+                  is_tag = true;
                 }
                 {
                   name = "model";
@@ -1385,15 +1386,15 @@ let cfg = config.senpro; in {
                   oid = "SNMPv2-MIB::sysUpTime.0";
                 }
                 {
-                  name = "serial_number";
+                  name = "serialNumber";
                   oid = "SYNOLOGY-SYSTEM-MIB::serialNumber.0";
                 }
                 {
-                  name = "fw_version";
+                  name = "firmwareVersion";
                   oid = "SYNOLOGY-SYSTEM-MIB::version.0";
                 }
                 {
-                  name = "fw_up_available";
+                  name = "firmwareUpgradeAvailable";
                   oid = "SYNOLOGY-SYSTEM-MIB::upgradeAvailable.0";
                 }
               ];
@@ -1402,14 +1403,17 @@ let cfg = config.senpro; in {
                   name = "synology.nas.cpu";
                   oid = "HOST-RESOURCES-MIB::hrProcessorTable";
                   index_as_tag = true;
+                  inherit_tags = [ "hostname" ];
                 }
                 {
                   name = "synology.nas.disk";
                   oid = "SYNOLOGY-DISK-MIB::diskTable";
+                  inherit_tags = [ "hostname" ];
                 }
                 {
                   name = "synology.nas.raid";
                   oid = "SYNOLOGY-RAID-MIB::raidTable";
+                  inherit_tags = [ "hostname" ];
                 }
               ];
             })
