@@ -41,6 +41,34 @@ let cfg = config.senpro; in {
             '';
           };
         };
+        authProxy = {
+          noc = {
+            username = mkOption {
+              type = types.str;
+              default = "noc";
+              example = "noc";
+              description = ''
+                Username for the NOC (Network Operations Center) user.
+              '';
+            };
+            password = mkOption {
+              type = types.str;
+              default = "1HmuSzUoq1iAZfeF4zdRYuINYl0Poe5eXt43NokbAUK4SaoIOEMdwtqpPEMlwrK8";
+              example = "C6HmQc7iybQc1Mms3tUpsXaxuR77sZqeTQ8V9AGnChYoNYaFCSkQWycCuwA1e2TS";
+              description = ''
+                Password for the NOC (Network Operations Center) user.
+              '';
+            };
+          };
+          whitelist = mkOption {
+            type = types.str;
+            default = "192.168.1.0/24";
+            example = "192.168.1.0/24, 192.168.2.0/24";
+            description = ''
+              Whitelist of networks or hosts that allowed to use the auth proxy.
+            '';
+          };
+        };
         influxdb = {
           publicURL = mkOption {
             type = types.str;
@@ -583,6 +611,7 @@ let cfg = config.senpro; in {
             "--label=traefik.http.routers.grafana.service=grafana"
             "--label=traefik.http.routers.grafana.rule=Host(`${cfg.oci-containers.grafana.rootURL}`)"
             "--label=traefik.http.services.grafana.loadBalancer.server.port=3000"
+            "--label=traefik.http.middlewares.grafanaAuthProxy.basicAuth.users=${cfg.oci-containers.grafana.authProxy.noc.username}:${cfg.oci-containers.grafana.authProxy.noc.password}"
           ];
           environment = {
             GF_USERS_ALLOW_SIGN_UP = "false";
@@ -608,6 +637,11 @@ let cfg = config.senpro; in {
             GF_SMTP_PASSWORD = "${cfg.oci-containers.grafana.smtp.password}";
             GF_SMTP_FROM_NAME = "${cfg.oci-containers.grafana.smtp.displayName}";
             GF_SMTP_FROM_ADDRESS = "${cfg.oci-containers.grafana.smtp.from}";
+            GF_AUTH_PROXY_ENABLED = "true";
+            GF_AUTH_PROXY_HEADER_NAME = "X-WEBAUTH-USER";
+            GF_AUTH_PROXY_HEADER_PROPERTY = "username";
+            GF_AUTH_PROXY_AUTO_SIGN_UP = "true";
+            GF_AUTH_PROXY_WHITELIST = "${cfg.oci-containers.grafana.authProxy.whitelist}";
           };
           volumes = [
             "grafana:/etc/grafana/provisioning"

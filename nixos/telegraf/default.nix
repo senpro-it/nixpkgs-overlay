@@ -1047,12 +1047,25 @@ let cfg = config.senpro; in {
                   oid = "SNMPv2-MIB::sysDescr.0";
                 }
                 {
-                  name = "hostname";
+                  name = "host";
                   oid = "SNMPv2-MIB::sysName.0";
+                  is_tag = true;
+                }
+                {
+                  name = "firmwareVersion";
+                  oid = "SNWL-COMMON-MIB::snwlSysFirmwareVersion.0";
                 }
                 {
                   name = "model";
                   oid = "SNWL-COMMON-MIB::snwlSysModel.0";
+                }
+                {
+                  name = "romVersion";
+                  oid = "SNWL-COMMON-MIB::snwlSysROMVersion.0";
+                }
+                {
+                  name = "serialNumber";
+                  oid = "SNWL-COMMON-MIB::snwlSysSerialNumber.0";
                 }
                 {
                   name = "uptime";
@@ -1065,7 +1078,7 @@ let cfg = config.senpro; in {
                   oid = "IF-MIB::ifTable";
                 }
                 {
-                  name = "sonicwall.ip_addresses";
+                  name = "sonicwall.ipAddresses";
                   oid = "IP-MIB::ipAddrTable";
                 }
               ];
