@@ -652,7 +652,7 @@ let cfg = config.senpro; in {
                   oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtSwVersion.0";
                 }
                 {
-                  name = "hostname";
+                  name = "host";
                   oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtHostname.0";
                   is_tag = true;
                 }
@@ -685,12 +685,12 @@ let cfg = config.senpro; in {
                 {
                   name = "aruba.mobility-gateway.host.memory";
                   oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtMemoryTable";
-                  inherit_tags = [ "hostname" ];
+                  inherit_tags = [ "host" ];
                 }
                 {
                   name = "aruba.mobility-gateway.host.processor";
                   oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtProcessorTable";
-                  inherit_tags = [ "hostname" ];
+                  inherit_tags = [ "host" ];
                 }
               ];
             })
@@ -739,7 +739,7 @@ let cfg = config.senpro; in {
                   oid = "SNMPv2-MIB::sysDescr.0";
                 }
                 {
-                  name = "hostname";
+                  name = "host";
                   oid = "SNMPv2-MIB::sysName.0";
                 }
                 {
@@ -751,10 +751,12 @@ let cfg = config.senpro; in {
                 {
                   name = "aruba.switch.interfaces";
                   oid = "IF-MIB::ifTable";
+                  inherit_tags = [ "host" ];
                 }
                 {
-                  name = "aruba.switch.ip_addresses";
+                  name = "aruba.switch.ipAddresses";
                   oid = "IP-MIB::ipAddrTable";
+                  inherit_tags = [ "host" ];
                 }
               ];
             })
@@ -773,11 +775,6 @@ let cfg = config.senpro; in {
               retries = 5;
               field = [
                 {
-                  name = "hostname";
-                  oid = "SNMPv2-MIB::sysName.0";
-                  is_tag = true;
-                }
-                {
                   name = "cpuUsed";
                   oid = "QTS-MIB::systemCPU-Usage.0";
                 }
@@ -788,6 +785,11 @@ let cfg = config.senpro; in {
                 {
                   name = "diskCount";
                   oid = "QTS-MIB::diskCount.0";
+                }
+                {
+                  name = "host";
+                  oid = "SNMPv2-MIB::sysName.0";
+                  is_tag = true;
                 }
                 {
                   name = "memFree";
@@ -838,37 +840,37 @@ let cfg = config.senpro; in {
                 {
                   name = "qnap.disk";
                   oid = "QTS-MIB::diskTable";
-                  inherit_tags = [ "hostname" ];
+                  inherit_tags = [ "host" ];
                 }
                 {
                   name = "qnap.interfaces";
                   oid = "NAS-MIB::systemIfTable";
-                  inherit_tags = [ "hostname" ];
+                  inherit_tags = [ "host" ];
                 }
                 {
                   name = "qnap.lun";
                   oid = "QTS-MIB::lunTable";
-                  inherit_tags = [ "hostname" ];
+                  inherit_tags = [ "host" ];
                 }
                 {
                   name = "qnap.raid";
                   oid = "QTS-MIB::raidTable";
-                  inherit_tags = [ "hostname" ];
+                  inherit_tags = [ "host" ];
                 }
                 {
-                  name = "qnap.system_fan";
+                  name = "qnap.systemFan";
                   oid = "QTS-MIB::systemFanTable";
-                  inherit_tags = [ "hostname" ];
+                  inherit_tags = [ "host" ];
                 }
                 {
                   name = "qnap.target";
                   oid = "QTS-MIB::targeTable";
-                  inherit_tags = [ "hostname" ];
+                  inherit_tags = [ "host" ];
                 }
                 {
                   name = "qnap.volume";
                   oid = "QTS-MIB::volumeTable";
-                  inherit_tags = [ "hostname" ];
+                  inherit_tags = [ "host" ];
                 }
               ];
             })
@@ -931,7 +933,7 @@ let cfg = config.senpro; in {
                   oid = "PowerNet-MIB::upsAdvIdentFirmwareRevision.0";
                 }
                 {
-                  name = "hostname";
+                  name = "host";
                   oid = "PowerNet-MIB::upsBasicIdentName.0";
                   is_tag = true;
                 }
@@ -1020,7 +1022,7 @@ let cfg = config.senpro; in {
                 {
                   name = "schneider-electric.apc.configDevice";
                   oid = "PowerNet-MIB::upsBasicConfigDeviceTable";
-                  inherit_tags = [ "hostname" ];
+                  inherit_tags = [ "host" ];
                 }
               ];
             })
@@ -1076,10 +1078,12 @@ let cfg = config.senpro; in {
                 {
                   name = "sonicwall.interfaces";
                   oid = "IF-MIB::ifTable";
+                  inherit_tags = [ "host" ];
                 }
                 {
                   name = "sonicwall.ipAddresses";
                   oid = "IP-MIB::ipAddrTable";
+                  inherit_tags = [ "host" ];
                 }
               ];
             })
@@ -1106,7 +1110,7 @@ let cfg = config.senpro; in {
                   oid = "SNMPv2-MIB::sysDescr.0";
                 }
                 {
-                  name = "hostname";
+                  name = "host";
                   oid = "SNMPv2-MIB::sysName.0";
                 }
                 {
@@ -1119,18 +1123,22 @@ let cfg = config.senpro; in {
                   name = "sophos.sg.cpu";
                   oid = "HOST-RESOURCES-MIB::hrProcessorTable";
                   index_as_tag = true;
+                  inherit_tags = [ "host" ];
                 }
                 {
                   name = "sophos.sg.interfaces";
                   oid = "IF-MIB::ifTable";
+                  inherit_tags = [ "host" ];
                 }
                 {
-                  name = "sophos.sg.ip_addresses";
+                  name = "sophos.sg.ipAddresses";
                   oid = "IP-MIB::ipAddrTable";
+                  inherit_tags = [ "host" ];
                 }
                 {
                   name = "sophos.sg.storage";
                   oid = "HOST-RESOURCES-MIB::hrStorageTable";
+                  inherit_tags = [ "host" ];
                 }
               ];
             })
@@ -1173,7 +1181,7 @@ let cfg = config.senpro; in {
                   oid = "SFOS-FIREWALL-MIB::sfosDeviceFWVersion.0";
                 }
                 {
-                  name = "hostname";
+                  name = "host";
                   oid = "SFOS-FIREWALL-MIB::sfosDeviceName.0";
                   is_tag = true;
                 }
@@ -1354,12 +1362,12 @@ let cfg = config.senpro; in {
                 {
                   name = "sophos.xg.interfaces";
                   oid = "IF-MIB::ifTable";
-                  inherit_tags = [ "hostname" ];
+                  inherit_tags = [ "host" ];
                 }
                 {
                   name = "sophos.xg.ipAddresses";
                   oid = "IP-MIB::ipAddrTable";
-                  inherit_tags = [ "hostname" ];
+                  inherit_tags = [ "host" ];
                 }
               ];
             })
@@ -1386,7 +1394,7 @@ let cfg = config.senpro; in {
                   oid = "SNMPv2-MIB::sysDescr.0";
                 }
                 {
-                  name = "hostname";
+                  name = "host";
                   oid = "SNMPv2-MIB::sysName.0";
                   is_tag = true;
                 }
@@ -1416,17 +1424,17 @@ let cfg = config.senpro; in {
                   name = "synology.nas.cpu";
                   oid = "HOST-RESOURCES-MIB::hrProcessorTable";
                   index_as_tag = true;
-                  inherit_tags = [ "hostname" ];
+                  inherit_tags = [ "host" ];
                 }
                 {
                   name = "synology.nas.disk";
                   oid = "SYNOLOGY-DISK-MIB::diskTable";
-                  inherit_tags = [ "hostname" ];
+                  inherit_tags = [ "host" ];
                 }
                 {
                   name = "synology.nas.raid";
                   oid = "SYNOLOGY-RAID-MIB::raidTable";
-                  inherit_tags = [ "hostname" ];
+                  inherit_tags = [ "host" ];
                 }
               ];
             })
