@@ -1112,6 +1112,7 @@ let cfg = config.senpro; in {
                 {
                   name = "host";
                   oid = "SNMPv2-MIB::sysName.0";
+                  is_tag = true;
                 }
                 {
                   name = "uptime";
