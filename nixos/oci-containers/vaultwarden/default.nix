@@ -122,95 +122,61 @@ let cfg = config.senpro; in {
     };
   };
 
-  config = {
-    systemd.services = lib.mkIf (cfg.oci-containers != {}) {
-      "podman-vaultwarden-healthcheck" = lib.mkIf cfg.oci-containers.vaultwarden.enable {
-        serviceConfig.Type = "oneshot";
-          script = ''
-            ${pkgs.podman}/bin/podman healthcheck run vaultwarden
-          '';
-      };
+  config = mkIf cfg.oci-containers.vaultwarden.enable {
+    systemd.services."podman-vaultwarden-healthcheck" = {
+      serviceConfig.Type = "oneshot";
+      script = ''
+        ${pkgs.podman}/bin/podman healthcheck run vaultwarden
+      '';
     };
-    systemd.timers."podman-vaultwarden-healthcheck" = lib.mkIf cfg.oci-containers.vaultwarden.enable {
+    systemd.timers."podman-vaultwarden-healthcheck" = {
       wantedBy = [ "timers.target" ];
       timerConfig = {
         OnCalendar = "*:0/1";
         Unit = "podman-vaultwarden-healthcheck.service";
       };
     };
-    virtualisation.oci-containers.containers = lib.mkIf (cfg.oci-containers != {}) (lib.mkMerge [
-      (lib.mkIf cfg.oci-containers.vaultwarden.enable {
-        vaultwarden = {
-          image = "docker.io/vaultwarden/server:latest";
-          autoStart = true;
-          dependsOn = [
-            "vaultwarden-postgres"
-          ];
-          extraOptions = [
-            "--net=proxy"
-            "--label=traefik.enable=true"
-            "--label=traefik.http.routers.vaultwarden.tls=true"
-            "--label=traefik.http.routers.vaultwarden.tls.certresolver=letsEncrypt"
-            "--label=traefik.http.routers.vaultwarden.entrypoints=https2-tcp"
-            "--label=traefik.http.routers.vaultwarden.service=vaultwarden"
-            "--label=traefik.http.routers.vaultwarden.rule=Host(`${cfg.oci-containers.vaultwarden.publicURL}`)"
-            "--label=traefik.http.services.vaultwarden.loadBalancer.server.port=80"
-            "--label=traefik.http.routers.vaultwarden-websocket.tls=true"
-            "--label=traefik.http.routers.vaultwarden-websocket.entrypoints=https2-tcp"
-            "--label=traefik.http.routers.vaultwarden-websocket.service=vaultwarden-websocket"
-            "--label=traefik.http.routers.vaultwarden-websocket.rule=Host(`${cfg.oci-containers.vaultwarden.publicURL}`) && Path(`/notifications/hub`)"
-            "--label=traefik.http.services.vaultwarden-websocket.loadBalancer.server.port=3012"
-            "--healthcheck-retries=10"
-            "--healthcheck-interval=60s"
-            "--healthcheck-start-period=1m"
-            "--healthcheck-command=curl http://localhost:80/alive || exit 1"
-          ];
-          environment = {
-            HIBP_API_KEY = "${cfg.oci-containers.vaultwarden.hibpApiKey}";
-            DOMAIN = "https://${cfg.oci-containers.vaultwarden.publicURL}";
-            SIGNUPS_ALLOWED = "false";
-            SMTP_HOST = "${cfg.oci-containers.vaultwarden.smtp.host}";
-            SMTP_PORT = "${toString cfg.oci-containers.vaultwarden.smtp.port}";
-            SMTP_FROM = "${cfg.oci-containers.vaultwarden.smtp.from}";
-            SMTP_FROM_NAME = "${cfg.oci-containers.vaultwarden.smtp.displayName}";
-            SMTP_SECURITY = "${cfg.oci-containers.vaultwarden.smtp.tlsPolicy}";
-            SMTP_USERNAME = "${cfg.oci-containers.vaultwarden.smtp.username}";
-            SMTP_PASSWORD = "${cfg.oci-containers.vaultwarden.smtp.password}";
-            WEBSOCKET_ENABLED = "true";
-            ADMIN_TOKEN = "${cfg.oci-containers.vaultwarden.adminToken}";
-            DATABASE_URL = "/data/db.sqlite3";
-          };
-          volumes = [ "vaultwarden-data:/data" ];
+    virtualisation.oci-containers.containers = {
+      vaultwarden = {
+        image = "docker.io/vaultwarden/server:1.27.0";
+        autoStart = true;
+        extraOptions = [
+          "--net=proxy"
+          "--label=traefik.enable=true"
+          "--label=traefik.http.routers.vaultwarden.tls=true"
+          "--label=traefik.http.routers.vaultwarden.tls.certresolver=letsencrypt"
+          "--label=traefik.http.routers.vaultwarden.entrypoints=https"
+          "--label=traefik.http.routers.vaultwarden.service=vaultwarden"
+          "--label=traefik.http.routers.vaultwarden.rule=Host(`${cfg.oci-containers.vaultwarden.publicURL}`)"
+          "--label=traefik.http.services.vaultwarden.loadBalancer.server.port=80"
+          "--label=traefik.http.routers.vaultwarden-websocket.tls=true"
+          "--label=traefik.http.routers.vaultwarden-websocket.entrypoints=https"
+          "--label=traefik.http.routers.vaultwarden-websocket.service=vaultwarden-websocket"
+          "--label=traefik.http.routers.vaultwarden-websocket.rule=Host(`${cfg.oci-containers.vaultwarden.publicURL}`) && Path(`/notifications/hub`)"
+          "--label=traefik.http.services.vaultwarden-websocket.loadBalancer.server.port=3012"
+          "--healthcheck-retries=10"
+          "--healthcheck-interval=60s"
+          "--healthcheck-start-period=1m"
+          "--healthcheck-command=curl http://localhost:80/alive || exit 1"
+        ];
+        environment = {
+          HIBP_API_KEY = "${cfg.oci-containers.vaultwarden.hibpApiKey}";
+          DOMAIN = "https://${cfg.oci-containers.vaultwarden.publicURL}";
+          SIGNUPS_ALLOWED = "false";
+          SMTP_HOST = "${cfg.oci-containers.vaultwarden.smtp.host}";
+          SMTP_PORT = "${toString cfg.oci-containers.vaultwarden.smtp.port}";
+          SMTP_FROM = "${cfg.oci-containers.vaultwarden.smtp.from}";
+          SMTP_FROM_NAME = "${cfg.oci-containers.vaultwarden.smtp.displayName}";
+          SMTP_SECURITY = "${cfg.oci-containers.vaultwarden.smtp.tlsPolicy}";
+          SMTP_USERNAME = "${cfg.oci-containers.vaultwarden.smtp.username}";
+          SMTP_PASSWORD = "${cfg.oci-containers.vaultwarden.smtp.password}";
+          WEBSOCKET_ENABLED = "true";
+          ADMIN_TOKEN = "${cfg.oci-containers.vaultwarden.adminToken}";
+          DATABASE_URL = "/data/db.sqlite3";
         };
-        vaultwarden-mariadb = {
-          image = "docker.io/library/mariadb:latest";
-          autoStart = true;
-          extraOptions = [
-            "--net=proxy"
-          ];
-          environment = {
-            MARIADB_DATABASE = "vaultwarden";
-            MARIADB_USER = "vaultwarden";
-            MARIADB_PASSWORD = "${cfg.oci-containers.vaultwarden.mariadb.password}";
-            MARIADB_ROOT_PASSWORD = "${cfg.oci-containers.vaultwarden.mariadb.rootPassword}";
-          };
-          volumes = [ "vaultwarden-mariadb-data:/var/lib/mysql" ];
-        };
-        vaultwarden-postgres = {
-          image = "docker.io/library/postgres:latest";
-          autoStart = true;
-          extraOptions = [
-            "--net=proxy"
-          ];
-          environment = {
-            POSTGRES_DB = "vaultwarden";
-            POSTGRES_USER = "vaultwarden";
-            POSTGRES_PASSWORD = "${cfg.oci-containers.vaultwarden.postgres.password}";
-          };
-          volumes = [ "vaultwarden-postgres-data:/var/lib/postgresql/data" ];
-        };
-      })
-    ]);
+        volumes = [ "vaultwarden-data:/data" ];
+      };
+    };
   };
 
 }
