@@ -50,52 +50,50 @@ let cfg = config.senpro; in {
     };
   };
 
-  config = {
-    virtualisation.oci-containers.containers = lib.mkIf (cfg.oci-containers != {}) (lib.mkMerge [
-      (lib.mkIf cfg.oci-containers.keycloak.enable {
-        keycloak = {
-          image = "quay.io/keycloak/keycloak:latest";
-          autoStart = true;
-          cmd = [ "start" "--auto-build" ];
-          dependsOn = [
-            "keycloak-postgres"
-          ];
-          extraOptions = [
-            "--net=proxy"
-            "--label=traefik.enable=true"
-            "--label=traefik.http.routers.keycloak.tls=true"
-            "--label=traefik.http.routers.keycloak.entrypoints=https2-tcp"
-            "--label=traefik.http.routers.keycloak.service=keycloak"
-            "--label=traefik.http.routers.keycloak.rule=Host(`${cfg.oci-containers.keycloak.publicURL}`)"
-            "--label=traefik.http.services.keycloak.loadBalancer.server.port=8080"
-          ];
-          environment = {
-            KC_DB = "postgres";
-            KC_DB_URL = "jdbc:postgresql://keycloak-postgres:5432/keycloak";
-            KC_DB_USER = "keycloak";
-            KC_DB_SCHEMA = "public";
-            KC_DB_PASSWORD = "${cfg.oci-containers.keycloak.postgres.password}";
-            KC_HOSTNAME = "${cfg.oci-containers.keycloak.publicURL}";
-            KEYCLOAK_ADMIN = "${cfg.oci-containers.keycloak.admin.username}";
-            KEYCLOAK_ADMIN_PASSWORD = "${cfg.oci-containers.keycloak.admin.password}";
-            KC_PROXY = "edge";
-          };
+  config = mkIf cfg.oci-containers.keycloak.enable {
+    virtualisation.oci-containers.containers = {
+      keycloak = {
+        image = "quay.io/keycloak/keycloak:21.0";
+        autoStart = true;
+        cmd = [ "start" "--auto-build" ];
+        dependsOn = [
+          "keycloak-postgres"
+        ];
+        extraOptions = [
+          "--net=proxy"
+          "--label=traefik.enable=true"
+          "--label=traefik.http.routers.keycloak.tls=true"
+          "--label=traefik.http.routers.keycloak.entrypoints=https"
+          "--label=traefik.http.routers.keycloak.service=keycloak"
+          "--label=traefik.http.routers.keycloak.rule=Host(`${cfg.oci-containers.keycloak.publicURL}`)"
+          "--label=traefik.http.services.keycloak.loadBalancer.server.port=8080"
+        ];
+        environment = {
+          KC_DB = "postgres";
+          KC_DB_URL = "jdbc:postgresql://keycloak-postgres:5432/keycloak";
+          KC_DB_USER = "keycloak";
+          KC_DB_SCHEMA = "public";
+          KC_DB_PASSWORD = "${cfg.oci-containers.keycloak.postgres.password}";
+          KC_HOSTNAME = "${cfg.oci-containers.keycloak.publicURL}";
+          KEYCLOAK_ADMIN = "${cfg.oci-containers.keycloak.admin.username}";
+          KEYCLOAK_ADMIN_PASSWORD = "${cfg.oci-containers.keycloak.admin.password}";
+          KC_PROXY = "edge";
         };
-        keycloak-postgres = {
-          image = "docker.io/library/postgres:latest";
-          autoStart = true;
-          extraOptions = [
-            "--net=proxy"
-          ];
-          environment = {
-            POSTGRES_DB = "keycloak";
-            POSTGRES_USER = "keycloak";
-            POSTGRES_PASSWORD = "${cfg.oci-containers.keycloak.postgres.password}";
-          };
-          volumes = [ "keycloak-postgres-data:/var/lib/postgresql/data" ];
+      };
+      keycloak-postgres = {
+        image = "docker.io/library/postgres:latest";
+        autoStart = true;
+        extraOptions = [
+          "--net=proxy"
+        ];
+        environment = {
+          POSTGRES_DB = "keycloak";
+          POSTGRES_USER = "keycloak";
+          POSTGRES_PASSWORD = "${cfg.oci-containers.keycloak.postgres.password}";
         };
-      })
-    ]);
+        volumes = [ "keycloak-postgres-data:/var/lib/postgresql/data" ];
+      };
+    };
   };
 
 }
