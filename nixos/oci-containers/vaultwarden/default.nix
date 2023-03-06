@@ -144,7 +144,6 @@ let cfg = config.senpro; in {
           "--net=proxy"
           "--label=traefik.enable=true"
           "--label=traefik.http.routers.vaultwarden.tls=true"
-          "--label=traefik.http.routers.vaultwarden.tls.certresolver=letsencrypt"
           "--label=traefik.http.routers.vaultwarden.entrypoints=https"
           "--label=traefik.http.routers.vaultwarden.service=vaultwarden"
           "--label=traefik.http.routers.vaultwarden.rule=Host(`${cfg.oci-containers.vaultwarden.publicURL}`)"
