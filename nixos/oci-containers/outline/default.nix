@@ -143,103 +143,101 @@ let cfg = config.senpro; in {
     };
   };
 
-  config = {
-    virtualisation.oci-containers.containers = lib.mkIf (cfg.oci-containers != {}) (lib.mkMerge [
-      (lib.mkIf cfg.oci-containers.outline.enable {
-        outline = {
-          image = "docker.io/outlinewiki/outline:latest";
-          autoStart = true;
-          user = "root";
-          cmd = [ "yarn" "start" "--env=production-ssl-disabled" ];
-          dependsOn = [
-            "outline-minio"
-            "outline-redis"
-            "outline-postgres"
-          ];
-          extraOptions = [
-            "--net=proxy"
-            "--label=traefik.enable=true"
-            "--label=traefik.http.routers.outline.tls=true"
-            "--label=traefik.http.routers.outline.entrypoints=https2-tcp"
-            "--label=traefik.http.routers.outline.service=outline"
-            "--label=traefik.http.routers.outline.rule=Host(`${cfg.oci-containers.outline.publicURL}`)"
-            "--label=traefik.http.services.outline.loadBalancer.server.port=3000"
-          ];
-          environment = {
-            SECRET_KEY = "${cfg.oci-containers.outline.secret}";
-            UTILS_SECRET = "${cfg.oci-containers.outline.utils_secret}";
-            PGSSLMODE = "disable";
-            DATABASE_URL = "postgres://outline:${cfg.oci-containers.outline.postgres.password}@outline-postgres:5432/outline";
-            REDIS_URL = "redis://outline-redis:6379";
-            URL = "https://${cfg.oci-containers.outline.publicURL}";
-            PORT = "3000";
-            FORCE_HTTPS = "false";
-            AWS_ACCESS_KEY_ID = "minio";
-            AWS_REGION = "eu-west-1";
-            AWS_SECRET_ACCESS_KEY = "${cfg.oci-containers.outline.minio.password}";
-            AWS_S3_UPLOAD_BUCKET_URL = "https://${cfg.oci-containers.outline.minio.uploadBucketURL}";
-            AWS_S3_UPLOAD_BUCKET_NAME = "outline";
-            AWS_S3_UPLOAD_MAX_SIZE = "26214400";
-            AWS_S3_FORCE_PATH_STYLE = "true";
-            AWS_S3_ACL = "private";
-            SMTP_HOST = "${cfg.oci-containers.outline.smtp.host}";
-            SMTP_PORT = "${toString cfg.oci-containers.outline.smtp.port}";
-            SMTP_USERNAME = "${cfg.oci-containers.outline.smtp.username}";
-            SMTP_PASSWORD = "${cfg.oci-containers.outline.smtp.password}";
-            SMTP_FROM_EMAIL = "${cfg.oci-containers.outline.smtp.from}";
-            OIDC_CLIENT_ID = "outline";
-            OIDC_CLIENT_SECRET = "${cfg.oci-containers.outline.keycloak.client.secret}";
-            OIDC_AUTH_URI = "https://${cfg.oci-containers.outline.keycloak.provider}/realms/${cfg.oci-containers.outline.keycloak.realm}/protocol/openid-connect/auth";
-            OIDC_TOKEN_URI = "https://${cfg.oci-containers.outline.keycloak.provider}/realms/${cfg.oci-containers.outline.keycloak.realm}/protocol/openid-connect/token";
-            OIDC_USERINFO_URI = "https://${cfg.oci-containers.outline.keycloak.provider}/realms/${cfg.oci-containers.outline.keycloak.realm}/protocol/openid-connect/userinfo";
-            OIDC_USERNAME_CLAIM = "email";
-            OIDC_DISPLAY_NAME = "Keycloak";
-            OIDC_SCOPES = "openid profile email";
-          };
+  config = mkIf cfg.oci-containers.outline.enable {
+    virtualisation.oci-containers.containers = {
+      outline = {
+        image = "docker.io/outlinewiki/outline:0.68.1";
+        autoStart = true;
+        user = "root";
+        cmd = [ "yarn" "start" "--env=production-ssl-disabled" ];
+        dependsOn = [
+          "outline-minio"
+          "outline-redis"
+          "outline-postgres"
+        ];
+        extraOptions = [
+          "--net=proxy"
+          "--label=traefik.enable=true"
+          "--label=traefik.http.routers.outline.tls=true"
+          "--label=traefik.http.routers.outline.entrypoints=https"
+          "--label=traefik.http.routers.outline.service=outline"
+          "--label=traefik.http.routers.outline.rule=Host(`${cfg.oci-containers.outline.publicURL}`)"
+          "--label=traefik.http.services.outline.loadBalancer.server.port=3000"
+        ];
+        environment = {
+          SECRET_KEY = "${cfg.oci-containers.outline.secret}";
+          UTILS_SECRET = "${cfg.oci-containers.outline.utils_secret}";
+          PGSSLMODE = "disable";
+          DATABASE_URL = "postgres://outline:${cfg.oci-containers.outline.postgres.password}@outline-postgres:5432/outline";
+          REDIS_URL = "redis://outline-redis:6379";
+          URL = "https://${cfg.oci-containers.outline.publicURL}";
+          PORT = "3000";
+          FORCE_HTTPS = "false";
+          AWS_ACCESS_KEY_ID = "minio";
+          AWS_REGION = "eu-west-1";
+          AWS_SECRET_ACCESS_KEY = "${cfg.oci-containers.outline.minio.password}";
+          AWS_S3_UPLOAD_BUCKET_URL = "https://${cfg.oci-containers.outline.minio.uploadBucketURL}";
+          AWS_S3_UPLOAD_BUCKET_NAME = "outline";
+          AWS_S3_UPLOAD_MAX_SIZE = "26214400";
+          AWS_S3_FORCE_PATH_STYLE = "true";
+          AWS_S3_ACL = "private";
+          SMTP_HOST = "${cfg.oci-containers.outline.smtp.host}";
+          SMTP_PORT = "${toString cfg.oci-containers.outline.smtp.port}";
+          SMTP_USERNAME = "${cfg.oci-containers.outline.smtp.username}";
+          SMTP_PASSWORD = "${cfg.oci-containers.outline.smtp.password}";
+          SMTP_FROM_EMAIL = "${cfg.oci-containers.outline.smtp.from}";
+          OIDC_CLIENT_ID = "outline";
+          OIDC_CLIENT_SECRET = "${cfg.oci-containers.outline.keycloak.client.secret}";
+          OIDC_AUTH_URI = "https://${cfg.oci-containers.outline.keycloak.provider}/realms/${cfg.oci-containers.outline.keycloak.realm}/protocol/openid-connect/auth";
+          OIDC_TOKEN_URI = "https://${cfg.oci-containers.outline.keycloak.provider}/realms/${cfg.oci-containers.outline.keycloak.realm}/protocol/openid-connect/token";
+          OIDC_USERINFO_URI = "https://${cfg.oci-containers.outline.keycloak.provider}/realms/${cfg.oci-containers.outline.keycloak.realm}/protocol/openid-connect/userinfo";
+          OIDC_USERNAME_CLAIM = "email";
+          OIDC_DISPLAY_NAME = "Keycloak";
+          OIDC_SCOPES = "openid profile email";
         };
-        outline-minio = {
-          image = "quay.io/minio/minio:latest";
-          autoStart = true;
-          cmd = [ "server" "/data" "--console-address" ":9001" ];
-          extraOptions = [
-            "--net=proxy"
-            "--label=traefik.enable=true"
-            "--label=traefik.http.routers.outline-minio.tls=true"
-            "--label=traefik.http.routers.outline-minio.entrypoints=https2-tcp"
-            "--label=traefik.http.routers.outline-minio.service=outline-minio"
-            "--label=traefik.http.routers.outline-minio.rule=Host(`${cfg.oci-containers.outline.minio.uploadBucketURL}`)"
-            "--label=traefik.http.services.outline-minio.loadBalancer.server.port=9000"
-            "--label=traefik.http.routers.outline-minio-console.tls=true"
-            "--label=traefik.http.routers.outline-minio-console.entrypoints=https2-tcp"
-            "--label=traefik.http.routers.outline-minio-console.service=outline-minio-console"
-            "--label=traefik.http.routers.outline-minio-console.rule=Host(`${cfg.oci-containers.outline.minio.adminConsoleURL}`)"
-            "--label=traefik.http.services.outline-minio-console.loadBalancer.server.port=9001"
-          ];
-          environment = {
-            MINIO_ROOT_USER = "minio";
-            MINIO_ROOT_PASSWORD = "${cfg.oci-containers.outline.minio.password}";
-            MINIO_BROWSER_REDIRECT_URL = "https://${cfg.oci-containers.outline.minio.adminConsoleURL}";
-          };
-          volumes = [ "outline-minio-data:/data" ];
+      };
+      outline-minio = {
+        image = "quay.io/minio/minio:latest";
+        autoStart = true;
+        cmd = [ "server" "/data" "--console-address" ":9001" ];
+        extraOptions = [
+          "--net=proxy"
+          "--label=traefik.enable=true"
+          "--label=traefik.http.routers.outline-minio.tls=true"
+          "--label=traefik.http.routers.outline-minio.entrypoints=https"
+          "--label=traefik.http.routers.outline-minio.service=outline-minio"
+          "--label=traefik.http.routers.outline-minio.rule=Host(`${cfg.oci-containers.outline.minio.uploadBucketURL}`)"
+          "--label=traefik.http.services.outline-minio.loadBalancer.server.port=9000"
+          "--label=traefik.http.routers.outline-minio-console.tls=true"
+          "--label=traefik.http.routers.outline-minio-console.entrypoints=https"
+          "--label=traefik.http.routers.outline-minio-console.service=outline-minio-console"
+          "--label=traefik.http.routers.outline-minio-console.rule=Host(`${cfg.oci-containers.outline.minio.adminConsoleURL}`)"
+          "--label=traefik.http.services.outline-minio-console.loadBalancer.server.port=9001"
+        ];
+        environment = {
+          MINIO_ROOT_USER = "minio";
+          MINIO_ROOT_PASSWORD = "${cfg.oci-containers.outline.minio.password}";
+          MINIO_BROWSER_REDIRECT_URL = "https://${cfg.oci-containers.outline.minio.adminConsoleURL}";
         };
-        outline-redis = {
-          image = "docker.io/library/redis:latest";
-          autoStart = true;
-          extraOptions = [ "--net=proxy" ];
+        volumes = [ "outline-minio-data:/data" ];
+      };
+      outline-redis = {
+        image = "docker.io/library/redis:latest";
+        autoStart = true;
+        extraOptions = [ "--net=proxy" ];
+      };
+      outline-postgres = {
+        image = "docker.io/library/postgres:latest";
+        autoStart = true;
+        extraOptions = [ "--net=proxy" ];
+        environment = {
+          POSTGRES_DB = "outline";
+          POSTGRES_USER = "outline";
+          POSTGRES_PASSWORD = "${cfg.oci-containers.outline.postgres.password}";
         };
-        outline-postgres = {
-          image = "docker.io/library/postgres:latest";
-          autoStart = true;
-          extraOptions = [ "--net=proxy" ];
-          environment = {
-            POSTGRES_DB = "outline";
-            POSTGRES_USER = "outline";
-            POSTGRES_PASSWORD = "${cfg.oci-containers.outline.postgres.password}";
-          };
-          volumes = [ "outline-postgres-data:/var/lib/postgresql/data" ];
-        };
-      })
-    ]);
+        volumes = [ "outline-postgres-data:/var/lib/postgresql/data" ];
+      };
+    };
   };
 
 }
