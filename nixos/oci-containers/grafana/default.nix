@@ -150,7 +150,7 @@ let cfg = config.senpro; in {
   config = mkIf cfg.oci-containers.grafana.enable {
     virtualisation.oci-containers.containers = {
       grafana = {
-        image = "docker.io/grafana/grafana:9.4.3";
+        image = "docker.io/grafana/grafana:9.3.8";
         autoStart = true;
         dependsOn = [
           "grafana-influxdb"
@@ -158,6 +158,7 @@ let cfg = config.senpro; in {
         extraOptions = [
           "--net=proxy"
           "--label=traefik.enable=true"
+          "--label=traefik.docker.network=proxy"
           "--label=traefik.http.routers.grafana.tls=true"
           "--label=traefik.http.routers.grafana.entrypoints=https"
           "--label=traefik.http.routers.grafana.service=grafana"
@@ -206,6 +207,7 @@ let cfg = config.senpro; in {
         extraOptions = [
           "--net=proxy"
           "--label=traefik.enable=true"
+          "--label=traefik.docker.network=proxy"
           "--label=traefik.http.routers.grafana-alertmanager.tls=true"
           "--label=traefik.http.routers.grafana-alertmanager.entrypoints=https"
           "--label=traefik.http.routers.grafana-alertmanager.service=grafana-alertmanager"
@@ -222,6 +224,7 @@ let cfg = config.senpro; in {
         extraOptions = [
           "--net=proxy"
           "--label=traefik.enable=true"
+          "--label=traefik.docker.network=proxy"
           "--label=traefik.http.routers.grafana-influxdb.tls=true"
           "--label=traefik.http.routers.grafana-influxdb.entrypoints=https"
           "--label=traefik.http.routers.grafana-influxdb.service=grafana-influxdb"

@@ -85,6 +85,7 @@ let cfg = config.senpro; in {
           TRAEFIK_ENTRYPOINTS_HTTPS_ADDRESS = ":443";
           TRAEFIK_ENTRYPOINTS_HTTPS_HTTP3_ADVERTISEDPORT = "443";
           TRAEFIK_EXPERIMENTAL_HTTP3 = "true";
+          TRAEFIK_LOG_LEVEL = "DEBUG";
           TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT = "false";
           TRAEFIK_PROVIDERS_FILE_DIRECTORY = "/etc/traefik/conf.d";
         };
