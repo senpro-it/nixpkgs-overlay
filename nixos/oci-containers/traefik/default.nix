@@ -21,10 +21,10 @@ let cfg = config.senpro; in {
 
   config = mkIf cfg.oci-containers.traefik.enable {
     boot.kernel.sysctl."net.core.rmem_max" = 2500000;
-    systemd.services.podman-traefik-dynamic = {
+    systemd.services.podman-traefik-provisioning = {
       enable = true;
       description = "Dynamic config provisioning for Traefik";
-      after = [ "podman-traefik.service" ];
+      requiredBy = [ "podman-traefik.service" ];
       restartIfChanged = true;
       preStart = ''
         ${pkgs.coreutils-full}/bin/mkdir /var/lib/containers/storage/volumes/traefik/_data/conf.d
