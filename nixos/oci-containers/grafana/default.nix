@@ -150,7 +150,7 @@ let cfg = config.senpro; in {
   config = mkIf cfg.oci-containers.grafana.enable {
     virtualisation.oci-containers.containers = {
       grafana = {
-        image = "docker.io/grafana/grafana:9.3.8";
+        image = "docker.io/grafana/grafana:9.4.3";
         autoStart = true;
         dependsOn = [
           "grafana-influxdb"
@@ -167,6 +167,7 @@ let cfg = config.senpro; in {
           "--label=traefik.http.middlewares.grafanaAuthProxy.basicAuth.users=${cfg.oci-containers.grafana.authProxy.noc.username}:${cfg.oci-containers.grafana.authProxy.noc.password}"
         ];
         environment = {
+          GF_DATABASE_WAL = "true";
           GF_USERS_ALLOW_SIGN_UP = "false";
           GF_USERS_AUTO_ASSIGN_ORG = "true";
           GF_AUTH_DISABLE_LOGIN_FORM = "true";
