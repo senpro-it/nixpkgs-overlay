@@ -7,6 +7,7 @@
     ./heimdall
     ./keycloak
     ./outline
+    ./passbolt
     ./traefik
     ./vaultwarden
   ];
