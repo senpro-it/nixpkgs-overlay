@@ -116,7 +116,7 @@ let cfg = config.senpro; in {
           MYSQL_RANDOM_ROOT_PASSWORD = "true";
           MYSQL_DATABASE = "passbolt";
           MYSQL_USER = "passbolt";
-          MYSQL_PASSWORD = "https://${cfg.oci-containers.passbolt.mariadb.password}";
+          MYSQL_PASSWORD = "${cfg.oci-containers.passbolt.mariadb.password}";
         };
         volumes = [ "passbolt-mariadb-data:/var/lib/mysql" ];
       };
