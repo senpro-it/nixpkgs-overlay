@@ -6,6 +6,8 @@ let
 
   cfg = config.senpro;
 
+  settingsFormat = pkgs.formats.toml {};
+
   telegrafOptions.agentConfig = mkOption {
     type = types.listOf types.str;
     default = [];
@@ -81,62 +83,16 @@ in {
       enable = mkEnableOption ''
         Whether to enable the telegraf monitoring agent.
       '';
-      outputs = {
-        influxdb_v2 = {
-          enable = mkEnableOption ''
-            Whether to enable the telegraf monitoring agent.
-          '';
-          instances = mkOption {
-            type = with types; listOf (submodule {
-              options = {
-                urls = mkOption {
-                  type = types.listOf types.str;
-                  default = [];
-                  example = literalExpression ''
-                    [ "https://influxdb.example.com" ]
-                  '';
-                  description = lib.mdDoc ''
-                    List of InfluxDB instances where the output should be written to. Please be aware that this module uses InfluxDB v2 for connection to the database.
-                  '';
-                };
-                token = mkOption {
-                  type = types.str;
-                  example = "PXA06C0lATm3Uf/1wI10/C6MyAXj9KTo3dpcE5s3W4w=";
-                  description = lib.mdDoc ''
-                    API token for connection to the InfluxDB.
-                  '';
-                };
-                organization = mkOption {
-                  type = types.str;
-                  example = "ExampleOrg";
-                  description = lib.mdDoc ''
-                    Name of your InfluxDB organization where the destination bucket is located.
-                  '';
-                };
-                bucket = mkOption {
-                  type = types.str;
-                  example = "Default";
-                  description = lib.mdDoc ''
-                    Name of the bucket where your telegraf metrics should be put in.
-                  '';
-                };
-              };
-            });
-            example = literalExpression ''
-              {
-                influxdb_v2 = [
-                  {
-                    urls = [ "https://influxdb.example.com" ];
-                    token = "PXA06C0lATm3Uf/1wI10/C6MyAXj9KTo3dpcE5s3W4w=";
-                    organization = "ExampleOrg";
-                    bucket = "Default";
-                  }
-                ];
-              }
-            '';
-            description = lib.mdDoc ''
-              Output configuration for the telegraf agent. Currently only InfluxDB is supported.
-            '';
+      outputs = mkOption {
+        default = {};
+        description = lib.mdDoc "Output configuration for telegraf";
+        type = settingsFormat.type;
+        example = {
+          influxdb_v2 = {
+            urls = [ "https://influxdb.example.com/" ];
+            token = "your-influxdb-token";
+            organization = "ExampleOrg";
+            bucket = "ExampleBucket";
           };
         };
       };
@@ -1047,15 +1003,7 @@ in {
             })
           ];
         };
-        outputs = {
-          influxdb_v2 = mapAttrs (_: instances: {
-            urls = instances.url;
-            token = "${instances.token}";
-            organization = "${instances.organization}";
-            bucket = "${instances.bucket}";
-            insecure_skip_verify = true;
-          }) cfg.telegraf.outputs.influxdb_v2;
-        };
+        outputs = cfg.telegraf.outputs;
       };
     };
   };
