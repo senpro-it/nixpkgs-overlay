@@ -9,6 +9,7 @@
     ./outline
     ./passbolt
     ./traefik
+    ./unifi-controller
     ./vaultwarden
   ];
 
