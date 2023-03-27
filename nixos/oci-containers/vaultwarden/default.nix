@@ -138,7 +138,7 @@ let cfg = config.senpro; in {
     };
     virtualisation.oci-containers.containers = {
       vaultwarden = {
-        image = "docker.io/vaultwarden/server:1.27.0";
+        image = "ghcr.io/dani-garcia/vaultwarden:1.28.0";
         autoStart = true;
         extraOptions = [
           "--net=proxy"
@@ -170,6 +170,7 @@ let cfg = config.senpro; in {
           SMTP_USERNAME = "${cfg.oci-containers.vaultwarden.smtp.username}";
           SMTP_PASSWORD = "${cfg.oci-containers.vaultwarden.smtp.password}";
           WEBSOCKET_ENABLED = "true";
+          ORG_GROUPS_ENABLED = "true";
           ADMIN_TOKEN = "${cfg.oci-containers.vaultwarden.adminToken}";
           DATABASE_URL = "/data/db.sqlite3";
         };
