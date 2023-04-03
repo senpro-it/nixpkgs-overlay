@@ -97,6 +97,36 @@ in {
         };
       };
       inputs = {
+        api = {
+          enable = mkEnableOption ''
+            Whether to enable SNMP monitoring.
+          '';
+          vendors = {
+            sophos = {
+              central = {
+                enable = mkEnableOption ''
+                  Whether to enable the Aruba Mobility Gateway monitoring via SNMP.
+                '';
+                client = {
+                  id = mkOption {
+                    type = types.str;
+                    example = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
+                    description = lib.mdDoc ''
+                      Client ID for the Sophos Central API (Tenant).
+                    '';
+                  };
+                  secret = mkOption {
+                    type = types.str;
+                    example = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+                    description = lib.mdDoc ''
+                      Client Secret for the Sophos Central API (Tenant).
+                    '';
+                  };
+                };
+              };
+            };
+          };
+        };
         snmp = {
           enable = mkEnableOption ''
             Whether to enable SNMP monitoring.
@@ -213,6 +243,14 @@ in {
           snmp_translator = "gosmi";
         };
         inputs = {
+          exec = lib.mkIf cfg.telegraf.inputs.api.enable [
+            (lib.mkIf cfg.telegraf.inputs.api.vendors.sophos.central.enable {
+              commands = [ "${pkgs.line-exporters}/bin/lxp-sophos-central '${cfg.telegraf.inputs.api.vendors.sophos.central.client.id}' '${cfg.telegraf.inputs.api.vendors.sophos.central.client.secret}'" ];
+              timeout = "5m";
+              interval = "900s";
+              data_format = "influx";
+            })
+          ];
           snmp = lib.mkIf cfg.telegraf.inputs.snmp.enable [
             (lib.mkIf cfg.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.self.enable {
               name = "aruba.mobilityGateway.self";
