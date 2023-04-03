@@ -138,7 +138,7 @@ let cfg = config.senpro; in {
     };
     virtualisation.oci-containers.containers = {
       vaultwarden = {
-        image = "ghcr.io/dani-garcia/vaultwarden:1.28.0";
+        image = "ghcr.io/dani-garcia/vaultwarden:1.28.1";
         autoStart = true;
         extraOptions = [
           "--net=proxy"

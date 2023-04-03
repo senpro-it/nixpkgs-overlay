@@ -150,7 +150,7 @@ let cfg = config.senpro; in {
   config = mkIf cfg.oci-containers.grafana.enable {
     virtualisation.oci-containers.containers = {
       grafana = {
-        image = "docker.io/grafana/grafana:9.4.3";
+        image = "docker.io/grafana/grafana:9.4.7";
         autoStart = true;
         dependsOn = [
           "grafana-influxdb"
