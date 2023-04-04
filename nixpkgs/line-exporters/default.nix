@@ -7,12 +7,12 @@
 
 stdenv.mkDerivation {
   pname = "line-exporters";
-  version = "2023-04-03";
+  version = "2023-04-04";
   src = fetchFromGitHub {
     owner = "senpro-it";
     repo = "line-exporters";
-    rev = "870cff6a05fe39b7f7a5dd103bc33a4283289461";
-    sha256 = "sha256-qbfJX3Fj64uDByO/4Ztwg2HLI+wCD8nOJXlDyhTrt0U=";
+    rev = "b9ad5fe9034bed3cce0b418e86874631886f50f8";
+    sha256 = "Nj6xRl7ycigzZ735uldXyzKOJIua8RaiO41wYXJNWJ4=";
   };
   buildInputs = [ bash curl jq ];
   nativeBuildInputs = [ makeWrapper ];
