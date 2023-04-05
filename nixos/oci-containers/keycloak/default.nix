@@ -63,6 +63,7 @@ let cfg = config.senpro; in {
           "--net=proxy"
           "--label=traefik.enable=true"
           "--label=traefik.http.routers.keycloak.tls=true"
+          "--label=traefik.http.routers.keycloak.tls.certresolver=letsencrypt"
           "--label=traefik.http.routers.keycloak.entrypoints=https"
           "--label=traefik.http.routers.keycloak.service=keycloak"
           "--label=traefik.http.routers.keycloak.rule=Host(`${cfg.oci-containers.keycloak.publicURL}`)"

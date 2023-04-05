@@ -118,6 +118,7 @@ let cfg = config.senpro; in {
           "--entrypoints.https.address=:443"
           "--entrypoints.https.http3.advertisedport=443"
           "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
+          "--certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,9.9.9.9:53,8.8.8.8:53"
           "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=${cfg.oci-containers.traefik.configuration.static.certificatesResolvers.letsEncrypt.acme.dnsChallenge.provider}"
           "--certificatesresolvers.letsencrypt.acme.email=${cfg.oci-containers.traefik.configuration.static.certificatesResolvers.letsEncrypt.acme.email}"
           "--certificatesresolvers.letsencrypt.acme.storage=/etc/traefik/acme.json"

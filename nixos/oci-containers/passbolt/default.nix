@@ -86,6 +86,7 @@ let cfg = config.senpro; in {
           "--net=proxy"
           "--label=traefik.enable=true"
           "--label=traefik.http.routers.passbolt.tls=true"
+          "--label=traefik.http.routers.passbolt.tls.certresolver=letsencrypt"
           "--label=traefik.http.routers.passbolt.entrypoints=https"
           "--label=traefik.http.routers.passbolt.service=passbolt"
           "--label=traefik.http.routers.passbolt.rule=Host(`${cfg.oci-containers.passbolt.publicURL}`)"

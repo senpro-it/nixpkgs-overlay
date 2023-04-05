@@ -31,6 +31,7 @@ let cfg = config.senpro; in {
           "--net=proxy"
           "--label=traefik.enable=true"
           "--label=traefik.http.routers.heimdall.tls=true"
+          "--label=traefik.http.routers.heimdall.tls.certresolver=letsencrypt"
           "--label=traefik.http.routers.heimdall.entrypoints=https"
           "--label=traefik.http.routers.heimdall.service=heimdall"
           "--label=traefik.http.routers.heimdall.rule=Host(`${cfg.oci-containers.heimdall.publicURL}`)"
