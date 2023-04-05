@@ -10,10 +10,42 @@ let cfg = config.senpro; in {
         enable = mkEnableOption ''
           Whether to enable the `traefik` oci-container.
         '';
-        configuration = mkOption {
-          default = "";
-          type = types.lines;
-          description = lib.mdDoc "Additional configuration for Traefik beside the default config";
+        configuration = {
+          static = {
+            certificatesResolvers = {
+              letsEncrypt = {
+                acme = {
+                  email = mkOption {
+                    example = "example@example.com";
+                    type = types.str;
+                    description = lib.mdDoc "Mail address for alerts regarding expiring certificates.";
+                  };
+                  dnsChallenge = {
+                    provider = mkOption {
+                      example = "ionos";
+                      type = types.str;
+                      description = lib.mdDoc "Provider code for the ACME DNS challenge. Don't forget to provide eventually needed environment variables through ";
+                    };
+                  };
+                };
+              };
+            };
+          };
+          dynamic = mkOption {
+            default = "";
+            type = types.lines;
+            description = lib.mdDoc "Additional, user-provided dynamic configuration for Traefik.";
+          };
+          environment = mkOption {
+            type = with types; attrsOf str;
+            default = {};
+            description = lib.mdDoc "Environment variables to set for the Traefik container.";
+            example = literalExpression ''
+              {
+                IONOS_API_KEY = "43swm2sdxiamsa0djssd6435ccss";
+              }
+            '';
+          };
         };
       };
     };
@@ -23,7 +55,7 @@ let cfg = config.senpro; in {
     boot.kernel.sysctl."net.core.rmem_max" = 2500000;
     systemd.services.podman-traefik-provisioning = {
       enable = true;
-      description = "Dynamic config provisioning for Traefik";
+      description = "Configuration provisioning for the Traefik container.";
       requiredBy = [ "podman-traefik.service" ];
       restartIfChanged = true;
       preStart = ''
@@ -55,7 +87,7 @@ let cfg = config.senpro; in {
           "      - CurveP521" \
           "      - CurveP384" \
           "      minVersion: VersionTLS12" > /var/lib/containers/storage/volumes/traefik/_data/conf.d/main.yml
-          ${pkgs.coreutils-full}/bin/printf "%s\n" "${cfg.oci-containers.traefik.configuration}" > /var/lib/containers/storage/volumes/traefik/_data/conf.d/cust.yml
+          ${pkgs.coreutils-full}/bin/printf "%s\n" "${cfg.oci-containers.traefik.configuration.dynamic}" > /var/lib/containers/storage/volumes/traefik/_data/conf.d/cust.yml
       '';
       serviceConfig = {
         ExecStart = ''
@@ -76,19 +108,22 @@ let cfg = config.senpro; in {
         extraOptions = [
           "--net=proxy"
         ];
-        environment = {
-          TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_HTTPCHALLENGE_ENTRYPOINT = "http";
-          TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_STORAGE = "/etc/traefik/acme.json";
-          TRAEFIK_ENTRYPOINTS_HTTP_ADDRESS = ":80/tcp";
-          TRAEFIK_ENTRYPOINTS_HTTP_HTTP_REDIRECTIONS_ENTRYPOINT_SCHEME = "https";
-          TRAEFIK_ENTRYPOINTS_HTTP_HTTP_REDIRECTIONS_ENTRYPOINT_TO = "https";
-          TRAEFIK_ENTRYPOINTS_HTTPS_ADDRESS = ":443";
-          TRAEFIK_ENTRYPOINTS_HTTPS_HTTP3_ADVERTISEDPORT = "443";
-          TRAEFIK_EXPERIMENTAL_HTTP3 = "true";
-          TRAEFIK_LOG_LEVEL = "DEBUG";
-          TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT = "false";
-          TRAEFIK_PROVIDERS_FILE_DIRECTORY = "/etc/traefik/conf.d";
-        };
+        cmd = [
+          "--providers.docker=true"
+          "--providers.docker.exposedbydefault=false"
+          "--providers.file.directory=/etc/traefik/conf.d"
+          "--entrypoints.http.address=:80/tcp"
+          "--entrypoints.http.http.redirections.entrypoint.to=https"
+          "--entrypoints.http.http.redirections.entrypoint.scheme=https"
+          "--entrypoints.https.address=:443"
+          "--entrypoints.https.http3.advertisedport=443"
+          "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
+          "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=${cfg.oci-containers.traefik.configuration.static.certificatesResolvers.letsEncrypt.acme.dnsChallenge.provider}"
+          "--certificatesresolvers.letsencrypt.acme.email=${cfg.oci-containers.traefik.configuration.static.certificatesResolvers.letsEncrypt.acme.email}"
+          "--certificatesresolvers.letsencrypt.acme.storage=/etc/traefik/acme.json"
+          "--experimental.http3=true"
+        ];
+        environment = cfg.oci-containers.traefik.configuration.environment;
         volumes = [
           "traefik:/etc/traefik"
           "/run/podman/podman.sock:/var/run/docker.sock"
