@@ -146,7 +146,7 @@ let cfg = config.senpro; in {
   config = mkIf cfg.oci-containers.outline.enable {
     virtualisation.oci-containers.containers = {
       outline = {
-        image = "docker.io/outlinewiki/outline:0.68.1";
+        image = "docker.io/outlinewiki/outline:0.69.0";
         autoStart = true;
         user = "root";
         cmd = [ "yarn" "start" "--env=production-ssl-disabled" ];

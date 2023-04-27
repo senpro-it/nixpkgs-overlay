@@ -100,7 +100,7 @@ let cfg = config.senpro; in {
     };
     virtualisation.oci-containers.containers = {
       traefik = {
-        image = "docker.io/library/traefik:v2.9";
+        image = "docker.io/library/traefik:v2.10";
         autoStart = true;
         ports = [
           "80:80/tcp" "443:443/tcp" "443:443/udp"
