@@ -125,6 +125,40 @@ in {
                 };
               };
             };
+            vmware = {
+              vsphere = {
+                enable = mkEnableOption ''
+                  Whether to enable the vSphere monitoring.
+                '';
+                sdk = {
+                  username = mkOption {
+                    type = types.str;
+                    example = "Administrator@vsphere.local";
+                    default = "Administrator@vsphere.local";
+                    description = lib.mdDoc ''
+                      Username of the login user for vSphere.
+                    '';
+                  };
+                  password = mkOption {
+                    type = types.str;
+                    example = "C8TK9UHEKLSv7BcJPKpEu5ij8de3HEHa";
+                    description = lib.mdDoc ''
+                      Password of the login user for vSphere.
+                    '';
+                  };
+                  endpoints = mkOption {
+                    type = types.listOf types.str;
+                    default = [];
+                    example = literalExpression ''
+                      [ "https://vcenter.local/sdk" ]
+                    '';
+                    description = lib.mdDoc ''
+                      vSphere instances which should be monitored. Note the `/sdk` at the end, which is essentially to connect to the right endpoint.
+                    '';
+                  };
+                };
+              };
+            };
           };
         };
         snmp = {
@@ -1040,6 +1074,34 @@ in {
               ];
             })
           ];
+          vsphere = lib.mkIf cfg.telegraf.inputs.api.enable [
+            (lib.mkIf cfg.telegraf.inputs.api.vendors.vmware.vsphere.enable {
+              interval = "60s";
+              vcenters = cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.endpoints;
+              username = "${cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.username}";
+              password = "${cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.password}";
+              insecure_skip_verify = true;
+              force_discover_on_init = true;
+              datastore_metric_exclude = [ "*" ];
+              cluster_metric_exclude = [ "*" ];
+              datacenter_metric_exclude = [ "*" ];
+              collect_concurrency = 4;
+              discover_concurrency = 4;
+            })
+            (lib.mkIf cfg.telegraf.inputs.api.vendors.vmware.vsphere.enable {
+              interval = "300s";
+              vcenters = cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.endpoints;
+              username = "${cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.username}";
+              password = "${cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.password}";
+              insecure_skip_verify = true;
+              force_discover_on_init = true;
+              host_metric_exclude = [ "*" ];
+              vm_metric_exclude = [ "*" ];
+              collect_concurrency = 4;
+              discover_concurrency = 4;
+            })
+          ];
+
         };
         outputs = cfg.telegraf.outputs;
       };
