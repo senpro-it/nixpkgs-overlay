@@ -363,6 +363,7 @@ in {
                 { name = "cpuTemperature"; oid = "QTS-MIB::cpuTemperature.0"; }
                 { name = "diskCount"; oid = "QTS-MIB::diskCount.0"; }
                 { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
+                { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
                 { name = "memFree"; oid = "QTS-MIB::systemFreeMem.0"; }
                 { name = "memUsed"; oid = "QTS-MIB::systemUsedMemory.0"; }
                 { name = "memTotal"; oid = "QTS-MIB::systemTotalMem.0"; }
@@ -574,6 +575,7 @@ in {
               field = [
                 { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
                 { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
+                { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
                 { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
                 { name = "model"; oid = "SYNOLOGY-SYSTEM-MIB::modelName.0"; }
                 { name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
