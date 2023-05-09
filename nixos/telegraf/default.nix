@@ -280,7 +280,7 @@ in {
           snmp_translator = "gosmi";
         };
         inputs = {
-          exec = lib.mkIf cfg.telegraf.inputs.api.enable [
+          exec = lib.mkIf cfg.telegraf.inputs.api.vendors.sophos.central.enable [
             (lib.mkIf cfg.telegraf.inputs.api.vendors.sophos.central.enable {
               commands = [ "${pkgs.line-exporters}/bin/lxp-sophos-central '${cfg.telegraf.inputs.api.vendors.sophos.central.client.id}' '${cfg.telegraf.inputs.api.vendors.sophos.central.client.secret}'" ];
               timeout = "5m";
