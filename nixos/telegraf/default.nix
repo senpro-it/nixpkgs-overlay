@@ -586,6 +586,9 @@ in {
                 { name = "temperature"; oid = "SYNOLOGY-SYSTEM-MIB::temperature.0"; }
                 { name = "memAvailReal"; oid = "UCD-SNMP-MIB::memAvailReal.0"; }
                 { name = "memTotalReal"; oid = "UCD-SNMP-MIB::memTotalReal.0"; }
+                { name = "memTotalFree"; oid = "UCD-SNMP-MIB::memTotalFree.0"; }
+                { name = "memBuffer"; oid = "UCD-SNMP-MIB::memBuffer.0"; }
+                { name = "memCached"; oid = "UCD-SNMP-MIB::memCached.0"; }
                 { name = "memAvailSwap"; oid = "UCD-SNMP-MIB::memAvailSwap.0"; }
                 { name = "memTotalSwap"; oid = "UCD-SNMP-MIB::memTotalSwap.0"; }
               ];
