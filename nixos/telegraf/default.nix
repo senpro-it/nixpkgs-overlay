@@ -597,14 +597,7 @@ in {
               table = [
                 { name = "synology.nas.cpu"; oid = "HOST-RESOURCES-MIB::hrProcessorTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
                 { name = "synology.nas.disk"; oid = "SYNOLOGY-DISK-MIB::diskTable"; inherit_tags = [ "host" ]; }
-                {
-                  name = "synology.nas.interfaces"; oid = "IF-MIB::ifXTable"; index_as_tag = true;
-                  field = [
-                    { oid = "IF-MIB::ifName"; is_tag = true; }
-                    { oid = "IF-MIB::ifHCInOctets"; }
-                    { oid = "IF-MIB::ifHCOutOctets"; }
-                  ];
-                }
+                { name = "synology.nas.interfaces"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
                 { name = "synology.nas.raid"; oid = "SYNOLOGY-RAID-MIB::raidTable"; inherit_tags = [ "host" ]; }
                 { name = "synology.nas.service"; oid = "SYNOLOGY-SERVICES-MIB::serviceTable"; inherit_tags = [ "host" ]; }
                 { name = "synology.nas.volume"; oid = "HOST-RESOURCES-MIB::hrStorageTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
