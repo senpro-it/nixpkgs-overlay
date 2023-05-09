@@ -590,6 +590,7 @@ in {
           vsphere = lib.mkIf cfg.telegraf.inputs.api.vendors.vmware.vsphere.enable [
             {
               interval = "60s";
+              name_prefix = "vmware.";
               vcenters = cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.endpoints;
               username = "${cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.username}";
               password = "${cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.password}";
@@ -603,6 +604,7 @@ in {
             }
             {
               interval = "300s";
+              name_prefix = "vmware.";
               vcenters = cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.endpoints;
               username = "${cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.username}";
               password = "${cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.password}";
