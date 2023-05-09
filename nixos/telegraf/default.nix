@@ -580,7 +580,9 @@ in {
                 { name = "serialNumber"; oid = "SYNOLOGY-SYSTEM-MIB::serialNumber.0"; }
                 { name = "firmwareVersion"; oid = "SYNOLOGY-SYSTEM-MIB::version.0"; }
                 { name = "firmwareUpgradeAvailable"; oid = "SYNOLOGY-SYSTEM-MIB::upgradeAvailable.0"; }
+                { name = "cpuFanStatus"; oid = "SYNOLOGY-SYSTEM-MIB::cpuFanStatus.0"; }
                 { name = "cpuIdle"; oid = "UCD-SNMP-MIB::ssCpuIdle.0"; }
+                { name = "powerStatus"; oid = "SYNOLOGY-SYSTEM-MIB::powerStatus.0"; }
                 { name = "systemStatus"; oid = "SYNOLOGY-SYSTEM-MIB::systemStatus.0"; }
                 { name = "systemFanStatus"; oid = "SYNOLOGY-SYSTEM-MIB::systemFanStatus.0"; }
                 { name = "temperature"; oid = "SYNOLOGY-SYSTEM-MIB::temperature.0"; }
