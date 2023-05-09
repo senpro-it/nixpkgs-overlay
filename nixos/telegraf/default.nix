@@ -182,6 +182,18 @@ in {
                 credentials = telegrafOptions.authSNMPv3;
               };
             };
+            kentix = {
+              doorlocks = {
+                endpoints = {
+                  self = {
+                    enable = mkEnableOption ''
+                      Whether to enable the Kentix doorlock monitoring via SNMP.
+                    '';
+                    agents = telegrafOptions.agentConfig;
+                  }; };
+                credentials = telegrafOptions.authSNMPv3;
+              };
+            };
             qnap = {
               nas = {
                 endpoints = {
@@ -575,8 +587,8 @@ in {
               ];
             })
           ];
-          vsphere = lib.mkIf cfg.telegraf.inputs.api.enable [
-            (lib.mkIf cfg.telegraf.inputs.api.vendors.vmware.vsphere.enable {
+          vsphere = lib.mkIf cfg.telegraf.inputs.api.vendors.vmware.vsphere.enable [
+            {
               interval = "60s";
               vcenters = cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.endpoints;
               username = "${cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.username}";
@@ -588,8 +600,8 @@ in {
               datacenter_metric_exclude = [ "*" ];
               collect_concurrency = 4;
               discover_concurrency = 4;
-            })
-            (lib.mkIf cfg.telegraf.inputs.api.vendors.vmware.vsphere.enable {
+            }
+            {
               interval = "300s";
               vcenters = cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.endpoints;
               username = "${cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.username}";
@@ -600,7 +612,7 @@ in {
               vm_metric_exclude = [ "*" ];
               collect_concurrency = 4;
               discover_concurrency = 4;
-            })
+            }
           ];
 
         };
