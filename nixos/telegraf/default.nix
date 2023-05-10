@@ -492,7 +492,7 @@ in {
             (lib.mkIf cfg.telegraf.inputs.snmp.vendors.sophos.xg.endpoints.self.enable {
               name = "sophos.xg";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.telegraf.inputs.snmp.vendors.sophos.sg.endpoints.self.agents;
+              agents = cfg.telegraf.inputs.snmp.vendors.sophos.xg.endpoints.self.agents;
               timeout = "20s";
               version = 3;
               sec_level = "${cfg.telegraf.inputs.snmp.vendors.sophos.xg.credentials.security.level}";
