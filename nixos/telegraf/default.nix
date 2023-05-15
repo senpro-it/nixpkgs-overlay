@@ -377,8 +377,8 @@ in {
                 { name = "firmwareUpdateAvailable"; oid = "QTS-MIB::firmwareUpgradeAvailable.0"; }
               ];
               table = [
-                { name = "qnap.nas.disk"; oid = "QTS-MIB::diskTable"; inherit_tags = [ "host" ]; }
-                { name = "qnap.nas.interface"; oid = "NAS-MIB::systemIfTable"; inherit_tags = [ "host" ]; }
+                { name = "qnap.nas.diskTable"; oid = "QTS-MIB::diskTable"; inherit_tags = [ "host" ]; }
+                { name = "qnap.nas.interfaces"; oid = "NAS-MIB::systemIfTable"; inherit_tags = [ "host" ]; }
                 { name = "qnap.nas.lun"; oid = "QTS-MIB::lunTable"; inherit_tags = [ "host" ]; }
                 { name = "qnap.nas.raid"; oid = "QTS-MIB::raidTable"; inherit_tags = [ "host" ]; }
                 { name = "qnap.nas.systemFan"; oid = "QTS-MIB::systemFanTable"; inherit_tags = [ "host" ]; }
@@ -459,8 +459,13 @@ in {
                 { name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
               ];
             table = [
-                { name = "sonicWall.interface"; oid = "IF-MIB::ifTable"; inherit_tags = [ "host" ]; }
-                { name = "sonicWall.ipAddresses"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
+                { name = "sonicwall.fwTzNsa.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "IF-MIB::ifDescr"; is_tag = true; }
+                ]; }
+                { name = "sonicwall.fwTzNsa.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "IF-MIB::ifName"; is_tag = true; }
+                ]; }
+                { name = "sonicWall.fwTzNsa.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
               ];
             })
             (lib.mkIf cfg.telegraf.inputs.snmp.vendors.sophos.sg.endpoints.self.enable {
@@ -555,10 +560,13 @@ in {
                 { name = "uptime"; oid = "SFOS-FIREWALL-MIB::sfosUpTime.0"; }
               ];
               table = [
-                { name = "sophos.xg.interfaces"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                { name = "sophos.xg.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "IF-MIB::ifDescr"; is_tag = true; }
+                ]; }
+                { name = "sophos.xg.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "IF-MIB::ifName"; is_tag = true; }
                 ]; }
-                { name = "sophos.xg.ipAddresses"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
+                { name = "sophos.xg.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
               ];
             })
             (lib.mkIf cfg.telegraf.inputs.snmp.vendors.synology.nas.endpoints.self.enable {
@@ -599,16 +607,17 @@ in {
                 { name = "memTotalSwap"; oid = "UCD-SNMP-MIB::memTotalSwap.0"; }
               ];
               table = [
-                { name = "synology.nas.cpu"; oid = "HOST-RESOURCES-MIB::hrProcessorTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
-                { name = "synology.nas.disk"; oid = "SYNOLOGY-DISK-MIB::diskTable"; inherit_tags = [ "host" ]; }
-                { name = "synology.nas.interfaces"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                { name = "synology.nas.diskTable"; oid = "SYNOLOGY-DISK-MIB::diskTable"; inherit_tags = [ "host" ]; }
+                { name = "synology.nas.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "IF-MIB::ifDescr"; is_tag = true; }
+                ]; }
+                { name = "synology.nas.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "IF-MIB::ifName"; is_tag = true; }
                 ]; }
-                { name = "synology.nas.raid"; oid = "SYNOLOGY-RAID-MIB::raidTable"; inherit_tags = [ "host" ]; field = [
+                { name = "synology.nas.raidTable"; oid = "SYNOLOGY-RAID-MIB::raidTable"; inherit_tags = [ "host" ]; field = [
                   { oid = "SYNOLOGY-RAID-MIB::raidName"; is_tag = true; }
                 ]; }
-                { name = "synology.nas.service"; oid = "SYNOLOGY-SERVICES-MIB::serviceTable"; inherit_tags = [ "host" ]; }
-                { name = "synology.nas.volume"; oid = "HOST-RESOURCES-MIB::hrStorageTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+                { name = "synology.nas.serviceTable"; oid = "SYNOLOGY-SERVICES-MIB::serviceTable"; inherit_tags = [ "host" ]; }
               ];
             })
           ];
