@@ -604,7 +604,9 @@ in {
                 { name = "synology.nas.interfaces"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "IF-MIB::ifName"; is_tag = true; }
                 ]; }
-                { name = "synology.nas.raid"; oid = "SYNOLOGY-RAID-MIB::raidTable"; inherit_tags = [ "host" ]; }
+                { name = "synology.nas.raid"; oid = "SYNOLOGY-RAID-MIB::raidTable"; inherit_tags = [ "host" ]; field = [
+                  { oid = "SYNOLOGY-RAID-MIB::raidName"; is_tag = true; }
+                ]; }
                 { name = "synology.nas.service"; oid = "SYNOLOGY-SERVICES-MIB::serviceTable"; inherit_tags = [ "host" ]; }
                 { name = "synology.nas.volume"; oid = "HOST-RESOURCES-MIB::hrStorageTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
               ];
