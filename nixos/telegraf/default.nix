@@ -375,6 +375,9 @@ in {
                 { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
                 { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
                 { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
+                { name = "model"; oid = "NMS-CHASSIS::nmscardDescr.0"; }
+                { name = "serialNumber"; oid = "NMS-CHASSIS::nmscardSerial.0"; }
+                { name = "fwVersion"; oid = "NMS-CHASSIS::nmscardSwVersion.0"; }
               ];
               table = [
                 { name = "fs.switch.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
@@ -383,6 +386,13 @@ in {
                 { name = "fs.switch.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "IF-MIB::ifName"; is_tag = true; }
                 ]; }
+                { name = "fs.switch.ifExtStatisticsTable"; oid = "NMS-INTERFACE-EXT::ifExtStatisticsTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "NMS-INTERFACE-EXT::ifExtDesc"; is_tag = true; }
+                ]; }
+                { name = "fs.switch.ipAddrTable"; oid = "NMS-IP-ADDRESS-MIB::ipAddrTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "NMS-IP-ADDRESS-MIB::nmsIpEntAddr"; is_tag = true; }
+                ]; }
+                { name = "fs.switch.nmspmCPUTotalTable"; oid = "NMS-PROCESS-MIB::nmspmCPUTotalTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
               ];
             })
             (lib.mkIf cfg.telegraf.inputs.snmp.vendors.qnap.nas.endpoints.self.enable {
