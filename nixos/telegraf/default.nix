@@ -20,6 +20,15 @@ let
   };
 
   telegrafOptions.authSNMPv3 = with types; {
+    context = {
+      name = mkOption {
+        type = types.str;
+        example = "27652626525562";
+        description = lib.mdDoc ''
+          Context name for SNMPv3 to authenticate at the agent.
+        '';
+      };
+    };
     authentication = {
       protocol = mkOption {
         type = types.enum [ "MD5" "SHA" "SHA224" "SHA256" "SHA384" "SHA512" ];
@@ -362,6 +371,7 @@ in {
               agents = cfg.telegraf.inputs.snmp.vendors.fs.switch.endpoints.self.agents;
               timeout = "20s";
               version = 3;
+              context_name = "${cfg.telegraf.inputs.snmp.vendors.fs.switch.credentials.context.name}";
               sec_level = "${cfg.telegraf.inputs.snmp.vendors.fs.switch.credentials.security.level}";
               sec_name = "${cfg.telegraf.inputs.snmp.vendors.fs.switch.credentials.security.username}";
               auth_protocol = "${cfg.telegraf.inputs.snmp.vendors.fs.switch.credentials.authentication.protocol}";
