@@ -431,6 +431,9 @@ in {
                 { name = "fwVersion"; oid = "NMS-CHASSIS::nmscardSwVersion.0"; }
               ];
               table = [
+                { name = "cisco.switch.ifTable"; oid = "RFC1213-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "RFC1213-MIB::ifDescr"; is_tag = true; }
+                ]; }
                 { name = "fs.switch.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "IF-MIB::ifName"; is_tag = true; }
                 ]; }
