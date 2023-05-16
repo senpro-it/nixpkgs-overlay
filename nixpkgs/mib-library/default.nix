@@ -2,13 +2,13 @@
 
 stdenv.mkDerivation rec {
   name = "mib-library";
-  version = "2023-05-16.001";
+  version = "2023-05-17.002";
 
   src = fetchFromGitHub {
     owner = "senpro-it";
     repo = "mibs";
-    rev = "22c8d0c1c7fe5a474e597091e9bb9811364022df";
-    sha256 = "EWWv8D9QMu15e2HKILyjRsCsWZW+haebN+c2d8ZhcQg=";
+    rev = "ba9faf8c972540b9d5121376947d55cf63cc81a4";
+    sha256 = "7PAOgYac0jt2Z8f9IT/fthgaL5ohWiRbCT0luZAdk7w=";
   };
 
   installPhase = ''
