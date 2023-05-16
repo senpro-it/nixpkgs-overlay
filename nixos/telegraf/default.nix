@@ -191,6 +191,18 @@ in {
                 credentials = telegrafOptions.authSNMPv3;
               };
             };
+            cisco = {
+              switch = {
+                endpoints = {
+                  self = {
+                    enable = mkEnableOption ''
+                      Whether to enable the Cisco switch monitoring via SNMP.
+                    '';
+                    agents = telegrafOptions.agentConfig;
+                  }; };
+                credentials = telegrafOptions.authSNMPv3;
+              };
+            };
             fs = {
               switch = {
                 endpoints = {
@@ -363,6 +375,35 @@ in {
                     { oid = "WLSX-WLAN-MIB::wlanAPName"; is_tag = true; }
                   ];
                 }
+              ];
+            })
+            (lib.mkIf cfg.telegraf.inputs.snmp.vendors.cisco.switch.endpoints.self.enable {
+              name = "cisco.switch";
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
+              agents = cfg.telegraf.inputs.snmp.vendors.cisco.switch.endpoints.self.agents;
+              timeout = "20s";
+              version = 3;
+              sec_level = "${cfg.telegraf.inputs.snmp.vendors.cisco.switch.credentials.security.level}";
+              sec_name = "${cfg.telegraf.inputs.snmp.vendors.cisco.switch.credentials.security.username}";
+              auth_protocol = "${cfg.telegraf.inputs.snmp.vendors.cisco.switch.credentials.authentication.protocol}";
+              auth_password = "${cfg.telegraf.inputs.snmp.vendors.cisco.switch.credentials.authentication.password}";
+              priv_protocol = "${cfg.telegraf.inputs.snmp.vendors.cisco.switch.credentials.privacy.protocol}";
+              priv_password = "${cfg.telegraf.inputs.snmp.vendors.cisco.switch.credentials.privacy.password}";
+              retries = 5;
+              field = [
+                { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
+                { name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
+                { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
+                { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
+                { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
+              ];
+              table = [
+                { name = "cisco.switch.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "IF-MIB::ifDescr"; is_tag = true; }
+                ]; }
+                { name = "cisco.switch.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "IF-MIB::ifName"; is_tag = true; }
+                ]; }
               ];
             })
             (lib.mkIf cfg.telegraf.inputs.snmp.vendors.fs.switch.endpoints.self.enable {
