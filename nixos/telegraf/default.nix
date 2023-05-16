@@ -431,9 +431,6 @@ in {
                 { name = "fwVersion"; oid = "NMS-CHASSIS::nmscardSwVersion.0"; }
               ];
               table = [
-#                { name = "fs.switch.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
-#                  { oid = "IF-MIB::ifDescr"; is_tag = true; }
-#                ]; }
                 { name = "fs.switch.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "IF-MIB::ifName"; is_tag = true; }
                 ]; }

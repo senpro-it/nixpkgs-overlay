@@ -2,7 +2,7 @@
 
 stdenv.mkDerivation rec {
   name = "mib-library";
-  version = "2023-05-17.002";
+  version = "2023-05-17.004";
 
   src = fetchFromGitHub {
     owner = "senpro-it";
