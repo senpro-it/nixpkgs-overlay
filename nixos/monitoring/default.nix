@@ -8,6 +8,63 @@ let
 
   settingsFormat = pkgs.formats.toml {};
 
+  fritzinfluxdbOptions.inputConfig = { name, ... }: {
+    options = {
+      name = mkOption {
+        type = types.str;
+        default = "${name}";
+        example = "FRITZ1";
+        description = lib.mdDoc ''
+          Name of the FRITZ!Box (used as measurement tag in InfluxDB).
+        '';
+      };
+      host = mkOption {
+        type = types.str;
+        example = "192.168.178.1";
+        description = lib.mdDoc ''
+          FQDN or IPv4 address of the FRITZ!Box.
+        '';
+      };
+      user = mkOption {
+        type = types.str;
+        example = "admin";
+        description = lib.mdDoc ''
+          User to access the targeted FRITZ!Box via TR-064.
+        '';
+      };
+      pass = mkOption {
+        type = types.str;
+        example = "your-secure-password";
+        description = lib.mdDoc ''
+          Password for the specified FRITZ!Box read-access user.
+        '';
+      };
+    };
+  };
+
+  createFritzInfluxDBContainer = opts: name:
+    {
+      image = "docker.io/bbricardo/fritzinfluxdb:latest";
+      autoStart = true;
+      environment = {
+        FRITZBOX_HOSTNAME = "${opts.host}";
+        FRITZBOX_PORT = "49443";
+        FRITZBOX_TLS_ENABLED = "true";
+        FRITZBOX_USERNAME = "${opts.user}";
+        FRITZBOX_PASSWORD = "${opts.pass}";
+        FRITZBOX_BOX_TAG = "${opts.name}";
+        INFLUXDB_VERSION = "2";
+        INFLUXDB_HOSTNAME = "${cfg.monitoring.fritzinfluxdb.output.influxdb_v2.host}";
+        INFLUXDB_PORT = "443";
+        INFLUXDB_TLS_ENABLED = "true";
+        INFLUXDB_ORGANISATION = "${cfg.monitoring.fritzinfluxdb.output.influxdb_v2.organization}";
+        INFLUXDB_BUCKET = "${cfg.monitoring.fritzinfluxdb.output.influxdb_v2.bucket}";
+        INFLUXDB_TOKEN = "${cfg.monitoring.fritzinfluxdb.output.influxdb_v2.token}";
+        INFLUXDB_MEASUREMENT_NAME = "fritzbox";
+      };
+    };
+
+
   telegrafOptions.agentConfig = mkOption {
     type = types.listOf types.str;
     default = [];
@@ -88,277 +145,335 @@ let
 in {
 
   options.senpro = {
-    telegraf = {
-      enable = mkEnableOption ''
-        Whether to enable the telegraf monitoring agent.
-      '';
-      outputs = mkOption {
-        default = {};
-        description = lib.mdDoc "Output configuration for telegraf";
-        type = settingsFormat.type;
-        example = {
+    monitoring = {
+      fritzinfluxdb = {
+        enable = mkEnableOption ''
+          Whether to enable fritzinfluxdb (FRITZ!Box monitoring agent).
+        '';
+        inputs = mkOption {
+          default = {};
+          type = with types; attrsOf (submodule fritzinfluxdbOptions.inputConfig);
+          example = literalExpression ''
+            {
+              FRITZ1 = {
+                host = "192.168.178.1";
+                user = "fritz";
+                pass = "your-secure-password";
+              };
+            }
+          '';
+          description = lib.mdDoc ''
+            Per-host configuration for the FRITZ!Box devices which should be monitored.
+          '';
+        };
+        output = {
           influxdb_v2 = {
-            urls = [ "https://influxdb.example.com/" ];
-            token = "your-influxdb-token";
-            organization = "ExampleOrg";
-            bucket = "ExampleBucket";
-          };
-        };
-      };
-      inputs = {
-        api = {
-          enable = mkEnableOption ''
-            Whether to enable SNMP monitoring.
-          '';
-          vendors = {
-            sophos = {
-              central = {
-                enable = mkEnableOption ''
-                  Whether to enable the Aruba Mobility Gateway monitoring via SNMP.
-                '';
-                client = {
-                  id = mkOption {
-                    type = types.str;
-                    example = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
-                    description = lib.mdDoc ''
-                      Client ID for the Sophos Central API (Tenant).
-                    '';
-                  };
-                  secret = mkOption {
-                    type = types.str;
-                    example = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
-                    description = lib.mdDoc ''
-                      Client Secret for the Sophos Central API (Tenant).
-                    '';
-                  }; };
-              };
+            host = mkOption {
+              type = types.str;
+              example = "influxdb.example.com";
+              description = lib.mdDoc ''
+                FQDN of the targeted InfluxDB instance. Protocol is hardcoded to SSL over 443.
+              '';
             };
-            vmware = {
-              vsphere = {
-                enable = mkEnableOption ''
-                  Whether to enable the vSphere monitoring.
-                '';
-                sdk = {
-                  username = mkOption {
-                    type = types.str;
-                    example = "Administrator@vsphere.local";
-                    default = "Administrator@vsphere.local";
-                    description = lib.mdDoc ''
-                      Username of the login user for vSphere.
-                    '';
-                  };
-                  password = mkOption {
-                    type = types.str;
-                    example = "C8TK9UHEKLSv7BcJPKpEu5ij8de3HEHa";
-                    description = lib.mdDoc ''
-                      Password of the login user for vSphere.
-                    '';
-                  };
-                  endpoints = mkOption {
-                    type = types.listOf types.str;
-                    default = [];
-                    example = literalExpression ''
-                      [ "https://vcenter.local/sdk" ]
-                    '';
-                    description = lib.mdDoc ''
-                      vSphere instances which should be monitored. Note the `/sdk` at the end, which is essentially to connect to the right endpoint.
-                    '';
-                  }; };
-              };
+            token = mkOption {
+              type = types.str;
+              example = "your-influxdb-token";
+              description = lib.mdDoc ''
+                Token for the the targeted InfluxDB instance.
+              '';
             };
-          };
-        };
-        snmp = {
-          enable = mkEnableOption ''
-            Whether to enable SNMP monitoring.
-          '';
-          vendors = {
-            aruba = {
-              mobilityGateway = {
-                endpoints = {
-                  self = {
-                    enable = mkEnableOption ''
-                      Whether to enable the Aruba Mobility Gateway monitoring via SNMP.
-                    '';
-                    agents = telegrafOptions.agentConfig;
-                  };
-                  accessPoints = {
-                    enable = mkEnableOption ''
-                      Whether to enable the Aruba AP monitoring (through Mobility Gateway) via SNMP.
-                    '';
-                    agents = telegrafOptions.agentConfig;
-                  }; };
-                credentials = telegrafOptions.authSNMPv3;
-              };
+            organization = mkOption {
+              type = types.str;
+              example = "your-influxdb-org";
+              description = lib.mdDoc ''
+                InfluxDB organization where the targeted bucket resides.
+              '';
             };
-            cisco = {
-              switch = {
-                endpoints = {
-                  self = {
-                    enable = mkEnableOption ''
-                      Whether to enable the Cisco switch monitoring via SNMP.
-                    '';
-                    agents = telegrafOptions.agentConfig;
-                  }; };
-                credentials = telegrafOptions.authSNMPv3;
-              };
-            };
-            fs = {
-              switch = {
-                endpoints = {
-                  self = {
-                    enable = mkEnableOption ''
-                      Whether to enable the FS switch monitoring via SNMP.
-                    '';
-                    agents = telegrafOptions.agentConfig;
-                  }; };
-                credentials = telegrafOptions.authSNMPv3;
-              };
-            };
-            kentix = {
-              doorlocks = {
-                endpoints = {
-                  self = {
-                    enable = mkEnableOption ''
-                      Whether to enable the Kentix doorlock monitoring via SNMP.
-                    '';
-                    agents = telegrafOptions.agentConfig;
-                  }; };
-                credentials = telegrafOptions.authSNMPv3;
-              };
-            };
-            qnap = {
-              nas = {
-                endpoints = {
-                  self = {
-                    enable = mkEnableOption ''
-                      Whether to enable the QNAP NAS monitoring via SNMP.
-                    '';
-                    agents = telegrafOptions.agentConfig;
-                  }; };
-                credentials = telegrafOptions.authSNMPv3;
-              };
-            };
-            schneiderElectric = {
-              apc = {
-                endpoints = {
-                  self = {
-                    enable = mkEnableOption ''
-                      Whether to enable the Schneider Electric APC monitoring via SNMP.
-                    '';
-                    agents = telegrafOptions.agentConfig;
-                  }; };
-                credentials = telegrafOptions.authSNMPv3;
-              };
-            };
-            sonicWall = {
-              fwTzNsa = {
-                endpoints = {
-                  self = {
-                    enable = mkEnableOption ''
-                      Whether to enable the SonicWall TZ & NSa monitoring via SNMP.
-                    '';
-                    agents = telegrafOptions.agentConfig;
-                  }; };
-                credentials = telegrafOptions.authSNMPv3;
-              };
-            };
-            sophos = {
-              sg = {
-                endpoints = {
-                  self = {
-                    enable = mkEnableOption ''
-                      Whether to enable the Sophos SG monitoring via SNMP.
-                    '';
-                    agents = telegrafOptions.agentConfig;
-                  }; };
-                credentials = telegrafOptions.authSNMPv3;
-              };
-              xg = {
-                endpoints = {
-                  self = {
-                    enable = mkEnableOption ''
-                      Whether to enable the Sophos XG/XGS monitoring via SNMP.
-                    '';
-                    agents = telegrafOptions.agentConfig;
-                  }; };
-                credentials = telegrafOptions.authSNMPv3;
-              };
-            };
-            synology = {
-              nas = {
-                endpoints = {
-                  self = {
-                    enable = mkEnableOption ''
-                      Whether to enable the Synology NAS monitoring via SNMP.
-                    '';
-                    agents = telegrafOptions.agentConfig;
-                  }; };
-                credentials = telegrafOptions.authSNMPv3;
-              };
+            bucket = mkOption {
+              type = types.str;
+              default = "avm";
+              example = "your-influxdb-bucket";
+              description = lib.mdDoc ''
+                InfluxDB bucket where the output should be delivered to.
+              '';
             };
           };
         };
       };
-    };
-    unifi-poller = {
-      enable = mkEnableOption ''
-        Whether to enable the UniFi poller (Ubiquiti monitoring agent).
-      '';
-      input = {
-        unifi-controller = {
-          url = mkOption {
-            type = types.str;
-            example = "https://unifictrl.example.com:8443/";
-            description = lib.mdDoc ''
-              URL of the targeted UniFi controller.
-            '';
+      telegraf = {
+        enable = mkEnableOption ''
+          Whether to enable the telegraf monitoring agent.
+        '';
+        outputs = mkOption {
+          default = {};
+          description = lib.mdDoc "Output configuration for telegraf";
+          type = settingsFormat.type;
+          example = {
+            influxdb_v2 = {
+              urls = [ "https://influxdb.example.com/" ];
+              token = "your-influxdb-token";
+              organization = "ExampleOrg";
+              bucket = "ExampleBucket";
+              namepass = [ "sophos" ];
+            };
           };
-          user = mkOption {
-            type = types.str;
-            example = "admin";
-            description = lib.mdDoc ''
-              User to access the targeted UniFi controller.
+        };
+        inputs = {
+          api = {
+            enable = mkEnableOption ''
+              Whether to enable SNMP monitoring.
             '';
+            vendors = {
+              sophos = {
+                central = {
+                  enable = mkEnableOption ''
+                    Whether to enable the Aruba Mobility Gateway monitoring via SNMP.
+                  '';
+                  client = {
+                    id = mkOption {
+                      type = types.str;
+                      example = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
+                      description = lib.mdDoc ''
+                        Client ID for the Sophos Central API (Tenant).
+                      '';
+                    };
+                    secret = mkOption {
+                      type = types.str;
+                      example = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+                      description = lib.mdDoc ''
+                        Client Secret for the Sophos Central API (Tenant).
+                      '';
+                    }; };
+                };
+              };
+              vmware = {
+                vsphere = {
+                  enable = mkEnableOption ''
+                    Whether to enable the vSphere monitoring.
+                  '';
+                  sdk = {
+                    username = mkOption {
+                      type = types.str;
+                      example = "Administrator@vsphere.local";
+                      default = "Administrator@vsphere.local";
+                      description = lib.mdDoc ''
+                        Username of the login user for vSphere.
+                      '';
+                    };
+                    password = mkOption {
+                      type = types.str;
+                      example = "C8TK9UHEKLSv7BcJPKpEu5ij8de3HEHa";
+                      description = lib.mdDoc ''
+                        Password of the login user for vSphere.
+                      '';
+                    };
+                    endpoints = mkOption {
+                      type = types.listOf types.str;
+                      default = [];
+                      example = literalExpression ''
+                        [ "https://vcenter.local/sdk" ]
+                      '';
+                      description = lib.mdDoc ''
+                        vSphere instances which should be monitored. Note the `/sdk` at the end, which is essentially to connect to the right endpoint.
+                      '';
+                    }; };
+                };
+              };
+            };
           };
-          pass = mkOption {
-            type = types.str;
-            example = "your-secure-password";
-            description = lib.mdDoc ''
-              Password for the specified UniFi controller read-access user.
+          snmp = {
+            enable = mkEnableOption ''
+              Whether to enable SNMP monitoring.
             '';
+            vendors = {
+              aruba = {
+                mobilityGateway = {
+                  endpoints = {
+                    self = {
+                      enable = mkEnableOption ''
+                        Whether to enable the Aruba Mobility Gateway monitoring via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    };
+                    accessPoints = {
+                      enable = mkEnableOption ''
+                        Whether to enable the Aruba AP monitoring (through Mobility Gateway) via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    }; };
+                  credentials = telegrafOptions.authSNMPv3;
+                };
+              };
+              cisco = {
+                switch = {
+                  endpoints = {
+                    self = {
+                      enable = mkEnableOption ''
+                        Whether to enable the Cisco switch monitoring via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    }; };
+                  credentials = telegrafOptions.authSNMPv3;
+                };
+              };
+              fs = {
+                switch = {
+                  endpoints = {
+                    self = {
+                      enable = mkEnableOption ''
+                        Whether to enable the FS switch monitoring via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    }; };
+                  credentials = telegrafOptions.authSNMPv3;
+                };
+              };
+              kentix = {
+                doorlocks = {
+                  endpoints = {
+                    self = {
+                      enable = mkEnableOption ''
+                        Whether to enable the Kentix doorlock monitoring via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    }; };
+                  credentials = telegrafOptions.authSNMPv3;
+                };
+              };
+              qnap = {
+                nas = {
+                  endpoints = {
+                    self = {
+                      enable = mkEnableOption ''
+                        Whether to enable the QNAP NAS monitoring via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    }; };
+                  credentials = telegrafOptions.authSNMPv3;
+                };
+              };
+              schneiderElectric = {
+                apc = {
+                  endpoints = {
+                    self = {
+                      enable = mkEnableOption ''
+                        Whether to enable the Schneider Electric APC monitoring via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    }; };
+                  credentials = telegrafOptions.authSNMPv3;
+                };
+              };
+              sonicWall = {
+                fwTzNsa = {
+                  endpoints = {
+                    self = {
+                      enable = mkEnableOption ''
+                        Whether to enable the SonicWall TZ & NSa monitoring via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    }; };
+                  credentials = telegrafOptions.authSNMPv3;
+                };
+              };
+              sophos = {
+                sg = {
+                  endpoints = {
+                    self = {
+                      enable = mkEnableOption ''
+                        Whether to enable the Sophos SG monitoring via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    }; };
+                  credentials = telegrafOptions.authSNMPv3;
+                };
+                xg = {
+                  endpoints = {
+                    self = {
+                      enable = mkEnableOption ''
+                        Whether to enable the Sophos XG/XGS monitoring via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    }; };
+                  credentials = telegrafOptions.authSNMPv3;
+                };
+              };
+              synology = {
+                nas = {
+                  endpoints = {
+                    self = {
+                      enable = mkEnableOption ''
+                        Whether to enable the Synology NAS monitoring via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    }; };
+                  credentials = telegrafOptions.authSNMPv3;
+                };
+              };
+            };
           };
         };
       };
-      output = {
-        influxdb_v2 = {
-          url = mkOption {
-            type = types.str;
-            example = "https://influxdb.example.com/";
-            description = lib.mdDoc ''
-              URL of the targeted InfluxDB instance.
-            '';
+      unifi-poller = {
+        enable = mkEnableOption ''
+          Whether to enable the UniFi poller (Ubiquiti monitoring agent).
+        '';
+        input = {
+          unifi-controller = {
+            url = mkOption {
+              type = types.str;
+              example = "https://unifictrl.example.com:8443/";
+              description = lib.mdDoc ''
+                URL of the targeted UniFi controller.
+              '';
+            };
+            user = mkOption {
+              type = types.str;
+              example = "admin";
+              description = lib.mdDoc ''
+                User to access the targeted UniFi controller.
+              '';
+            };
+            pass = mkOption {
+              type = types.str;
+              example = "your-secure-password";
+              description = lib.mdDoc ''
+                Password for the specified UniFi controller read-access user.
+              '';
+            };
           };
-          token = mkOption {
-            type = types.str;
-            example = "your-influxdb-token";
-            description = lib.mdDoc ''
-              Token for the the targeted InfluxDB instance.
-            '';
-          };
-          organization = mkOption {
-            type = types.str;
-            example = "your-influxdb-org";
-            description = lib.mdDoc ''
-              InfluxDB organization where the targeted bucket resides.
-            '';
-          };
-          bucket = mkOption {
-            type = types.str;
-            example = "your-influxdb-bucket";
-            description = lib.mdDoc ''
-              InfluxDB bucket where the output should be delivered to.
-            '';
+        };
+        output = {
+          influxdb_v2 = {
+            url = mkOption {
+              type = types.str;
+              example = "https://influxdb.example.com/";
+              description = lib.mdDoc ''
+                URL of the targeted InfluxDB instance.
+              '';
+            };
+            token = mkOption {
+              type = types.str;
+              example = "your-influxdb-token";
+              description = lib.mdDoc ''
+                Token for the the targeted InfluxDB instance.
+              '';
+            };
+            organization = mkOption {
+              type = types.str;
+              example = "your-influxdb-org";
+              description = lib.mdDoc ''
+                InfluxDB organization where the targeted bucket resides.
+              '';
+            };
+            bucket = mkOption {
+              type = types.str;
+              default = "ubiquiti";
+              example = "your-influxdb-bucket";
+              description = lib.mdDoc ''
+                InfluxDB bucket where the output should be delivered to.
+              '';
+            };
           };
         };
       };
@@ -367,7 +482,7 @@ in {
 
   config = {
 
-    services.telegraf = lib.mkIf cfg.telegraf.enable {
+    services.telegraf = lib.mkIf cfg.monitoring.telegraf.enable {
       enable = true;
       extraConfig = {
         agent = {
@@ -375,27 +490,27 @@ in {
           snmp_translator = "gosmi";
         };
         inputs = {
-          exec = lib.mkIf cfg.telegraf.inputs.api.vendors.sophos.central.enable [
-            (lib.mkIf cfg.telegraf.inputs.api.vendors.sophos.central.enable {
-              commands = [ "${pkgs.line-exporters}/bin/lxp-sophos-central '${cfg.telegraf.inputs.api.vendors.sophos.central.client.id}' '${cfg.telegraf.inputs.api.vendors.sophos.central.client.secret}'" ];
+          exec = lib.mkIf cfg.monitoring.telegraf.inputs.api.vendors.sophos.central.enable [
+            (lib.mkIf cfg.monitoring.telegraf.inputs.api.vendors.sophos.central.enable {
+              commands = [ "${pkgs.line-exporters}/bin/lxp-sophos-central '${cfg.monitoring.telegraf.inputs.api.vendors.sophos.central.client.id}' '${cfg.monitoring.telegraf.inputs.api.vendors.sophos.central.client.secret}'" ];
               timeout = "5m";
               interval = "900s";
               data_format = "influx";
             })
           ];
-          snmp = lib.mkIf cfg.telegraf.inputs.snmp.enable [
-            (lib.mkIf cfg.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.self.enable {
+          snmp = lib.mkIf cfg.monitoring.telegraf.inputs.snmp.enable [
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.self.enable {
               name = "aruba.mobilityGateway.self";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.self.agents;
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.self.agents;
               timeout = "20s";
               version = 3;
-              sec_level = "${cfg.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.security.level}";
-              sec_name = "${cfg.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.security.username}";
-              auth_protocol = "${cfg.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.authentication.protocol}";
-              auth_password = "${cfg.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.authentication.password}";
-              priv_protocol = "${cfg.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.privacy.protocol}";
-              priv_password = "${cfg.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.privacy.password}";
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.privacy.password}";
               retries = 5;
               field = [
                 { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
@@ -417,18 +532,18 @@ in {
                 { name = "aruba.mobilityGateway.self.processor"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtProcessorTable"; inherit_tags = [ "host" ]; }
               ];
             })
-            (lib.mkIf cfg.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.accessPoints.enable {
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.accessPoints.enable {
               name = "aruba.mobilityGateway.accessPoints";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.accessPoints.agents;
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.accessPoints.agents;
               timeout = "20s";
               version = 3;
-              sec_level = "${cfg.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.security.level}";
-              sec_name = "${cfg.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.security.username}";
-              auth_protocol = "${cfg.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.authentication.protocol}";
-              auth_password = "${cfg.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.authentication.password}";
-              priv_protocol = "${cfg.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.privacy.protocol}";
-              priv_password = "${cfg.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.privacy.password}";
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.privacy.password}";
               retries = 5;
               table = [
                 {
@@ -439,18 +554,18 @@ in {
                 }
               ];
             })
-            (lib.mkIf cfg.telegraf.inputs.snmp.vendors.cisco.switch.endpoints.self.enable {
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.cisco.switch.endpoints.self.enable {
               name = "cisco.switch";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.telegraf.inputs.snmp.vendors.cisco.switch.endpoints.self.agents;
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.cisco.switch.endpoints.self.agents;
               timeout = "20s";
               version = 3;
-              sec_level = "${cfg.telegraf.inputs.snmp.vendors.cisco.switch.credentials.security.level}";
-              sec_name = "${cfg.telegraf.inputs.snmp.vendors.cisco.switch.credentials.security.username}";
-              auth_protocol = "${cfg.telegraf.inputs.snmp.vendors.cisco.switch.credentials.authentication.protocol}";
-              auth_password = "${cfg.telegraf.inputs.snmp.vendors.cisco.switch.credentials.authentication.password}";
-              priv_protocol = "${cfg.telegraf.inputs.snmp.vendors.cisco.switch.credentials.privacy.protocol}";
-              priv_password = "${cfg.telegraf.inputs.snmp.vendors.cisco.switch.credentials.privacy.password}";
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.cisco.switch.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.cisco.switch.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.cisco.switch.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.cisco.switch.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.cisco.switch.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.cisco.switch.credentials.privacy.password}";
               retries = 5;
               field = [
                 { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
@@ -468,19 +583,19 @@ in {
                 ]; }
               ];
             })
-            (lib.mkIf cfg.telegraf.inputs.snmp.vendors.fs.switch.endpoints.self.enable {
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.endpoints.self.enable {
               name = "fs.switch";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.telegraf.inputs.snmp.vendors.fs.switch.endpoints.self.agents;
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.endpoints.self.agents;
               timeout = "20s";
               version = 3;
-              context_name = "${cfg.telegraf.inputs.snmp.vendors.fs.switch.credentials.context.name}";
-              sec_level = "${cfg.telegraf.inputs.snmp.vendors.fs.switch.credentials.security.level}";
-              sec_name = "${cfg.telegraf.inputs.snmp.vendors.fs.switch.credentials.security.username}";
-              auth_protocol = "${cfg.telegraf.inputs.snmp.vendors.fs.switch.credentials.authentication.protocol}";
-              auth_password = "${cfg.telegraf.inputs.snmp.vendors.fs.switch.credentials.authentication.password}";
-              priv_protocol = "${cfg.telegraf.inputs.snmp.vendors.fs.switch.credentials.privacy.protocol}";
-              priv_password = "${cfg.telegraf.inputs.snmp.vendors.fs.switch.credentials.privacy.password}";
+              context_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.credentials.context.name}";
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.credentials.privacy.password}";
               retries = 5;
               field = [
                 { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
@@ -508,19 +623,19 @@ in {
                 { name = "fs.switch.nmspmCPUTotalTable"; oid = "NMS-PROCESS-MIB::nmspmCPUTotalTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
               ];
             })
-            (lib.mkIf cfg.telegraf.inputs.snmp.vendors.qnap.nas.endpoints.self.enable {
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.endpoints.self.enable {
               name = "qnap.nas";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.telegraf.inputs.snmp.vendors.qnap.nas.endpoints.self.agents;
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.endpoints.self.agents;
               interval = "300s";
               timeout = "20s";
               version = 3;
-              sec_level = "${cfg.telegraf.inputs.snmp.vendors.qnap.nas.credentials.security.level}";
-              sec_name = "${cfg.telegraf.inputs.snmp.vendors.qnap.nas.credentials.security.username}";
-              auth_protocol = "${cfg.telegraf.inputs.snmp.vendors.qnap.nas.credentials.authentication.protocol}";
-              auth_password = "${cfg.telegraf.inputs.snmp.vendors.qnap.nas.credentials.authentication.password}";
-              priv_protocol = "${cfg.telegraf.inputs.snmp.vendors.qnap.nas.credentials.privacy.protocol}";
-              priv_password = "${cfg.telegraf.inputs.snmp.vendors.qnap.nas.credentials.privacy.password}";
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.credentials.privacy.password}";
               retries = 5;
               field = [
                 { name = "cpuUsed"; oid = "QTS-MIB::systemCPU-Usage.0"; }
@@ -550,18 +665,18 @@ in {
                 { name = "qnap.nas.volume"; oid = "QTS-MIB::volumeTable"; inherit_tags = [ "host" ]; }
               ];
             })
-            (lib.mkIf cfg.telegraf.inputs.snmp.vendors.schneiderElectric.apc.endpoints.self.enable {
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.schneiderElectric.apc.endpoints.self.enable {
               name = "schneiderElectric.apc";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.telegraf.inputs.snmp.vendors.schneiderElectric.apc.endpoints.self.agents;
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.schneiderElectric.apc.endpoints.self.agents;
               timeout = "20s";
               version = 3;
-              sec_level = "${cfg.telegraf.inputs.snmp.vendors.schneiderElectric.apc.credentials.security.level}";
-              sec_name = "${cfg.telegraf.inputs.snmp.vendors.schneiderElectric.apc.credentials.security.username}";
-              auth_protocol = "${cfg.telegraf.inputs.snmp.vendors.schneiderElectric.apc.credentials.authentication.protocol}";
-              auth_password = "${cfg.telegraf.inputs.snmp.vendors.schneiderElectric.apc.credentials.authentication.password}";
-              priv_protocol = "${cfg.telegraf.inputs.snmp.vendors.schneiderElectric.apc.credentials.privacy.protocol}";
-              priv_password = "${cfg.telegraf.inputs.snmp.vendors.schneiderElectric.apc.credentials.privacy.password}";
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.schneiderElectric.apc.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.schneiderElectric.apc.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.schneiderElectric.apc.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.schneiderElectric.apc.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.schneiderElectric.apc.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.schneiderElectric.apc.credentials.privacy.password}";
               retries = 5;
               field = [
                 { name = "batteryActualVoltage"; oid = "PowerNet-MIB::upsAdvBatteryActualVoltage.0"; }
@@ -599,18 +714,18 @@ in {
                 { name = "schneiderElectric.apc.configDevice"; oid = "PowerNet-MIB::upsBasicConfigDeviceTable"; inherit_tags = [ "host" ]; }
               ];
             })
-            (lib.mkIf cfg.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.endpoints.self.enable {
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.endpoints.self.enable {
               name = "sonicWall.fwTzNsa";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.endpoints.self.agents;
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.endpoints.self.agents;
               timeout = "20s";
               version = 3;
-              sec_level = "${cfg.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.security.level}";
-              sec_name = "${cfg.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.security.username}";
-              auth_protocol = "${cfg.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.authentication.protocol}";
-              auth_password = "${cfg.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.authentication.password}";
-              priv_protocol = "${cfg.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.privacy.protocol}";
-              priv_password = "${cfg.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.privacy.password}";
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.privacy.password}";
               retries = 5;
               field = [
                 { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
@@ -632,18 +747,18 @@ in {
                 { name = "sonicWall.fwTzNsa.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
               ];
             })
-            (lib.mkIf cfg.telegraf.inputs.snmp.vendors.sophos.sg.endpoints.self.enable {
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.sg.endpoints.self.enable {
               name = "sophos.sg";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.telegraf.inputs.snmp.vendors.sophos.sg.endpoints.self.agents;
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.sg.endpoints.self.agents;
               timeout = "20s";
               version = 3;
-              sec_level = "${cfg.telegraf.inputs.snmp.vendors.sophos.sg.credentials.security.level}";
-              sec_name = "${cfg.telegraf.inputs.snmp.vendors.sophos.sg.credentials.security.username}";
-              auth_protocol = "${cfg.telegraf.inputs.snmp.vendors.sophos.sg.credentials.authentication.protocol}";
-              auth_password = "${cfg.telegraf.inputs.snmp.vendors.sophos.sg.credentials.authentication.password}";
-              priv_protocol = "${cfg.telegraf.inputs.snmp.vendors.sophos.sg.credentials.privacy.protocol}";
-              priv_password = "${cfg.telegraf.inputs.snmp.vendors.sophos.sg.credentials.privacy.password}";
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.sg.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.sg.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.sg.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.sg.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.sg.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.sg.credentials.privacy.password}";
               retries = 5;
               field = [
                 { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
@@ -658,18 +773,18 @@ in {
                 { name = "sophos.sg.storage"; oid = "HOST-RESOURCES-MIB::hrStorageTable"; inherit_tags = [ "host" ]; }
               ];
             })
-            (lib.mkIf cfg.telegraf.inputs.snmp.vendors.sophos.xg.endpoints.self.enable {
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.xg.endpoints.self.enable {
               name = "sophos.xg";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.telegraf.inputs.snmp.vendors.sophos.xg.endpoints.self.agents;
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.xg.endpoints.self.agents;
               timeout = "20s";
               version = 3;
-              sec_level = "${cfg.telegraf.inputs.snmp.vendors.sophos.xg.credentials.security.level}";
-              sec_name = "${cfg.telegraf.inputs.snmp.vendors.sophos.xg.credentials.security.username}";
-              auth_protocol = "${cfg.telegraf.inputs.snmp.vendors.sophos.xg.credentials.authentication.protocol}";
-              auth_password = "${cfg.telegraf.inputs.snmp.vendors.sophos.xg.credentials.authentication.password}";
-              priv_protocol = "${cfg.telegraf.inputs.snmp.vendors.sophos.xg.credentials.privacy.protocol}";
-              priv_password = "${cfg.telegraf.inputs.snmp.vendors.sophos.xg.credentials.privacy.password}";
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.xg.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.xg.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.xg.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.xg.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.xg.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.xg.credentials.privacy.password}";
               retries = 5;
               field = [
                 { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
@@ -733,18 +848,18 @@ in {
                 { name = "sophos.xg.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
               ];
             })
-            (lib.mkIf cfg.telegraf.inputs.snmp.vendors.synology.nas.endpoints.self.enable {
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.synology.nas.endpoints.self.enable {
               name = "synology.nas";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.telegraf.inputs.snmp.vendors.synology.nas.endpoints.self.agents;
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.synology.nas.endpoints.self.agents;
               timeout = "20s";
               version = 3;
-              sec_level = "${cfg.telegraf.inputs.snmp.vendors.synology.nas.credentials.security.level}";
-              sec_name = "${cfg.telegraf.inputs.snmp.vendors.synology.nas.credentials.security.username}";
-              auth_protocol = "${cfg.telegraf.inputs.snmp.vendors.synology.nas.credentials.authentication.protocol}";
-              auth_password = "${cfg.telegraf.inputs.snmp.vendors.synology.nas.credentials.authentication.password}";
-              priv_protocol = "${cfg.telegraf.inputs.snmp.vendors.synology.nas.credentials.privacy.protocol}";
-              priv_password = "${cfg.telegraf.inputs.snmp.vendors.synology.nas.credentials.privacy.password}";
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.nas.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.nas.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.nas.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.nas.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.nas.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.nas.credentials.privacy.password}";
               retries = 5;
               field = [
                 { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
@@ -785,13 +900,13 @@ in {
               ];
             })
           ];
-          vsphere = lib.mkIf cfg.telegraf.inputs.api.vendors.vmware.vsphere.enable [
+          vsphere = lib.mkIf cfg.monitoring.telegraf.inputs.api.vendors.vmware.vsphere.enable [
             {
               interval = "60s";
               name_prefix = "vmware.";
-              vcenters = cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.endpoints;
-              username = "${cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.username}";
-              password = "${cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.password}";
+              vcenters = cfg.monitoring.telegraf.inputs.api.vendors.vmware.vsphere.sdk.endpoints;
+              username = "${cfg.monitoring.telegraf.inputs.api.vendors.vmware.vsphere.sdk.username}";
+              password = "${cfg.monitoring.telegraf.inputs.api.vendors.vmware.vsphere.sdk.password}";
               insecure_skip_verify = true;
               force_discover_on_init = true;
               host_metric_include = [
@@ -975,9 +1090,9 @@ in {
             {
               interval = "300s";
               name_prefix = "vmware.";
-              vcenters = cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.endpoints;
-              username = "${cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.username}";
-              password = "${cfg.telegraf.inputs.api.vendors.vmware.vsphere.sdk.password}";
+              vcenters = cfg.monitoring.telegraf.inputs.api.vendors.vmware.vsphere.sdk.endpoints;
+              username = "${cfg.monitoring.telegraf.inputs.api.vendors.vmware.vsphere.sdk.username}";
+              password = "${cfg.monitoring.telegraf.inputs.api.vendors.vmware.vsphere.sdk.password}";
               insecure_skip_verify = true;
               force_discover_on_init = true;
               datastore_metric_include = [
@@ -1083,27 +1198,32 @@ in {
           ];
 
         };
-        outputs = cfg.telegraf.outputs;
+        outputs = cfg.monitoring.telegraf.outputs;
       };
     };
 
     virtualisation.oci-containers = {
-      containers = {
-        unifi-poller = lib.mkIf cfg.unifi-poller.enable {
+      containers =
+        { unifi-poller = lib.mkIf cfg.monitoring.unifi-poller.enable {
           image = "ghcr.io/unpoller/unpoller:latest-arm64v8";
           autoStart = true;
           environment = {
-            UP_INFLUXDB_URL = "${cfg.unifi-poller.output.influxdb_v2.url}";
-            UP_INFLUXDB_ORG = "${cfg.unifi-poller.output.influxdb_v2.organization}";
-            UP_INFLUXDB_BUCKET = "${cfg.unifi-poller.output.influxdb_v2.bucket}";
-            UP_INFLUXDB_AUTH_TOKEN = "${cfg.unifi-poller.output.influxdb_v2.token}";
-            UP_UNIFI_DEFAULT_USER = "${cfg.unifi-poller.input.unifi-controller.user}";
-            UP_UNIFI_DEFAULT_PASS = "${cfg.unifi-poller.input.unifi-controller.pass}";
-            UP_UNIFI_DEFAULT_URL = "${cfg.unifi-poller.input.unifi-controller.url}";
+            UP_INFLUXDB_URL = "${cfg.monitoring.unifi-poller.output.influxdb_v2.url}";
+            UP_INFLUXDB_ORG = "${cfg.monitoring.unifi-poller.output.influxdb_v2.organization}";
+            UP_INFLUXDB_BUCKET = "${cfg.monitoring.unifi-poller.output.influxdb_v2.bucket}";
+            UP_INFLUXDB_AUTH_TOKEN = "${cfg.monitoring.unifi-poller.output.influxdb_v2.token}";
+            UP_UNIFI_DEFAULT_USER = "${cfg.monitoring.unifi-poller.input.unifi-controller.user}";
+            UP_UNIFI_DEFAULT_PASS = "${cfg.monitoring.unifi-poller.input.unifi-controller.pass}";
+            UP_UNIFI_DEFAULT_URL = "${cfg.monitoring.unifi-poller.input.unifi-controller.url}";
             UP_POLLER_DEBUG = "true";
           };
-        };
-      };
+        }; }
+        //
+        listToAttrs (
+          (map (name: {
+            name = "fritzinfluxdb-${name}"; value = createFritzInfluxDBContainer (builtins.getAttr name cfg.monitoring.fritzinfluxdb.inputs) name;
+          }) (builtins.attrNames cfg.monitoring.fritzinfluxdb.inputs))
+        );
     };
 
   };
