@@ -53,10 +53,10 @@ let cfg = config.senpro; in {
 
   config = mkIf cfg.oci-containers.traefik.enable {
     boot.kernel.sysctl."net.core.rmem_max" = 2500000;
-    systemd.services.podman-traefik-provisioning = {
+    systemd.services.docker-traefik-provisioning = {
       enable = true;
       description = "Configuration provisioning for the Traefik container.";
-      requiredBy = [ "podman-traefik.service" ];
+      requiredBy = [ "docker-traefik.service" ];
       restartIfChanged = true;
       preStart = ''
         ${pkgs.coreutils-full}/bin/mkdir /var/lib/containers/storage/volumes/traefik/_data/conf.d
@@ -127,7 +127,7 @@ let cfg = config.senpro; in {
         environment = cfg.oci-containers.traefik.configuration.environment;
         volumes = [
           "traefik:/etc/traefik"
-          "/run/podman/podman.sock:/var/run/docker.sock"
+          "/run/docker.sock:/var/run/docker.sock"
         ];
       };
     };
