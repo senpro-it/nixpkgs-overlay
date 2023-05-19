@@ -3,7 +3,7 @@
 {
 
   imports = [
-    ./telegraf
+    ./monitoring
     ./oci-containers
   ];
 
