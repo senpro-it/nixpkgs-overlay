@@ -301,6 +301,68 @@ in {
         };
       };
     };
+    unifi-poller = {
+      enable = mkEnableOption ''
+        Whether to enable the UniFi poller (Ubiquiti monitoring agent).
+      '';
+      input = {
+        unifi-controller = {
+          url = mkOption {
+            type = types.str;
+            example = "https://unifictrl.example.com:8443/";
+            description = lib.mdDoc ''
+              URL of the targeted UniFi controller.
+            '';
+          };
+          user = mkOption {
+            type = types.str;
+            example = "admin";
+            description = lib.mdDoc ''
+              User to access the targeted UniFi controller.
+            '';
+          };
+          pass = mkOption {
+            type = types.str;
+            example = "your-secure-password";
+            description = lib.mdDoc ''
+              Password for the specified UniFi controller read-access user.
+            '';
+          };
+        };
+      };
+      output = {
+        influxdb_v2 = {
+          url = mkOption {
+            type = types.str;
+            example = "https://influxdb.example.com/";
+            description = lib.mdDoc ''
+              URL of the targeted InfluxDB instance.
+            '';
+          };
+          token = mkOption {
+            type = types.str;
+            example = "your-influxdb-token";
+            description = lib.mdDoc ''
+              Token for the the targeted InfluxDB instance.
+            '';
+          };
+          organization = mkOption {
+            type = types.str;
+            example = "your-influxdb-org";
+            description = lib.mdDoc ''
+              InfluxDB organization where the targeted bucket resides.
+            '';
+          };
+          bucket = mkOption {
+            type = types.str;
+            example = "your-influxdb-bucket";
+            description = lib.mdDoc ''
+              InfluxDB bucket where the output should be delivered to.
+            '';
+          };
+        };
+      };
+    };
   };
 
   config = {
@@ -1022,6 +1084,25 @@ in {
 
         };
         outputs = cfg.telegraf.outputs;
+      };
+    };
+
+    virtualisation.oci-containers = {
+      containers = {
+        unifi-poller = lib.mkIf cfg.unifi-poller.enable {
+          image = "ghcr.io/unpoller/unpoller:latest-arm64v8";
+          autoStart = true;
+          environment = {
+            UP_INFLUXDB_URL = "${cfg.unifi-poller.output.influxdb_v2.url}";
+            UP_INFLUXDB_ORG = "${cfg.unifi-poller.output.influxdb_v2.organization}";
+            UP_INFLUXDB_BUCKET = "${cfg.unifi-poller.output.influxdb_v2.bucket}";
+            UP_INFLUXDB_AUTH_TOKEN = "${cfg.unifi-poller.output.influxdb_v2.token}";
+            UP_UNIFI_DEFAULT_USER = "${cfg.unifi-poller.input.unifi-controller.user}";
+            UP_UNIFI_DEFAULT_PASS = "${cfg.unifi-poller.input.unifi-controller.pass}";
+            UP_UNIFI_DEFAULT_URL = "${cfg.unifi-poller.input.unifi-controller.url}";
+            UP_POLLER_DEBUG = "true";
+          };
+        };
       };
     };
 
