@@ -899,6 +899,36 @@ in {
                 { name = "synology.nas.serviceTable"; oid = "SYNOLOGY-SERVICES-MIB::serviceTable"; inherit_tags = [ "host" ]; }
               ];
             })
+			(lib.mkIf cfg.telegraf.inputs.snmp.vendors.vmware.esxi.endpoints.self.enable {
+              name = "vmware.esxi";
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
+              agents = cfg.telegraf.inputs.snmp.vendors.vmware.esxi.endpoints.self.agents;
+              timeout = "20s";
+              version = 3;
+              sec_level = "${cfg.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.security.level}";
+              sec_name = "${cfg.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.security.username}";
+              auth_protocol = "${cfg.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.authentication.protocol}";
+              auth_password = "${cfg.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.authentication.password}";
+              priv_protocol = "${cfg.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.privacy.protocol}";
+              priv_password = "${cfg.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.privacy.password}";
+              retries = 5;
+              field = [
+                { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
+                { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
+                { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
+				{ name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
+				{ name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
+				{ name = "model"; oid = "VMWARE-SYSTEM-MIB::vmwProdName.0"; }
+				{ name = "firmwareVersion"; oid = "VMWARE-SYSTEM-MIB::vmwProdVersion.0"; }
+				{ name = "firmwareBuild"; oid = "VMWARE-SYSTEM-MIB::vmwProdBuild.0"; }
+				{ name = "firmwareUpdateLevel"; oid = "VMWARE-SYSTEM-MIB::vmwProdUpdate.0"; }
+				{ name = "firmwarePatchLevel"; oid = "VMWARE-SYSTEM-MIB::vmwProdPatch.0"; }
+				
+              ];
+              table = [
+			    { name = "vmware.esxi.vmTable"; oid = "VMWARE-VMINFO-MIB::vmwVmTable"; inherit_tags = [ "host" ]; }
+              ];
+            })
           ];
           vsphere = lib.mkIf cfg.monitoring.telegraf.inputs.api.vendors.vmware.vsphere.enable [
             {
