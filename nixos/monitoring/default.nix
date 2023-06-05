@@ -399,11 +399,23 @@ in {
                 };
               };
               synology = {
-                nas = {
+                dsm = {
                   endpoints = {
                     self = {
                       enable = mkEnableOption ''
-                        Whether to enable the Synology NAS monitoring via SNMP.
+                        Whether to enable the Synology DSM monitoring via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    }; };
+                  credentials = telegrafOptions.authSNMPv3;
+                };
+              };
+              vmware = {
+                esxi = {
+                  endpoints = {
+                    self = {
+                      enable = mkEnableOption ''
+                        Whether to enable the VMware ESXi monitoring via SNMP.
                       '';
                       agents = telegrafOptions.agentConfig;
                     }; };
@@ -848,18 +860,18 @@ in {
                 { name = "sophos.xg.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
               ];
             })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.synology.nas.endpoints.self.enable {
-              name = "synology.nas";
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.synology.dsm.endpoints.self.enable {
+              name = "synology.dsm";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.synology.nas.endpoints.self.agents;
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.synology.dsm.endpoints.self.agents;
               timeout = "20s";
               version = 3;
-              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.nas.credentials.security.level}";
-              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.nas.credentials.security.username}";
-              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.nas.credentials.authentication.protocol}";
-              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.nas.credentials.authentication.password}";
-              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.nas.credentials.privacy.protocol}";
-              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.nas.credentials.privacy.password}";
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.dsm.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.dsm.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.dsm.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.dsm.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.dsm.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.dsm.credentials.privacy.password}";
               retries = 5;
               field = [
                 { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
@@ -884,49 +896,56 @@ in {
                 { name = "memCached"; oid = "UCD-SNMP-MIB::memCached.0"; }
                 { name = "memAvailSwap"; oid = "UCD-SNMP-MIB::memAvailSwap.0"; }
                 { name = "memTotalSwap"; oid = "UCD-SNMP-MIB::memTotalSwap.0"; }
+                { name = "highAvailActiveNode"; oid = "SYNOLOGY-SHA-MIB::activeNodeName.0"; }
+                { name = "highAvailPassiveNode"; oid = "SYNOLOGY-SHA-MIB::passiveNodeName.0"; }
+                { name = "highAvailClusterName"; oid = "SYNOLOGY-SHA-MIB::clusterName.0"; }
+                { name = "highAvailClusterStatus"; oid = "SYNOLOGY-SHA-MIB::clusterStatus.0"; }
+                { name = "highAvailClusterAutoFailover"; oid = "SYNOLOGY-SHA-MIB::clusterAutoFailover.0"; }
+                { name = "highAvailHeartbeatStatus"; oid = "SYNOLOGY-SHA-MIB::heartbeatStatus.0"; }
+                { name = "highAvailHeartbeatTxRate"; oid = "SYNOLOGY-SHA-MIB::heartbeatTxRate.0"; }
+                { name = "highAvailHeartbeatLatency"; oid = "SYNOLOGY-SHA-MIB::heartbeatLatency.0"; }
               ];
               table = [
-                { name = "synology.nas.diskTable"; oid = "SYNOLOGY-DISK-MIB::diskTable"; inherit_tags = [ "host" ]; }
-                { name = "synology.nas.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                { name = "synology.dsm.diskTable"; oid = "SYNOLOGY-DISK-MIB::diskTable"; inherit_tags = [ "host" ]; }
+                { name = "synology.dsm.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "IF-MIB::ifDescr"; is_tag = true; }
                 ]; }
-                { name = "synology.nas.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                { name = "synology.dsm.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "IF-MIB::ifName"; is_tag = true; }
                 ]; }
-                { name = "synology.nas.raidTable"; oid = "SYNOLOGY-RAID-MIB::raidTable"; inherit_tags = [ "host" ]; field = [
+                { name = "synology.dsm.raidTable"; oid = "SYNOLOGY-RAID-MIB::raidTable"; inherit_tags = [ "host" ]; field = [
                   { oid = "SYNOLOGY-RAID-MIB::raidName"; is_tag = true; }
                 ]; }
-                { name = "synology.nas.serviceTable"; oid = "SYNOLOGY-SERVICES-MIB::serviceTable"; inherit_tags = [ "host" ]; }
+                { name = "synology.dsm.serviceTable"; oid = "SYNOLOGY-SERVICES-MIB::serviceTable"; inherit_tags = [ "host" ]; }
               ];
             })
-			(lib.mkIf cfg.telegraf.inputs.snmp.vendors.vmware.esxi.endpoints.self.enable {
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.vmware.esxi.endpoints.self.enable {
               name = "vmware.esxi";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.telegraf.inputs.snmp.vendors.vmware.esxi.endpoints.self.agents;
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.vmware.esxi.endpoints.self.agents;
               timeout = "20s";
               version = 3;
-              sec_level = "${cfg.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.security.level}";
-              sec_name = "${cfg.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.security.username}";
-              auth_protocol = "${cfg.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.authentication.protocol}";
-              auth_password = "${cfg.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.authentication.password}";
-              priv_protocol = "${cfg.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.privacy.protocol}";
-              priv_password = "${cfg.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.privacy.password}";
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.privacy.password}";
               retries = 5;
               field = [
                 { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
                 { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
                 { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
-				{ name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
-				{ name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
-				{ name = "model"; oid = "VMWARE-SYSTEM-MIB::vmwProdName.0"; }
-				{ name = "firmwareVersion"; oid = "VMWARE-SYSTEM-MIB::vmwProdVersion.0"; }
-				{ name = "firmwareBuild"; oid = "VMWARE-SYSTEM-MIB::vmwProdBuild.0"; }
-				{ name = "firmwareUpdateLevel"; oid = "VMWARE-SYSTEM-MIB::vmwProdUpdate.0"; }
-				{ name = "firmwarePatchLevel"; oid = "VMWARE-SYSTEM-MIB::vmwProdPatch.0"; }
-				
+                { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
+                { name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
+                { name = "model"; oid = "VMWARE-SYSTEM-MIB::vmwProdName.0"; }
+                { name = "firmwareVersion"; oid = "VMWARE-SYSTEM-MIB::vmwProdVersion.0"; }
+                { name = "firmwareBuild"; oid = "VMWARE-SYSTEM-MIB::vmwProdBuild.0"; }
+                { name = "firmwareUpdateLevel"; oid = "VMWARE-SYSTEM-MIB::vmwProdUpdate.0"; }
+                { name = "firmwarePatchLevel"; oid = "VMWARE-SYSTEM-MIB::vmwProdPatch.0"; }		
               ];
               table = [
-			    { name = "vmware.esxi.vmTable"; oid = "VMWARE-VMINFO-MIB::vmwVmTable"; inherit_tags = [ "host" ]; }
+                { name = "vmware.esxi.vmTable"; oid = "VMWARE-VMINFO-MIB::vmwVmTable"; inherit_tags = [ "host" ]; }
               ];
             })
           ];
