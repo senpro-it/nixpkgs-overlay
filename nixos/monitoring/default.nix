@@ -227,7 +227,7 @@ in {
               sophos = {
                 central = {
                   enable = mkEnableOption ''
-                    Whether to enable the Aruba Mobility Gateway monitoring via SNMP.
+                    Whether to enable the Sophos Central monitoring via API.
                   '';
                   client = {
                     id = mkOption {
@@ -575,7 +575,7 @@ in {
           ];
           snmp = lib.mkIf cfg.monitoring.telegraf.inputs.snmp.enable [
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.self.enable {
-              name = "aruba.mobilityGateway.self";
+              name = "aruba.mobilityGateway";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
               agents = cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.self.agents;
               timeout = "20s";
@@ -588,23 +588,27 @@ in {
               priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.privacy.password}";
               retries = 5;
               field = [
-                { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
-                { name = "cpuModel"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtProcessorModel.0"; }
-                { name = "cpuTotal"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtTotalCpu.0"; }
-                { name = "cpuUsedPercent"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtCpuUsedPercent.0"; }
-                { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
-                { name = "fwVersion"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtSwVersion.0"; }
-                { name = "host"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtHostname.0"; is_tag = true; }
-                { name = "hwVersion"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtHwVersion.0"; }
-                { name = "memoryUsedPercent"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtMemoryUsedPercent.0"; }
-                { name = "model"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtModelName.0"; }
-                { name = "packetLossPercent"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtMemoryUsedPercent.0"; }
-                { name = "serialNumber"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtSerialNumber.0"; }
+                { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
                 { name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
+                { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
+                { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
+                { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
+                { name = "model"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtModelName.0"; }
+                { name = "serialNumber"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtSerialNumber.0"; }
+                { name = "cpuUsage"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtCpuUsedPercent.0"; }
+                { name = "cpuModel"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtProcessorModel.0"; }
+                { name = "memUsage"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtMemoryUsedPercent.0"; }
+                { name = "firmwareVersion"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtSwVersion.0"; }
+                { name = "hardwareVersion"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtHwVersion.0"; }
               ];
               table = [
-                { name = "aruba.mobilityGateway.self.memory"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtMemoryTable"; inherit_tags = [ "host" ]; }
-                { name = "aruba.mobilityGateway.self.processor"; oid = "WLSX-SYSTEMEXT-MIB::wlsxSysExtProcessorTable"; inherit_tags = [ "host" ]; }
+                { name = "aruba.mobilityGateway.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "IF-MIB::ifDescr"; is_tag = true; }
+                ]; }
+                { name = "aruba.mobilityGateway.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "IF-MIB::ifName"; is_tag = true; }
+                ]; }
+                { name = "aruba.mobilityGateway.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
               ];
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.accessPoints.enable {
@@ -621,12 +625,16 @@ in {
               priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.privacy.password}";
               retries = 5;
               table = [
-                {
-                  name = "aruba.mobilityGateway.accessPoints"; oid = "WLSX-WLAN-MIB::wlsxWlanAPTable"; index_as_tag = true;
-                  field = [
-                    { oid = "WLSX-WLAN-MIB::wlanAPName"; is_tag = true; }
-                  ];
-                }
+                { name = "aruba.mobilityGateway.accessPoints.apTable"; oid = "WLSX-WLAN-MIB::wlsxWlanAPTable"; index_as_tag = true; field = [
+                  { oid = "WLSX-WLAN-MIB::wlanAPName"; is_tag = true; }
+                ]; }
+                { name = "aruba.mobilityGateway.accessPoints.essidTable"; oid = "WLSX-WLAN-MIB::wlsxWlanESSIDTable"; index_as_tag = true; }
+                { name = "aruba.mobilityGateway.accessPoints.radioTable"; oid = "WLSX-WLAN-MIB::wlsxWlanRadioTable"; index_as_tag = true; }
+                { name = "aruba.mobilityGateway.accessPoints.stationTable"; oid = "WLSX-WLAN-MIB::wlsxWlanStationTable"; index_as_tag = true; }
+                { name = "aruba.mobilityGateway.accessPoints.apStatsTable"; oid = "WLSX-WLAN-MIB::wlsxWlanAPStatsTable"; index_as_tag = true; }
+                { name = "aruba.mobilityGateway.accessPoints.essidStatsTable"; oid = "WLSX-WLAN-MIB::wlsxWlanAPESSIDStatsTable"; index_as_tag = true; }
+                { name = "aruba.mobilityGateway.accessPoints.radioStatsTable"; oid = "WLSX-WLAN-MIB::wlsxWlanAPRadioStatsTable"; index_as_tag = true; }
+                { name = "aruba.mobilityGateway.accessPoints.stationStatsTable"; oid = "WLSX-WLAN-MIB::wlsxWlanStationStatsTable"; index_as_tag = true; }
               ];
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.cisco.switch.endpoints.self.enable {
