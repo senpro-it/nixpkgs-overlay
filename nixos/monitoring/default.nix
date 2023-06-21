@@ -710,7 +710,7 @@ in {
               name = "qnap.nas";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
               agents = cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.endpoints.self.agents;
-              interval = "300s";
+              interval = "60s";
               timeout = "20s";
               version = 3;
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.credentials.security.level}";
