@@ -56,16 +56,6 @@ let cfg = config.senpro; in {
             '';
           };
         };
-        influxdb = {
-          publicURL = mkOption {
-            type = types.str;
-            default = "influxdb.local";
-            example = "influxdb.example.com";
-            description = ''
-              URL of the InfluxDB instance. Don't provide protocol, SSL is hardcoded.
-            '';
-          };
-        };
         keycloak = {
           provider = mkOption {
             type = types.str;
@@ -152,9 +142,6 @@ let cfg = config.senpro; in {
       grafana = {
         image = "docker.io/grafana/grafana:9.5.1";
         autoStart = true;
-        dependsOn = [
-          "grafana-influxdb"
-        ];
         extraOptions = [
           "--net=proxy"
           "--label=traefik.enable=true"
@@ -219,25 +206,6 @@ let cfg = config.senpro; in {
         ];
         volumes = [
           "grafana-alertmanager-data:/alertmanager"
-        ];
-      };
-      grafana-influxdb = {
-        image = "docker.io/library/influxdb:2.6";
-        autoStart = true;
-        extraOptions = [
-          "--net=proxy"
-          "--label=traefik.enable=true"
-          "--label=traefik.docker.network=proxy"
-          "--label=traefik.http.routers.grafana-influxdb.tls=true"
-          "--label=traefik.http.routers.grafana-influxdb.tls.certresolver=letsencrypt"
-          "--label=traefik.http.routers.grafana-influxdb.entrypoints=https"
-          "--label=traefik.http.routers.grafana-influxdb.service=grafana-influxdb"
-          "--label=traefik.http.routers.grafana-influxdb.rule=Host(`${cfg.oci-containers.grafana.influxdb.publicURL}`)"
-          "--label=traefik.http.services.grafana-influxdb.loadBalancer.server.port=8086"
-        ];
-        volumes = [
-          "grafana-influxdb:/etc/influxdb2"
-          "grafana-influxdb-data:/var/lib/influxdb2"
         ];
       };
     };
