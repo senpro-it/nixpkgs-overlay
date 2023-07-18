@@ -59,7 +59,7 @@ let cfg = config.senpro; in {
       requiredBy = [ "docker-traefik.service" ];
       restartIfChanged = true;
       preStart = ''
-        ${pkgs.coreutils-full}/bin/mkdir /var/lib/containers/storage/volumes/traefik/_data/conf.d
+        ${pkgs.coreutils-full}/bin/mkdir /var/lib/docker/volumes/traefik/_data/conf.d
         ${pkgs.coreutils-full}/bin/printf "%s\n" \
           "http:" \
           "  middlewares:" \
@@ -86,16 +86,16 @@ let cfg = config.senpro; in {
           "      curvePreferences:" \
           "      - CurveP521" \
           "      - CurveP384" \
-          "      minVersion: VersionTLS12" > /var/lib/containers/storage/volumes/traefik/_data/conf.d/main.yml
-          ${pkgs.coreutils-full}/bin/printf "%s\n" "${cfg.oci-containers.traefik.configuration.dynamic}" > /var/lib/containers/storage/volumes/traefik/_data/conf.d/cust.yml
+          "      minVersion: VersionTLS12" > /var/lib/docker/volumes/traefik/_data/conf.d/main.yml
+          ${pkgs.coreutils-full}/bin/printf "%s\n" "${cfg.oci-containers.traefik.configuration.dynamic}" > /var/lib/docker/volumes/traefik/_data/conf.d/cust.yml
       '';
       serviceConfig = {
         ExecStart = ''
-          ${pkgs.coreutils-full}/bin/tail -f /var/lib/containers/storage/volumes/traefik/_data/conf.d/main.yml
+          ${pkgs.coreutils-full}/bin/tail -f /var/lib/docker/volumes/traefik/_data/conf.d/main.yml
         '';
       };
       postStop = ''
-        ${pkgs.coreutils-full}/bin/rm -rf /var/lib/containers/storage/volumes/traefik/_data/conf.d
+        ${pkgs.coreutils-full}/bin/rm -rf /var/lib/docker/volumes/traefik/_data/conf.d
       '';
     };
     virtualisation.oci-containers.containers = {
