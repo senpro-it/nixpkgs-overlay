@@ -144,15 +144,6 @@ let cfg = config.senpro; in {
         autoStart = true;
         extraOptions = [
           "--net=proxy"
-          "--label=traefik.enable=true"
-          "--label=traefik.docker.network=proxy"
-          "--label=traefik.http.routers.grafana.tls=true"
-          "--label=traefik.http.routers.grafana.tls.certresolver=letsencrypt"
-          "--label=traefik.http.routers.grafana.entrypoints=https"
-          "--label=traefik.http.routers.grafana.service=grafana"
-          "--label=traefik.http.routers.grafana.rule=Host(`${cfg.oci-containers.grafana.rootURL}`)"
-          "--label=traefik.http.services.grafana.loadBalancer.server.port=3000"
-          "--label=traefik.http.middlewares.grafanaAuthProxy.basicAuth.users=${cfg.oci-containers.grafana.authProxy.noc.username}:${cfg.oci-containers.grafana.authProxy.noc.password}"
         ];
         environment = {
           GF_DATABASE_WAL = "true";
@@ -185,27 +176,10 @@ let cfg = config.senpro; in {
           GF_AUTH_PROXY_AUTO_SIGN_UP = "true";
           GF_AUTH_PROXY_WHITELIST = "${cfg.oci-containers.grafana.authProxy.whitelist}";
         };
+        ports = [ "3000:3000/tcp" ];
         volumes = [
           "grafana:/etc/grafana/provisioning"
           "grafana-data:/var/lib/grafana"
-        ];
-      };
-      grafana-alertmanager = {
-        image = "ghcr.io/senpro-it/alertmanager:main";
-        autoStart = true;
-        extraOptions = [
-          "--net=proxy"
-          "--label=traefik.enable=true"
-          "--label=traefik.docker.network=proxy"
-          "--label=traefik.http.routers.grafana-alertmanager.tls=true"
-          "--label=traefik.http.routers.grafana-alertmanager.tls.certresolver=letsencrypt"
-          "--label=traefik.http.routers.grafana-alertmanager.entrypoints=https"
-          "--label=traefik.http.routers.grafana-alertmanager.service=grafana-alertmanager"
-          "--label=traefik.http.routers.grafana-alertmanager.rule=Host(`${cfg.oci-containers.grafana.alertmanager.publicURL}`)"
-          "--label=traefik.http.services.grafana-alertmanager.loadBalancer.server.port=9093"
-        ];
-        volumes = [
-          "grafana-alertmanager-data:/alertmanager"
         ];
       };
     };
