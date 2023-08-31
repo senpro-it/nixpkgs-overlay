@@ -819,6 +819,12 @@ in {
                 { name = "romVersion"; oid = "SNWL-COMMON-MIB::snwlSysROMVersion.0"; }
                 { name = "serialNumber"; oid = "SNWL-COMMON-MIB::snwlSysSerialNumber.0"; }
                 { name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
+                { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
+                { name = "cpuUsage"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCurrentCPUUtil.0"; }
+                { name = "cpuUsageMgmt"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCurrentManagementCPUUtil.0"; }
+                { name = "cpuUsageInspect"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCurrentFwdAndInspectCPUUtil.0"; }
+                { name = "memUsage"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCurrentRAMUtil.0"; }
+                { name = "contentFilter"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCFS.0"; }
               ];
             table = [
                 { name = "sonicWall.fwTzNsa.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
@@ -828,6 +834,8 @@ in {
                   { oid = "IF-MIB::ifName"; is_tag = true; }
                 ]; }
                 { name = "sonicWall.fwTzNsa.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
+                { name = "sonicWall.fwTzNsa.vpnIpsecStats"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicSAStatTable"; inherit_tags = [ "host" ]; }
+                { name = "sonicWall.fwTzNsa.zoneStats"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicwallFwZoneTable"; inherit_tags = [ "host" ]; }
               ];
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.sg.endpoints.self.enable {
