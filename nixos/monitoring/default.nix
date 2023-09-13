@@ -833,7 +833,9 @@ in {
                 { name = "sonicWall.fwTzNsa.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "IF-MIB::ifName"; is_tag = true; }
                 ]; }
-                { name = "sonicWall.fwTzNsa.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
+                { name = "sonicWall.fwTzNsa.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; field = [
+                  { oid = "IP-MIB::ipAdEntIfIndex"; is_tag = true; }
+                ]; }
                 { name = "sonicWall.fwTzNsa.vpnIpsecStats"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicSAStatTable"; inherit_tags = [ "host" ]; }
                 { name = "sonicWall.fwTzNsa.zoneStats"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicwallFwZoneTable"; inherit_tags = [ "host" ]; }
               ];
