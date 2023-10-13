@@ -1385,6 +1385,7 @@ in {
         requiredBy = [ "docker-svci.service" ];
         restartIfChanged = true;
         preStart = ''
+          ${pkgs.docker-client}/bin/docker volume create svci
           ${pkgs.coreutils-full}/bin/printf "%s\n" \
             "# SVCi Configuration" \
             "# Copy this file into /etc/svci.toml and customize it to your environment." \
@@ -1409,6 +1410,7 @@ in {
         '';
         postStop = ''
           ${pkgs.coreutils-full}/bin/rm -f /var/lib/docker/volumes/svci/_data/svci.toml
+          ${pkgs.docker-client}/bin/docker volume delete svci
         '';
         serviceConfig = { ExecStart = ''${pkgs.bashInteractive}/bin/bash -c "while true; do echo 'docker-svci-provisioner is up & running'; sleep 1d; done"''; };
       };
