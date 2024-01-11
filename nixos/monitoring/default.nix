@@ -243,7 +243,8 @@ in {
                       description = lib.mdDoc ''
                         Client Secret for the Sophos Central API (Tenant).
                       '';
-                    }; };
+                    };
+                  };
                 };
               };
               vmware = {
@@ -276,7 +277,8 @@ in {
                       description = lib.mdDoc ''
                         vSphere instances which should be monitored. Note the `/sdk` at the end, which is essentially to connect to the right endpoint.
                       '';
-                    }; };
+                    };
+                  };
                 };
               };
             };
@@ -300,7 +302,8 @@ in {
                         Whether to enable the Aruba AP monitoring (through Mobility Gateway) via SNMP.
                       '';
                       agents = telegrafOptions.agentConfig;
-                    }; };
+                    };
+                  };
                   credentials = telegrafOptions.authSNMPv3;
                 };
               };
@@ -312,7 +315,8 @@ in {
                         Whether to enable the Cisco switch monitoring via SNMP.
                       '';
                       agents = telegrafOptions.agentConfig;
-                    }; };
+                    };
+                  };
                   credentials = telegrafOptions.authSNMPv3;
                 };
               };
@@ -324,7 +328,8 @@ in {
                         Whether to enable the FS switch monitoring via SNMP.
                       '';
                       agents = telegrafOptions.agentConfig;
-                    }; };
+                    };
+                  };
                   credentials = telegrafOptions.authSNMPv3;
                 };
               };
@@ -336,7 +341,8 @@ in {
                         Whether to enable the Kentix doorlock monitoring via SNMP.
                       '';
                       agents = telegrafOptions.agentConfig;
-                    }; };
+                    };
+                  };
                   credentials = telegrafOptions.authSNMPv3;
                 };
               };
@@ -348,7 +354,8 @@ in {
                         Whether to enable the QNAP NAS monitoring via SNMP.
                       '';
                       agents = telegrafOptions.agentConfig;
-                    }; };
+                    };
+                  };
                   credentials = telegrafOptions.authSNMPv3;
                 };
               };
@@ -360,7 +367,8 @@ in {
                         Whether to enable the Schneider Electric APC monitoring via SNMP.
                       '';
                       agents = telegrafOptions.agentConfig;
-                    }; };
+                    };
+                  };
                   credentials = telegrafOptions.authSNMPv3;
                 };
               };
@@ -372,7 +380,8 @@ in {
                         Whether to enable the SonicWall TZ & NSa monitoring via SNMP.
                       '';
                       agents = telegrafOptions.agentConfig;
-                    }; };
+                    };
+                  };
                   credentials = telegrafOptions.authSNMPv3;
                 };
               };
@@ -384,7 +393,8 @@ in {
                         Whether to enable the Sophos SG monitoring via SNMP.
                       '';
                       agents = telegrafOptions.agentConfig;
-                    }; };
+                    };
+                  };
                   credentials = telegrafOptions.authSNMPv3;
                 };
                 xg = {
@@ -394,7 +404,8 @@ in {
                         Whether to enable the Sophos XG/XGS monitoring via SNMP.
                       '';
                       agents = telegrafOptions.agentConfig;
-                    }; };
+                    };
+                  };
                   credentials = telegrafOptions.authSNMPv3;
                 };
               };
@@ -406,7 +417,8 @@ in {
                         Whether to enable the Synology DSM monitoring via SNMP.
                       '';
                       agents = telegrafOptions.agentConfig;
-                    }; };
+                    };
+                  };
                   credentials = telegrafOptions.authSNMPv3;
                 };
               };
@@ -418,7 +430,8 @@ in {
                         Whether to enable the VMware ESXi monitoring via SNMP.
                       '';
                       agents = telegrafOptions.agentConfig;
-                    }; };
+                    };
+                  };
                   credentials = telegrafOptions.authSNMPv3;
                 };
               };
@@ -428,7 +441,28 @@ in {
             enable = mkEnableOption ''
               Whether to enable Ping.
             '';
-            urls = [ "example.org" ];
+            #urls = [ "example.org" ];
+            urls = mkOption {
+              type = types.listOf types.str;
+              default = [];
+              example = literalExpression ''
+                [ "192.168.0.1" ]
+              '';
+              description = lib.mdDoc ''
+                Hosts to be pinged
+              '';
+            };
+            # method = "exec" types.str
+            # count = 1 types.str (ping -n)
+            # ping_interval = 1.0 types.str (sec)
+            # timeout = 1.0 (sec)
+            # deadline = 10 (sec)
+            # interface = "" types.str
+            # percentiles = [50, 95, 99] list (if method == "native")
+            # binary = "ping"
+            # arguments = ["-c", "3"] (shell args)
+            # ipv6 = false types.bool
+            # size = 56 (ICMP size)
           };
         };
       };
