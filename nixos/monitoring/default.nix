@@ -1382,6 +1382,7 @@ in {
           ping = lib.mkIf cfg.monitoring.telegraf.inputs.ping.enable [
             {
               urls = cfg.monitoring.telegraf.inputs.ping.urls;
+              method = "native";
             }
           ];
         };
