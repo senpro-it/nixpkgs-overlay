@@ -435,6 +435,19 @@ in {
                   credentials = telegrafOptions.authSNMPv3;
                 };
               };
+              zyxel = {
+                switch = {
+                  endpoints = {
+                    self = {
+                      enable = mkEnableOption ''
+                        Whether to enable the Zyxel switch monitoring via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    };
+                  };
+                  credentials = telegrafOptions.authSNMPv3;
+                };
+              };
             };
           };
           ping = {
@@ -1080,6 +1093,52 @@ in {
               ];
               table = [
                 { name = "vmware.esxi.vmTable"; oid = "VMWARE-VMINFO-MIB::vmwVmTable"; inherit_tags = [ "host" ]; }
+              ];
+            })
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.endpoints.self.enable {
+              name = "zyxel.switch";
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.endpoints.self.agents;
+              timeout = "20s";
+              version = 3;
+              context_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.credentials.context.name}";
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.credentials.privacy.password}";
+              retries = 5;
+              field = [
+                { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
+                { name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
+                { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
+                { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
+                { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
+                { name = "serialNumber"; oid = "ZYXEL-SYSTEM-MIB::zySysSerialNumber.0"; }
+                { name = "fwVersionMajor"; oid = "ZYXEL-SYSTEM-MIB::zySysSwPlatformMajorVers.0"; }
+                { name = "fwVersionMinor"; oid = "ZYXEL-SYSTEM-MIB::zySysSwPlatformMinorVers.0"; }
+                { name = "cpuUsage"; oid = "ZYXEL-SYSTEM-MGMT-MIB::zySysMgmtCPUUsage.0"; }
+                { name = "sysStatus"; oid = "ZYXEL-SYSTEM-MGMT-MIB::zySysMgmtSysStatus.0 "; }
+              ];
+              table = [
+                { name = "zyxel.switch.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "IF-MIB::ifDescr"; is_tag = true; }
+                ]; }
+                { name = "zyxel.switch.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "IF-MIB::ifName"; is_tag = true; }
+                ]; }
+                { name = "zyxel.switch.ifExtStatisticsTable"; oid = "NMS-INTERFACE-EXT::ifExtStatisticsTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "NMS-INTERFACE-EXT::ifExtDesc"; is_tag = true; }
+                ]; }
+                { name = "zyxel.switch.portTable"; oid = "ZYXEL-PORT-MIB::zyxelPortTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+                { name = "zyxel.switch.portInfoTable"; oid = "ZYXEL-PORT-MIB::zyxelPortInfoTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+                { name = "zyxel.switch.accessControlSetup"; oid = "ZYXEL-ACCESS-CONTROL-MIB::zyxelAccessControlTable"; inherit_tags = [ "host" ]; }
+                { name = "zyxel.switch.hwMonitorFan"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorFanRpmTable"; inherit_tags = [ "host" ]; }
+                { name = "zyxel.switch.hwMonitorTemp"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorTemperatureTable"; inherit_tags = [ "host" ]; }
+                { name = "zyxel.switch.hwMonitorVolt"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorVoltageTable"; inherit_tags = [ "host" ]; }
+                { name = "zyxel.switch.hwMonitorPower"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorPowerSourceTable"; inherit_tags = [ "host" ]; }
+                { name = "zyxel.switch.sysMemory"; oid = "ZYXEL-SYS-MEMORY-MIB::zyxelSysMemoryPoolTable"; inherit_tags = [ "host" ]; }
               ];
             })
           ];
