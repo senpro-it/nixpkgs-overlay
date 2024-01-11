@@ -1379,9 +1379,11 @@ in {
               discover_concurrency = 4;
             }
           ];
-          ping = (lib.mkIf cfg.monitoring.telegraf.inputs.ping.enable {
-            urls = cfg.monitoring.telegraf.inputs.ping.urls
-          });
+          ping = lib.mkIf cfg.monitoring.telegraf.inputs.ping.enable [
+            {
+              urls = cfg.monitoring.telegraf.inputs.ping.urls;
+            }
+          ];
         };
         outputs = cfg.monitoring.telegraf.outputs;
       };
