@@ -424,6 +424,12 @@ in {
               };
             };
           };
+          ping = {
+            enable = mkEnableOption ''
+              Whether to enable Ping.
+            '';
+            urls = [ "example.org" ];
+          };
         };
       };
       svci = {
