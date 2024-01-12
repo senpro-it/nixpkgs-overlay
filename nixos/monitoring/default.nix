@@ -463,47 +463,48 @@ in {
             # ipv6 = false types.bool
             # size = 56 (ICMP size)
           };
+
+          ## Options: Local Raspberry Pi
+          local_pi = {
+            enable = mkEnableOption ''
+                Monitor the local Raspberry Pi monitoring agent as well.
+            '';
+            stats = {
+              cpu = {
+                  enable = mkEnableOption ''
+                      Monitor the Pi's CPU?
+                  '';
+              };
+              disk = {
+                  enable = mkEnableOption ''
+                      Monitor the Pi's internal storage?
+                  '';
+              };
+              mem = {
+                  enable = mkEnableOption ''
+                      Monitor the Pi's RAM and SWAP?
+                  '';
+              };
+              kernel = {
+                  enable = mkEnableOption ''
+                      Monitor the Pi's Linux Kernel information?
+                  '';
+              };
+              processes = {
+                  enable = mkEnableOption ''
+                      Monitor the Pi's running processes?
+                  '';
+              };
+              system = {
+                  enable = mkEnableOption ''
+                      Monitor the Pi's system information?
+                  '';
+              };
+            };
+          };
         };
       };
 
-      ## Options: Local Raspberry Pi
-      local_pi = {
-        enable = mkEnableOption ''
-            Monitor the local Raspberry Pi monitoring agent as well.
-        '';
-        stats = {
-          cpu = {
-              enable = mkEnableOption ''
-                  Monitor the Pi's CPU?
-              '';
-          };
-          disk = {
-              enable = mkEnableOption ''
-                  Monitor the Pi's internal storage?
-              '';
-          };
-          mem = {
-              enable = mkEnableOption ''
-                  Monitor the Pi's RAM and SWAP?
-              '';
-          };
-          kernel = {
-              enable = mkEnableOption ''
-                  Monitor the Pi's Linux Kernel information?
-              '';
-          };
-          processes = {
-              enable = mkEnableOption ''
-                  Monitor the Pi's running processes?
-              '';
-          };
-          system = {
-              enable = mkEnableOption ''
-                  Monitor the Pi's system information?
-              '';
-          };
-        };
-      };
       svci = {
         enable = mkEnableOption ''
           Whether to enable SVCi (Spectrum Virtualize Insights).
