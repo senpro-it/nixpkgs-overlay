@@ -1101,7 +1101,6 @@ in {
               agents = cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.endpoints.self.agents;
               timeout = "20s";
               version = 3;
-              context_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.credentials.context.name}";
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.credentials.security.level}";
               sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.credentials.security.username}";
               auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.credentials.authentication.protocol}";
