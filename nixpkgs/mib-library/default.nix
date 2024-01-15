@@ -8,7 +8,7 @@ stdenv.mkDerivation rec {
     owner = "senpro-it";
     repo = "mibs";
     rev = "8f3f5a0991f8af48818e3f72b684b0b81cd7563e";
-    hash = "sha256-d9ed8c3dc2d80dd6533cf696b4cc4fe4533f1229010785ec21b3c432fbd404bd";
+    hash = "sha256-viPnQZgDw2kx1BYH1P0GtZoz4qPIv3Q2txjunkmQL8E=";
   };
 
   installPhase = ''
