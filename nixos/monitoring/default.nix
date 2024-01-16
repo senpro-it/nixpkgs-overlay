@@ -359,6 +359,28 @@ in {
                   credentials = telegrafOptions.authSNMPv3;
                 };
               };
+              reddox = {
+                endpoints = {
+                  self = {
+                    enable = mkEnableOption ''
+                      Whether to enable REDDOX monitoring via SNMP.
+                    '';
+                    agents = telegrafOptions.agentConfig;
+                  };
+                };
+                credentials = {
+                  community = mkOption {
+                    description = lib.mdDoc ''
+                      Specify the SNMPv2 community.
+                    '';
+                    type = types.str;
+                    default = "";
+                    example = literalExpression ''
+                      "reddoxptrg"
+                    '';
+                  };
+                };
+              };
               schneiderElectric = {
                 apc = {
                   endpoints = {
@@ -1093,6 +1115,115 @@ in {
               ];
               table = [
                 { name = "vmware.esxi.vmTable"; oid = "VMWARE-VMINFO-MIB::vmwVmTable"; inherit_tags = [ "host" ]; }
+              ];
+            })
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.reddox.endpoints.self.enable {
+              name = "reddox";
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.reddox.endpoints.self.agents;
+              timeout = "20s";
+              # TODO(KI): Switch to SNMPv3 in the future. Cuz more secure... that's it, really.
+              version = 2;
+              community = "${cfg.monitoring.telegraf.inputs.snmp.vendors.reddox.credentials.community}";
+              retries = 5;
+              field = [
+                { name = "SmtpReceiverConnectionsIn"; oid = "REDDOX::SmtpReceiverConnectionsIn"; }
+                { name = "SmtpReceiverConnectionsOut"; oid = "REDDOX::SmtpReceiverConnectionsOut"; }
+                { name = "SmtpReceiverMessagesReceivedIn"; oid = "REDDOX::SmtpReceiverMessagesReceivedIn"; }
+                { name = "SmtpReceiverMessagesReceivedOut"; oid = "REDDOX::SmtpReceiverMessagesReceivedOut"; }
+                { name = "SmtpReceiverBytesReceivedIn"; oid = "REDDOX::SmtpReceiverBytesReceivedIn"; }
+                { name = "SmtpReceiverBytesReceivedOut"; oid = "REDDOX::SmtpReceiverBytesReceivedOut"; }
+                { name = "SmtpReceiverActiveConnections"; oid = "REDDOX::SmtpReceiverActiveConnections"; }
+                { name = "RejectedMessagesBecauseIpBlacklisted"; oid = "REDDOX::RejectedMessagesBecauseIpBlacklisted"; }
+                { name = "RejectedMessagesBecauseAntiSpoofing"; oid = "REDDOX::RejectedMessagesBecauseAntiSpoofing"; }
+                { name = "RejectedMessagesBecauseSpf"; oid = "REDDOX::RejectedMessagesBecauseSpf"; }
+                { name = "ValidDkimSignatures"; oid = "REDDOX::ValidDkimSignatures"; }
+                { name = "InvalidDkimSignatures"; oid = "REDDOX::InvalidDkimSignatures"; }
+                { name = "SmtpSenderConnectionsIn"; oid = "REDDOX::SmtpSenderConnectionsIn"; }
+                { name = "SmtpSenderConnectionsOut"; oid = "REDDOX::SmtpSenderConnectionsOut"; }
+                { name = "SmtpSenderMessagesSentIn"; oid = "REDDOX::SmtpSenderMessagesSentIn"; }
+                { name = "SmtpSenderMessagesSentOut"; oid = "REDDOX::SmtpSenderMessagesSentOut"; }
+                { name = "SmtpSenderBytesSentIn"; oid = "REDDOX::SmtpSenderBytesSentIn"; }
+                { name = "SmtpSenderBytesSentOut"; oid = "REDDOX::SmtpSenderBytesSentOut"; }
+                { name = "SmtpSenderActiveConnections"; oid = "REDDOX::SmtpSenderActiveConnections"; }
+                { name = "MessagesWaitingForProcessing"; oid = "REDDOX::MessagesWaitingForProcessing"; }
+                { name = "MessagesWaitingForDelivery"; oid = "REDDOX::MessagesWaitingForDelivery"; }
+                { name = "ArchiveQueueLength"; oid = "REDDOX::ArchiveQueueLength"; }
+                { name = "RssMemoryUsageApplianceManager"; oid = "REDDOX::RssMemoryUsageApplianceManager"; }
+                { name = "RssMemoryUsageMailDepot"; oid = "REDDOX::RssMemoryUsageMailDepot"; }
+                { name = "RssMemoryUsageSystemManager"; oid = "REDDOX::RssMemoryUsageSystemManager"; }
+                { name = "RssMemoryyUsageComplianceLog"; oid = "REDDOX::RssMemoryyUsageComplianceLog"; }
+                { name = "RssMemoryUsageSpamfinder"; oid = "REDDOX::RssMemoryUsageSpamfinder"; }
+                { name = "RssMemoryUsageClamav"; oid = "REDDOX::RssMemoryUsageClamav"; }
+                { name = "RssMemoryUsageMongoDB"; oid = "REDDOX::RssMemoryUsageMongoDB"; }
+                { name = "RssMemoryUsageHaProxy"; oid = "REDDOX::RssMemoryUsageHaProxy"; }
+                { name = "RssMemoryUsageMailSealer"; oid = "REDDOX::RssMemoryUsageMailSealer"; }
+                { name = "RssMemoryUsageSmtpReceiver"; oid = "REDDOX::RssMemoryUsageSmtpReceiver"; }
+                { name = "RssMemoryUsageSmtpSender"; oid = "REDDOX::RssMemoryUsageSmtpSender"; }
+                { name = "RssMemoryUsageLogManager"; oid = "REDDOX::RssMemoryUsageLogManager"; }
+                { name = "RssMemoryUsageReddcryptGateway"; oid = "REDDOX::RssMemoryUsageReddcryptGateway"; }
+                { name = "RssMemoryUsageMailDepotIndex"; oid = "REDDOX::RssMemoryUsageMailDepotIndex"; }
+                { name = "CpuUsageApplianceManager"; oid = "REDDOX::CpuUsageApplianceManager"; }
+                { name = "CpuUsageMailDepot"; oid = "REDDOX::CpuUsageMailDepot"; }
+                { name = "CpuUsageSystemManager"; oid = "REDDOX::CpuUsageSystemManager"; }
+                { name = "CpuUsageComplianceLog"; oid = "REDDOX::CpuUsageComplianceLog"; }
+                { name = "CpuUsageSpamfinder"; oid = "REDDOX::CpuUsageSpamfinder"; }
+                { name = "CpuUsageClamav"; oid = "REDDOX::CpuUsageClamav"; }
+                { name = "CpuUsageMongoDB"; oid = "REDDOX::CpuUsageMongoDB"; }
+                { name = "CpuUsageHaProxy"; oid = "REDDOX::CpuUsageHaProxy"; }
+                { name = "CpuUsageMailSealer"; oid = "REDDOX::CpuUsageMailSealer"; }
+                { name = "CpuUsageSmtpReceiver"; oid = "REDDOX::CpuUsageSmtpReceiver"; }
+                { name = "CpuUsageSmtpSender"; oid = "REDDOX::CpuUsageSmtpSender"; }
+                { name = "CpuUsageLogManager"; oid = "REDDOX::CpuUsageLogManager"; }
+                { name = "CpuUsageReddcryptGateway"; oid = "REDDOX::CpuUsageReddcryptGateway"; }
+                { name = "CpuUsageMailDepotIndex"; oid = "REDDOX::CpuUsageMailDepotIndex"; }
+                { name = "UptimeApplianceManager"; oid = "REDDOX::UptimeApplianceManager"; }
+                { name = "UptimeMailDepot"; oid = "REDDOX::UptimeMailDepot"; }
+                { name = "UptimeSystemManager"; oid = "REDDOX::UptimeSystemManager"; }
+                { name = "UptimeComplianceLog"; oid = "REDDOX::UptimeComplianceLog"; }
+                { name = "UptimeSpamfinder"; oid = "REDDOX::UptimeSpamfinder"; }
+                { name = "UptimeClamav"; oid = "REDDOX::UptimeClamav"; }
+                { name = "UptimeMongoDB"; oid = "REDDOX::UptimeMongoDB"; }
+                { name = "UptimeHaProxy"; oid = "REDDOX::UptimeHaProxy"; }
+                { name = "UptimeMailSealer"; oid = "REDDOX::UptimeMailSealer"; }
+                { name = "UptimeSmtpReceiver"; oid = "REDDOX::UptimeSmtpReceiver"; }
+                { name = "UptimeSmtpSender"; oid = "REDDOX::UptimeSmtpSender"; }
+                { name = "UptimeLogManager"; oid = "REDDOX::UptimeLogManager"; }
+                { name = "UptimeReddcryptGateway"; oid = "REDDOX::UptimeReddcryptGateway"; }
+                { name = "UptimeMailDepotIndex"; oid = "REDDOX::UptimeMailDepotIndex"; }
+                { name = "OpenFilesTotal"; oid = "REDDOX::OpenFilesTotal"; }
+                { name = "OpenFilesContainer"; oid = "REDDOX::OpenFilesContainer"; }
+                { name = "OpenFilesIndex"; oid = "REDDOX::OpenFilesIndex"; }
+
+                # Default MIB OIDs (reused from (...).vendor.sophos.xg)
+                { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
+                { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
+                { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
+                { name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
+                # Missing:
+                # diskCapacity, diskPercentUsage,
+                # memoryCapacity (via defaults?), memoryPercentage
+              ];
+              table = [
+                {
+                  name = "reddox.ifTable"; 
+                  oid = "IF-MIB::ifTable"; 
+                  index_as_tag = true; 
+                  inherit_tags = [ "host" ]; 
+                  field = [
+                    { oid = "IF-MIB::ifDescr"; is_tag = true; }
+                  ];
+                }
+                {
+                  name = "reddox.ifXTable"; 
+                  oid = "IF-MIB::ifXTable"; 
+                  index_as_tag = true; 
+                  inherit_tags = [ "host" ]; 
+                  field = [
+                    { oid = "IF-MIB::ifName"; is_tag = true; }
+                  ];
+                }
+                { name = "reddox.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
               ];
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.endpoints.self.enable {
