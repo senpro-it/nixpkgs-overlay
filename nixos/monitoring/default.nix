@@ -359,11 +359,11 @@ in {
                   credentials = telegrafOptions.authSNMPv3;
                 };
               };
-              reddox = {
+              reddoxx = {
                 endpoints = {
                   self = {
                     enable = mkEnableOption ''
-                      Whether to enable REDDOX monitoring via SNMP.
+                      Whether to enable REDDOXX monitoring via SNMP.
                     '';
                     agents = telegrafOptions.agentConfig;
                   };
@@ -1118,7 +1118,7 @@ in {
               ];
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.reddox.endpoints.self.enable {
-              name = "reddox";
+              name = "reddoxx";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
               agents = cfg.monitoring.telegraf.inputs.snmp.vendors.reddox.endpoints.self.agents;
               timeout = "20s";
