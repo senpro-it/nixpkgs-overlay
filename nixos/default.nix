@@ -11,5 +11,5 @@
     senpro.backup_config = ''
       echo "[TODO] Config backup goes here..."
     '';
-  }
+  };
 }
