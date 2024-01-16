@@ -1206,7 +1206,7 @@ in {
               ];
               table = [
                 {
-                  name = "reddox.ifTable"; 
+                  name = "reddoxx.ifTable"; 
                   oid = "IF-MIB::ifTable"; 
                   index_as_tag = true; 
                   inherit_tags = [ "host" ]; 
@@ -1215,7 +1215,7 @@ in {
                   ];
                 }
                 {
-                  name = "reddox.ifXTable"; 
+                  name = "reddoxx.ifXTable"; 
                   oid = "IF-MIB::ifXTable"; 
                   index_as_tag = true; 
                   inherit_tags = [ "host" ]; 
@@ -1223,7 +1223,7 @@ in {
                     { oid = "IF-MIB::ifName"; is_tag = true; }
                   ];
                 }
-                { name = "reddox.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
+                { name = "reddoxx.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
               ];
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.endpoints.self.enable {
