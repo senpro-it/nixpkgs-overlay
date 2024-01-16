@@ -8,10 +8,8 @@
   ];
 
   config.system.activationScripts = {
-    senpro = {
-      backup_config = ''
-        echo "[TODO] Config backup goes here..."
-      '';
-    };
+    senpro_backupConfig = ''
+      echo "[TODO] Config backup goes here..."
+    '';
   };
 }
