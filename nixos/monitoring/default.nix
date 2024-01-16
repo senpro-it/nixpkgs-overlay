@@ -1117,14 +1117,14 @@ in {
                 { name = "vmware.esxi.vmTable"; oid = "VMWARE-VMINFO-MIB::vmwVmTable"; inherit_tags = [ "host" ]; }
               ];
             })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.reddox.endpoints.self.enable {
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.endpoints.self.enable {
               name = "reddoxx";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.reddox.endpoints.self.agents;
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.endpoints.self.agents;
               timeout = "20s";
               # TODO(KI): Switch to SNMPv3 in the future. Cuz more secure... that's it, really.
               version = 2;
-              community = "${cfg.monitoring.telegraf.inputs.snmp.vendors.reddox.credentials.community}";
+              community = "${cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.credentials.community}";
               retries = 5;
               field = [
                 { name = "SmtpReceiverConnectionsIn"; oid = "REDDOXX-MIB::SmtpReceiverConnectionsIn"; }
