@@ -472,6 +472,8 @@ in {
               };
             };
           };
+
+          ## Options: Ping
           ping = {
             enable = mkEnableOption ''
               Whether to enable Ping.
@@ -487,20 +489,57 @@ in {
                 Hosts to be pinged
               '';
             };
-            # method = "exec" types.str
             # count = 1 types.str (ping -n)
             # ping_interval = 1.0 types.str (sec)
             # timeout = 1.0 (sec)
             # deadline = 10 (sec)
             # interface = "" types.str
             # percentiles = [50, 95, 99] list (if method == "native")
-            # binary = "ping"
-            # arguments = ["-c", "3"] (shell args)
             # ipv6 = false types.bool
             # size = 56 (ICMP size)
           };
+
+          ## Options: Local Raspberry Pi
+          local_pi = {
+            enable = mkEnableOption ''
+                Monitor the local Raspberry Pi monitoring agent as well.
+            '';
+            stats = {
+              cpu = {
+                enable = mkEnableOption ''
+                    Monitor the Pi's CPU?
+                '';
+              };
+              disk = {
+                enable = mkEnableOption ''
+                    Monitor the Pi's internal storage?
+                '';
+              };
+              mem = {
+                enable = mkEnableOption ''
+                    Monitor the Pi's RAM and SWAP?
+                '';
+              };
+              kernel = {
+                enable = mkEnableOption ''
+                    Monitor the Pi's Linux Kernel information?
+                '';
+              };
+              processes = {
+                enable = mkEnableOption ''
+                    Monitor the Pi's running processes?
+                '';
+              };
+              system = {
+                enable = mkEnableOption ''
+                    Monitor the Pi's system information?
+                '';
+              };
+            };
+          };
         };
       };
+
       svci = {
         enable = mkEnableOption ''
           Whether to enable SVCi (Spectrum Virtualize Insights).
@@ -1568,13 +1607,46 @@ in {
               discover_concurrency = 4;
             }
           ];
-          ping = lib.mkIf cfg.monitoring.telegraf.inputs.ping.enable [
-            {
+
+          ## Ping Configuration
+          ping = lib.mkIf cfg.monitoring.telegraf.inputs.ping.enable [{
               name = "ping";
               urls = cfg.monitoring.telegraf.inputs.ping.urls;
               method = "native";
-            }
-          ];
+          }];
+
+          ## Local Raspberry Pi Configuration
+          cpu = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.cpu.enable [{
+                name_override = "local_pi.cpu";
+                percpu = true;
+                totalcpu = true;
+                collect_cpu_time = false;
+                report_active = false;
+                core_tags = true;
+            }];
+            disk = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.disk.enable [{
+                name_override = "local_pi.disk";
+                # NixOS verwendet btrfs; und das spammt die aktiven Mounts leider.
+                # Daher wird nur Bezug auf die MicroSD (rootFS bei einem Pi) verwendet.
+                # Die Boot Partition (/boot) wird komplett ignoriert - sind ca 200mb weil EFI GPT
+                mounts = [ "/" ];
+            }];
+            mem = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.mem.enable [{
+                name_override = "local_pi.mem";
+                # Keine Konfiguration nötig.
+            }];
+            kernel = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.kernel.enable [{
+                name_override = "local_pi.kernel";
+                collect = [ "*" ];
+            }];
+            processes = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.processes.enable [{
+                name_override = "local_pi.proc";
+                # Keine Konfiguration nötig.
+            }];
+            system = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.system.enable [{
+                name_override = "local_pi.sys";
+                # Keine Konfiguration nötig.
+            }];
         };
         outputs = cfg.monitoring.telegraf.outputs;
       };
