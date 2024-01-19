@@ -471,34 +471,34 @@ in {
             '';
             stats = {
               cpu = {
-                  enable = mkEnableOption ''
-                      Monitor the Pi's CPU?
-                  '';
+                enable = mkEnableOption ''
+                    Monitor the Pi's CPU?
+                '';
               };
               disk = {
-                  enable = mkEnableOption ''
-                      Monitor the Pi's internal storage?
-                  '';
+                enable = mkEnableOption ''
+                    Monitor the Pi's internal storage?
+                '';
               };
               mem = {
-                  enable = mkEnableOption ''
-                      Monitor the Pi's RAM and SWAP?
-                  '';
+                enable = mkEnableOption ''
+                    Monitor the Pi's RAM and SWAP?
+                '';
               };
               kernel = {
-                  enable = mkEnableOption ''
-                      Monitor the Pi's Linux Kernel information?
-                  '';
+                enable = mkEnableOption ''
+                    Monitor the Pi's Linux Kernel information?
+                '';
               };
               processes = {
-                  enable = mkEnableOption ''
-                      Monitor the Pi's running processes?
-                  '';
+                enable = mkEnableOption ''
+                    Monitor the Pi's running processes?
+                '';
               };
               system = {
-                  enable = mkEnableOption ''
-                      Monitor the Pi's system information?
-                  '';
+                enable = mkEnableOption ''
+                    Monitor the Pi's system information?
+                '';
               };
             };
           };
