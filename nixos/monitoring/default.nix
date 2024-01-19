@@ -1127,73 +1127,73 @@ in {
               community = "${cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.credentials.community}";
               retries = 5;
               field = [
-                { name = "SmtpReceiverConnectionsIn"; oid = "REDDOXX-MIB::SmtpReceiverConnectionsIn"; }
-                { name = "SmtpReceiverConnectionsOut"; oid = "REDDOXX-MIB::SmtpReceiverConnectionsOut"; }
-                { name = "SmtpReceiverMessagesReceivedIn"; oid = "REDDOXX-MIB::SmtpReceiverMessagesReceivedIn"; }
-                { name = "SmtpReceiverMessagesReceivedOut"; oid = "REDDOXX-MIB::SmtpReceiverMessagesReceivedOut"; }
-                { name = "SmtpReceiverBytesReceivedIn"; oid = "REDDOXX-MIB::SmtpReceiverBytesReceivedIn"; }
-                { name = "SmtpReceiverBytesReceivedOut"; oid = "REDDOXX-MIB::SmtpReceiverBytesReceivedOut"; }
-                { name = "SmtpReceiverActiveConnections"; oid = "REDDOXX-MIB::SmtpReceiverActiveConnections"; }
-                { name = "RejectedMessagesBecauseIpBlacklisted"; oid = "REDDOXX-MIB::RejectedMessagesBecauseIpBlacklisted"; }
-                { name = "RejectedMessagesBecauseAntiSpoofing"; oid = "REDDOXX-MIB::RejectedMessagesBecauseAntiSpoofing"; }
-                { name = "RejectedMessagesBecauseSpf"; oid = "REDDOXX-MIB::RejectedMessagesBecauseSpf"; }
-                { name = "ValidDkimSignatures"; oid = "REDDOXX-MIB::ValidDkimSignatures"; }
-                { name = "InvalidDkimSignatures"; oid = "REDDOXX-MIB::InvalidDkimSignatures"; }
-                { name = "SmtpSenderConnectionsIn"; oid = "REDDOXX-MIB::SmtpSenderConnectionsIn"; }
-                { name = "SmtpSenderConnectionsOut"; oid = "REDDOXX-MIB::SmtpSenderConnectionsOut"; }
-                { name = "SmtpSenderMessagesSentIn"; oid = "REDDOXX-MIB::SmtpSenderMessagesSentIn"; }
-                { name = "SmtpSenderMessagesSentOut"; oid = "REDDOXX-MIB::SmtpSenderMessagesSentOut"; }
-                { name = "SmtpSenderBytesSentIn"; oid = "REDDOXX-MIB::SmtpSenderBytesSentIn"; }
-                { name = "SmtpSenderBytesSentOut"; oid = "REDDOXX-MIB::SmtpSenderBytesSentOut"; }
-                { name = "SmtpSenderActiveConnections"; oid = "REDDOXX-MIB::SmtpSenderActiveConnections"; }
-                { name = "MessagesWaitingForProcessing"; oid = "REDDOXX-MIB::MessagesWaitingForProcessing"; }
-                { name = "MessagesWaitingForDelivery"; oid = "REDDOXX-MIB::MessagesWaitingForDelivery"; }
-                { name = "ArchiveQueueLength"; oid = "REDDOXX-MIB::ArchiveQueueLength"; }
-                { name = "RssMemoryUsageApplianceManager"; oid = "REDDOXX-MIB::RssMemoryUsageApplianceManager"; }
-                { name = "RssMemoryUsageMailDepot"; oid = "REDDOXX-MIB::RssMemoryUsageMailDepot"; }
-                { name = "RssMemoryUsageSystemManager"; oid = "REDDOXX-MIB::RssMemoryUsageSystemManager"; }
-                { name = "RssMemoryyUsageComplianceLog"; oid = "REDDOXX-MIB::RssMemoryyUsageComplianceLog"; }
-                { name = "RssMemoryUsageSpamfinder"; oid = "REDDOXX-MIB::RssMemoryUsageSpamfinder"; }
-                { name = "RssMemoryUsageClamav"; oid = "REDDOXX-MIB::RssMemoryUsageClamav"; }
-                { name = "RssMemoryUsageMongoDB"; oid = "REDDOXX-MIB::RssMemoryUsageMongoDB"; }
-                { name = "RssMemoryUsageHaProxy"; oid = "REDDOXX-MIB::RssMemoryUsageHaProxy"; }
-                { name = "RssMemoryUsageMailSealer"; oid = "REDDOXX-MIB::RssMemoryUsageMailSealer"; }
-                { name = "RssMemoryUsageSmtpReceiver"; oid = "REDDOXX-MIB::RssMemoryUsageSmtpReceiver"; }
-                { name = "RssMemoryUsageSmtpSender"; oid = "REDDOXX-MIB::RssMemoryUsageSmtpSender"; }
-                { name = "RssMemoryUsageLogManager"; oid = "REDDOXX-MIB::RssMemoryUsageLogManager"; }
-                { name = "RssMemoryUsageReddcryptGateway"; oid = "REDDOXX-MIB::RssMemoryUsageReddcryptGateway"; }
-                { name = "RssMemoryUsageMailDepotIndex"; oid = "REDDOXX-MIB::RssMemoryUsageMailDepotIndex"; }
-                { name = "CpuUsageApplianceManager"; oid = "REDDOXX-MIB::CpuUsageApplianceManager"; }
-                { name = "CpuUsageMailDepot"; oid = "REDDOXX-MIB::CpuUsageMailDepot"; }
-                { name = "CpuUsageSystemManager"; oid = "REDDOXX-MIB::CpuUsageSystemManager"; }
-                { name = "CpuUsageComplianceLog"; oid = "REDDOXX-MIB::CpuUsageComplianceLog"; }
-                { name = "CpuUsageSpamfinder"; oid = "REDDOXX-MIB::CpuUsageSpamfinder"; }
-                { name = "CpuUsageClamav"; oid = "REDDOXX-MIB::CpuUsageClamav"; }
-                { name = "CpuUsageMongoDB"; oid = "REDDOXX-MIB::CpuUsageMongoDB"; }
-                { name = "CpuUsageHaProxy"; oid = "REDDOXX-MIB::CpuUsageHaProxy"; }
-                { name = "CpuUsageMailSealer"; oid = "REDDOXX-MIB::CpuUsageMailSealer"; }
-                { name = "CpuUsageSmtpReceiver"; oid = "REDDOXX-MIB::CpuUsageSmtpReceiver"; }
-                { name = "CpuUsageSmtpSender"; oid = "REDDOXX-MIB::CpuUsageSmtpSender"; }
-                { name = "CpuUsageLogManager"; oid = "REDDOXX-MIB::CpuUsageLogManager"; }
-                { name = "CpuUsageReddcryptGateway"; oid = "REDDOXX-MIB::CpuUsageReddcryptGateway"; }
-                { name = "CpuUsageMailDepotIndex"; oid = "REDDOXX-MIB::CpuUsageMailDepotIndex"; }
-                { name = "UptimeApplianceManager"; oid = "REDDOXX-MIB::UptimeApplianceManager"; }
-                { name = "UptimeMailDepot"; oid = "REDDOXX-MIB::UptimeMailDepot"; }
-                { name = "UptimeSystemManager"; oid = "REDDOXX-MIB::UptimeSystemManager"; }
-                { name = "UptimeComplianceLog"; oid = "REDDOXX-MIB::UptimeComplianceLog"; }
-                { name = "UptimeSpamfinder"; oid = "REDDOXX-MIB::UptimeSpamfinder"; }
-                { name = "UptimeClamav"; oid = "REDDOXX-MIB::UptimeClamav"; }
-                { name = "UptimeMongoDB"; oid = "REDDOXX-MIB::UptimeMongoDB"; }
-                { name = "UptimeHaProxy"; oid = "REDDOXX-MIB::UptimeHaProxy"; }
-                { name = "UptimeMailSealer"; oid = "REDDOXX-MIB::UptimeMailSealer"; }
-                { name = "UptimeSmtpReceiver"; oid = "REDDOXX-MIB::UptimeSmtpReceiver"; }
-                { name = "UptimeSmtpSender"; oid = "REDDOXX-MIB::UptimeSmtpSender"; }
-                { name = "UptimeLogManager"; oid = "REDDOXX-MIB::UptimeLogManager"; }
-                { name = "UptimeReddcryptGateway"; oid = "REDDOXX-MIB::UptimeReddcryptGateway"; }
-                { name = "UptimeMailDepotIndex"; oid = "REDDOXX-MIB::UptimeMailDepotIndex"; }
-                { name = "OpenFilesTotal"; oid = "REDDOXX-MIB::OpenFilesTotal"; }
-                { name = "OpenFilesContainer"; oid = "REDDOXX-MIB::OpenFilesContainer"; }
-                { name = "OpenFilesIndex"; oid = "REDDOXX-MIB::OpenFilesIndex"; }
+                { name = "SmtpReceiverConnectionsIn"; oid = "REDDOXX-MIB::SmtpReceiverConnectionsIn"; conversion = "int"; }
+                { name = "SmtpReceiverConnectionsOut"; oid = "REDDOXX-MIB::SmtpReceiverConnectionsOut"; conversion = "int"; }
+                { name = "SmtpReceiverMessagesReceivedIn"; oid = "REDDOXX-MIB::SmtpReceiverMessagesReceivedIn"; conversion = "int"; }
+                { name = "SmtpReceiverMessagesReceivedOut"; oid = "REDDOXX-MIB::SmtpReceiverMessagesReceivedOut"; conversion = "int"; }
+                { name = "SmtpReceiverBytesReceivedIn"; oid = "REDDOXX-MIB::SmtpReceiverBytesReceivedIn"; conversion = "int"; }
+                { name = "SmtpReceiverBytesReceivedOut"; oid = "REDDOXX-MIB::SmtpReceiverBytesReceivedOut"; conversion = "int"; }
+                { name = "SmtpReceiverActiveConnections"; oid = "REDDOXX-MIB::SmtpReceiverActiveConnections"; conversion = "int"; }
+                { name = "RejectedMessagesBecauseIpBlacklisted"; oid = "REDDOXX-MIB::RejectedMessagesBecauseIpBlacklisted"; conversion = "int"; }
+                { name = "RejectedMessagesBecauseAntiSpoofing"; oid = "REDDOXX-MIB::RejectedMessagesBecauseAntiSpoofing"; conversion = "int"; }
+                { name = "RejectedMessagesBecauseSpf"; oid = "REDDOXX-MIB::RejectedMessagesBecauseSpf"; conversion = "int"; }
+                { name = "ValidDkimSignatures"; oid = "REDDOXX-MIB::ValidDkimSignatures"; conversion = "int"; }
+                { name = "InvalidDkimSignatures"; oid = "REDDOXX-MIB::InvalidDkimSignatures"; conversion = "int"; }
+                { name = "SmtpSenderConnectionsIn"; oid = "REDDOXX-MIB::SmtpSenderConnectionsIn"; conversion = "int"; }
+                { name = "SmtpSenderConnectionsOut"; oid = "REDDOXX-MIB::SmtpSenderConnectionsOut"; conversion = "int"; }
+                { name = "SmtpSenderMessagesSentIn"; oid = "REDDOXX-MIB::SmtpSenderMessagesSentIn"; conversion = "int"; }
+                { name = "SmtpSenderMessagesSentOut"; oid = "REDDOXX-MIB::SmtpSenderMessagesSentOut"; conversion = "int"; }
+                { name = "SmtpSenderBytesSentIn"; oid = "REDDOXX-MIB::SmtpSenderBytesSentIn"; conversion = "int"; }
+                { name = "SmtpSenderBytesSentOut"; oid = "REDDOXX-MIB::SmtpSenderBytesSentOut"; conversion = "int"; }
+                { name = "SmtpSenderActiveConnections"; oid = "REDDOXX-MIB::SmtpSenderActiveConnections"; conversion = "int"; }
+                { name = "MessagesWaitingForProcessing"; oid = "REDDOXX-MIB::MessagesWaitingForProcessing"; conversion = "int"; }
+                { name = "MessagesWaitingForDelivery"; oid = "REDDOXX-MIB::MessagesWaitingForDelivery"; conversion = "int"; }
+                { name = "ArchiveQueueLength"; oid = "REDDOXX-MIB::ArchiveQueueLength"; conversion = "int"; }
+                { name = "RssMemoryUsageApplianceManager"; oid = "REDDOXX-MIB::RssMemoryUsageApplianceManager"; conversion = "int"; }
+                { name = "RssMemoryUsageMailDepot"; oid = "REDDOXX-MIB::RssMemoryUsageMailDepot"; conversion = "int"; }
+                { name = "RssMemoryUsageSystemManager"; oid = "REDDOXX-MIB::RssMemoryUsageSystemManager"; conversion = "int"; }
+                { name = "RssMemoryyUsageComplianceLog"; oid = "REDDOXX-MIB::RssMemoryyUsageComplianceLog"; conversion = "int"; }
+                { name = "RssMemoryUsageSpamfinder"; oid = "REDDOXX-MIB::RssMemoryUsageSpamfinder"; conversion = "int"; }
+                { name = "RssMemoryUsageClamav"; oid = "REDDOXX-MIB::RssMemoryUsageClamav"; conversion = "int"; }
+                { name = "RssMemoryUsageMongoDB"; oid = "REDDOXX-MIB::RssMemoryUsageMongoDB"; conversion = "int"; }
+                { name = "RssMemoryUsageHaProxy"; oid = "REDDOXX-MIB::RssMemoryUsageHaProxy"; conversion = "int"; }
+                { name = "RssMemoryUsageMailSealer"; oid = "REDDOXX-MIB::RssMemoryUsageMailSealer"; conversion = "int"; }
+                { name = "RssMemoryUsageSmtpReceiver"; oid = "REDDOXX-MIB::RssMemoryUsageSmtpReceiver"; conversion = "int"; }
+                { name = "RssMemoryUsageSmtpSender"; oid = "REDDOXX-MIB::RssMemoryUsageSmtpSender"; conversion = "int"; }
+                { name = "RssMemoryUsageLogManager"; oid = "REDDOXX-MIB::RssMemoryUsageLogManager"; conversion = "int"; }
+                { name = "RssMemoryUsageReddcryptGateway"; oid = "REDDOXX-MIB::RssMemoryUsageReddcryptGateway"; conversion = "int"; }
+                { name = "RssMemoryUsageMailDepotIndex"; oid = "REDDOXX-MIB::RssMemoryUsageMailDepotIndex"; conversion = "int"; }
+                { name = "CpuUsageApplianceManager"; oid = "REDDOXX-MIB::CpuUsageApplianceManager"; conversion = "int"; }
+                { name = "CpuUsageMailDepot"; oid = "REDDOXX-MIB::CpuUsageMailDepot"; conversion = "int"; }
+                { name = "CpuUsageSystemManager"; oid = "REDDOXX-MIB::CpuUsageSystemManager"; conversion = "int"; }
+                { name = "CpuUsageComplianceLog"; oid = "REDDOXX-MIB::CpuUsageComplianceLog"; conversion = "int"; }
+                { name = "CpuUsageSpamfinder"; oid = "REDDOXX-MIB::CpuUsageSpamfinder"; conversion = "int"; }
+                { name = "CpuUsageClamav"; oid = "REDDOXX-MIB::CpuUsageClamav"; conversion = "int"; }
+                { name = "CpuUsageMongoDB"; oid = "REDDOXX-MIB::CpuUsageMongoDB"; conversion = "int"; }
+                { name = "CpuUsageHaProxy"; oid = "REDDOXX-MIB::CpuUsageHaProxy"; conversion = "int"; }
+                { name = "CpuUsageMailSealer"; oid = "REDDOXX-MIB::CpuUsageMailSealer"; conversion = "int"; }
+                { name = "CpuUsageSmtpReceiver"; oid = "REDDOXX-MIB::CpuUsageSmtpReceiver"; conversion = "int"; }
+                { name = "CpuUsageSmtpSender"; oid = "REDDOXX-MIB::CpuUsageSmtpSender"; conversion = "int"; }
+                { name = "CpuUsageLogManager"; oid = "REDDOXX-MIB::CpuUsageLogManager"; conversion = "int"; }
+                { name = "CpuUsageReddcryptGateway"; oid = "REDDOXX-MIB::CpuUsageReddcryptGateway"; conversion = "int"; }
+                { name = "CpuUsageMailDepotIndex"; oid = "REDDOXX-MIB::CpuUsageMailDepotIndex"; conversion = "int"; }
+                { name = "UptimeApplianceManager"; oid = "REDDOXX-MIB::UptimeApplianceManager"; conversion = "int"; }
+                { name = "UptimeMailDepot"; oid = "REDDOXX-MIB::UptimeMailDepot"; conversion = "int"; }
+                { name = "UptimeSystemManager"; oid = "REDDOXX-MIB::UptimeSystemManager"; conversion = "int"; }
+                { name = "UptimeComplianceLog"; oid = "REDDOXX-MIB::UptimeComplianceLog"; conversion = "int"; }
+                { name = "UptimeSpamfinder"; oid = "REDDOXX-MIB::UptimeSpamfinder"; conversion = "int"; }
+                { name = "UptimeClamav"; oid = "REDDOXX-MIB::UptimeClamav"; conversion = "int"; }
+                { name = "UptimeMongoDB"; oid = "REDDOXX-MIB::UptimeMongoDB"; conversion = "int"; }
+                { name = "UptimeHaProxy"; oid = "REDDOXX-MIB::UptimeHaProxy"; conversion = "int"; }
+                { name = "UptimeMailSealer"; oid = "REDDOXX-MIB::UptimeMailSealer"; conversion = "int"; }
+                { name = "UptimeSmtpReceiver"; oid = "REDDOXX-MIB::UptimeSmtpReceiver"; conversion = "int"; }
+                { name = "UptimeSmtpSender"; oid = "REDDOXX-MIB::UptimeSmtpSender"; conversion = "int"; }
+                { name = "UptimeLogManager"; oid = "REDDOXX-MIB::UptimeLogManager"; conversion = "int"; }
+                { name = "UptimeReddcryptGateway"; oid = "REDDOXX-MIB::UptimeReddcryptGateway"; conversion = "int"; }
+                { name = "UptimeMailDepotIndex"; oid = "REDDOXX-MIB::UptimeMailDepotIndex"; conversion = "int"; }
+                { name = "OpenFilesTotal"; oid = "REDDOXX-MIB::OpenFilesTotal"; conversion = "int"; }
+                { name = "OpenFilesContainer"; oid = "REDDOXX-MIB::OpenFilesContainer"; conversion = "int"; }
+                { name = "OpenFilesIndex"; oid = "REDDOXX-MIB::OpenFilesIndex"; conversion = "int"; }
 
                 # Default MIB OIDs (reused from (...).vendor.sophos.xg)
                 { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
