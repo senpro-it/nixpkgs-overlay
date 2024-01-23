@@ -1610,42 +1610,42 @@ in {
 
           ## Ping Configuration
           ping = lib.mkIf cfg.monitoring.telegraf.inputs.ping.enable [{
-              name = "ping";
-              urls = cfg.monitoring.telegraf.inputs.ping.urls;
-              method = "native";
+            name = "ping";
+            urls = cfg.monitoring.telegraf.inputs.ping.urls;
+            method = "native";
           }];
 
           ## Local Raspberry Pi Configuration
           cpu = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.cpu.enable [{
-                name_override = "local_pi.cpu";
-                percpu = true;
-                totalcpu = true;
-                collect_cpu_time = false;
-                report_active = false;
-                core_tags = true;
+              name_override = "local_pi.cpu";
+              percpu = true;
+              totalcpu = true;
+              collect_cpu_time = false;
+              report_active = false;
+              core_tags = true;
             }];
             disk = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.disk.enable [{
-                name_override = "local_pi.disk";
-                # NixOS verwendet btrfs; und das spammt die aktiven Mounts leider.
-                # Daher wird nur Bezug auf die MicroSD (rootFS bei einem Pi) verwendet.
-                # Die Boot Partition (/boot) wird komplett ignoriert - sind ca 200mb weil EFI GPT
-                mounts = [ "/" ];
+              name_override = "local_pi.disk";
+              # NixOS verwendet btrfs; und das spammt die aktiven Mounts leider.
+              # Daher wird nur Bezug auf die MicroSD (rootFS bei einem Pi) verwendet.
+              # Die Boot Partition (/boot) wird komplett ignoriert - sind ca 200mb weil EFI GPT
+              mount_points = [ "/" ];
             }];
             mem = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.mem.enable [{
-                name_override = "local_pi.mem";
-                # Keine Konfiguration nötig.
+              name_override = "local_pi.mem";
+              # Keine Konfiguration nötig.
             }];
             kernel = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.kernel.enable [{
-                name_override = "local_pi.kernel";
-                collect = [ "*" ];
+              name_override = "local_pi.kernel";
+              collect = [ "*" ];
             }];
             processes = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.processes.enable [{
-                name_override = "local_pi.proc";
-                # Keine Konfiguration nötig.
+              name_override = "local_pi.proc";
+              # Keine Konfiguration nötig.
             }];
             system = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.system.enable [{
-                name_override = "local_pi.sys";
-                # Keine Konfiguration nötig.
+              name_override = "local_pi.sys";
+              # Keine Konfiguration nötig.
             }];
         };
         outputs = cfg.monitoring.telegraf.outputs;
