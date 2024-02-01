@@ -1245,6 +1245,28 @@ in {
               ];
               table = [
                 {
+                  name = "reddoxx.storage";
+                  oid = "HOST-RESOURCES-MIB::hrStorageTable";
+                  index_as_tag = true;
+                  inherit_tags = ["host"];
+                  field = [
+                    {
+                      oid = "HOST-RESOURCES-MIB::hrStorageType";
+                      is_tag = true;
+                    }
+                    {
+                      oid = "HOST-RESOURCES-MIB::hrStorageDescr";
+                      is_tag = true;
+                    }
+                    {
+                      oid = "HOST-RESOURCES-MIB::hrStorageSize";
+                    }
+                    {
+                      oid = "HOST-RESOURCES-MIB::hrStorageUsed";
+                    }
+                  ];
+                }
+                {
                   name = "reddoxx.ifTable"; 
                   oid = "IF-MIB::ifTable"; 
                   index_as_tag = true; 
