@@ -1291,10 +1291,10 @@ in {
                   oid = "HOST-RESOURCES-MIB::hrProcessorTable";
                   index_as_tag = true;
                   inherit_tags = [ "host" ];
-                  field = {
+                  field = [{
                     oid = "HOST-RESOURCES-MIB::hrProcessorFrwID";
                     is_tag = true;
-                  };
+                  }];
                 }
               ];
             })
