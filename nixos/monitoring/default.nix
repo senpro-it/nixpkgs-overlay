@@ -1237,6 +1237,7 @@ in {
                 # Default MIB OIDs (reused from (...).vendor.sophos.xg)
                 { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
                 { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
+                { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
                 { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
                 { name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
                 # Missing:
@@ -1285,6 +1286,16 @@ in {
                   ];
                 }
                 { name = "reddoxx.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
+                {
+                  name = "reddoxx.cpu";
+                  oid = "HOST-RESOURCES-MIB::hrProcessorTable";
+                  index_as_tag = true;
+                  inherit_tags = [ "host" ];
+                  field = {
+                    oid = "HOST-RESOURCES-MIB::hrProcessorFrwID";
+                    is_tag = true;
+                  };
+                }
               ];
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.endpoints.self.enable {
