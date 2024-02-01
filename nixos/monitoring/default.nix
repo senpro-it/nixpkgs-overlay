@@ -1643,7 +1643,7 @@ in {
 
           ## Ping Configuration
           ping = lib.mkIf cfg.monitoring.telegraf.inputs.ping.enable [{
-            name = "ping";
+            name_override = "ping";
             urls = cfg.monitoring.telegraf.inputs.ping.urls;
             method = "native";
           }];
