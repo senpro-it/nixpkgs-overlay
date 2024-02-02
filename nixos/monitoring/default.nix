@@ -368,18 +368,7 @@ in {
                     agents = telegrafOptions.agentConfig;
                   };
                 };
-                credentials = {
-                  community = mkOption {
-                    description = lib.mdDoc ''
-                      Specify the SNMPv2 community.
-                    '';
-                    type = types.str;
-                    default = "";
-                    example = literalExpression ''
-                      "reddoxptrg"
-                    '';
-                  };
-                };
+                credentials = telegrafOptions.authSNMPv3;
               };
               schneiderElectric = {
                 apc = {
