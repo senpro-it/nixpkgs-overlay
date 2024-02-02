@@ -1328,7 +1328,7 @@ in {
                 ]; }
                 { name = "zyxel.switch.portTable"; oid = "ZYXEL-PORT-MIB::zyxelPortTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
                 { name = "zyxel.switch.portInfoTable"; oid = "ZYXEL-PORT-MIB::zyxelPortInfoTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
-                { name = "zyxel.switch.accessControlSetup"; oid = "ZYXEL-ACCESS-CONTROL-MIB::zyxelAccessControlTable"; inherit_tags = [ "host" ]; }
+                #{ name = "zyxel.switch.accessControlSetup"; oid = "ZYXEL-ACCESS-CONTROL-MIB::zyxelAccessControlTable"; inherit_tags = [ "host" ]; }
                 { name = "zyxel.switch.hwMonitorFan"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorFanRpmTable"; inherit_tags = [ "host" ]; }
                 { name = "zyxel.switch.hwMonitorTemp"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorTemperatureTable"; inherit_tags = [ "host" ]; }
                 { name = "zyxel.switch.hwMonitorVolt"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorVoltageTable"; inherit_tags = [ "host" ]; }
