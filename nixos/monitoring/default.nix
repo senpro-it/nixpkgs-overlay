@@ -1150,9 +1150,13 @@ in {
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
               agents = cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.endpoints.self.agents;
               timeout = "20s";
-              # TODO(KI): Switch to SNMPv3 in the future. Cuz more secure... that's it, really.
-              version = 2;
-              community = "${cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.credentials.community}";
+              version = 3;
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.credentials.privacy.password}";
               retries = 5;
               field = [
                 { name = "SmtpReceiverConnectionsIn"; oid = "REDDOXX-MIB::smtpReceiverConnectionsIn"; conversion = "int"; }
