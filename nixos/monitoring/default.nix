@@ -1314,7 +1314,7 @@ in {
                 { name = "fwVersionMajor"; oid = "ZYXEL-SYSTEM-MIB::zySysSwPlatformMajorVers.0"; }
                 { name = "fwVersionMinor"; oid = "ZYXEL-SYSTEM-MIB::zySysSwPlatformMinorVers.0"; }
                 { name = "cpuUsage"; oid = "ZYXEL-SYSTEM-MGMT-MIB::zySysMgmtCPUUsage.0"; }
-                { name = "sysStatus"; oid = "ZYXEL-SYSTEM-MGMT-MIB::zySysMgmtSysStatus.0 "; }
+                { name = "sysStatus"; oid = "ZYXEL-SYSTEM-MGMT-MIB::zySysMgmtSysStatus.0"; }
               ];
               table = [
                 { name = "zyxel.switch.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
