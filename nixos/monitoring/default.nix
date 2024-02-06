@@ -788,7 +788,6 @@ in {
               agents = cfg.monitoring.telegraf.inputs.snmp.vendors.fortinet.firewall.endpoints.self.agents;
               timeout = "20s";
               version = 3;
-              context_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.fortinet.firewall.credentials.context.name}";
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.fortinet.firewall.credentials.security.level}";
               sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.fortinet.firewall.credentials.security.username}";
               auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.fortinet.firewall.credentials.authentication.protocol}";
