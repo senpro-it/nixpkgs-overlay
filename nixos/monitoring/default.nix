@@ -836,7 +836,7 @@ in {
                   { oid = "IP-MIB::ipAdEntIfIndex"; is_tag = true; }
                 ]; }
                 { name = "fortinet.firewall.hwSensorTable"; oid = "FORTINET-FORTIGATE-MIB::fgHwSensorTable"; inherit_tags = [ "host" ]; field = [
-                  { oid = "FORTINET-FORTIGATE-MIB::fgHwSensorName"; is_tag = true; }
+                  { oid = "FORTINET-FORTIGATE-MIB::fgHwSensorEntName"; is_tag = true; }
                 ]; }
                 { name = "fortinet.firewall.licContractTable"; oid = "FORTINET-FORTIGATE-MIB::fgLicContractTable"; inherit_tags = [ "host" ]; field = [
                   { oid = "FORTINET-FORTIGATE-MIB::fgLicContractDesc"; is_tag = true; }
