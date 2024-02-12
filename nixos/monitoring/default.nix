@@ -1013,7 +1013,7 @@ in {
               timeout = "20s";
               version = 2;
               community = "${cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.credentials.community}";
-              fields = [
+              field = [
                 # Defaults:
                 { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
                 { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
