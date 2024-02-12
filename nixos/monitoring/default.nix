@@ -1036,17 +1036,17 @@ in {
                 { name = "alarmco"; oid = "KAM-PRO::alarmco"; }
               ]
               # Plus multisensors; generated
-              + kentixFuncs.mkMultisensor cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.multisensors
-              + kentixFuncs.mkTemperature cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.temperatures
-              + kentixFuncs.humidity cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.humiditys
-              + kentixFuncs.dewpoint cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.dewpoints
-              + kentixFuncs.mkAlarm cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.alarms
-              + kentixFuncs.mkCo2 cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.co2s
-              + kentixFuncs.mkMotion cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.motions
-              + kentixFuncs.mkDigiIn1 cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.digitalIn1s
-              + kentixFuncs.mkDigiIn2 cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.digitalIn2s
-              + kentixFuncs.mkDigiOut2 cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.digitalOut2s
-              + kentixFuncs.mkInitErrors cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.initErrors
+              ++ (kentixFuncs.mkMultisensor cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.multisensors)
+              ++ (kentixFuncs.mkTemperature cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.temperatures)
+              ++ (kentixFuncs.humidity cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.humiditys)
+              ++ (kentixFuncs.dewpoint cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.dewpoints)
+              ++ (kentixFuncs.mkAlarm cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.alarms)
+              ++ (kentixFuncs.mkCo2 cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.co2s)
+              ++ (kentixFuncs.mkMotion cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.motions)
+              ++ (kentixFuncs.mkDigiIn1 cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.digitalIn1s)
+              ++ (kentixFuncs.mkDigiIn2 cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.digitalIn2s)
+              ++ (kentixFuncs.mkDigiOut2 cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.digitalOut2s)
+              ++ (kentixFuncs.mkInitErrors cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.initErrors)
               ; # Hide and seek champion.
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.endpoints.self.enable {
