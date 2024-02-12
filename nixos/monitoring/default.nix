@@ -1049,6 +1049,7 @@ in {
               + kentixFuncs.mkDigiIn2 cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.digitalIn2s
               + kentixFuncs.mkDigiOut2 cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.digitalOut2s
               + kentixFuncs.mkInitErrors cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.initErrors
+              ; # Hide and seek champion.
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.endpoints.self.enable {
               name = "qnap.nas";
