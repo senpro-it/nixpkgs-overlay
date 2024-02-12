@@ -1007,7 +1007,7 @@ in {
                 { name = "fs.switch.nmspmCPUTotalTable"; oid = "NMS-PROCESS-MIB::nmspmCPUTotalTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
               ];
             })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.self.enable {
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.self.enable {
               name = "kentix.sensors";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
               agents = cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.self.agents;
