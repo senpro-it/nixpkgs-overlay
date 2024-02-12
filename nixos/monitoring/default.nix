@@ -174,7 +174,7 @@ let
     ## Generate tagged Sensors
     mkMultisensor = num: kentixFuncs.genSensorListExt "sensorname0" num { is_tag = true; };
     ## Generate temperatures
-    mkTemerature = num: kentixFuncs.genSensorList "temperature0" num;
+    mkTemperature = num: kentixFuncs.genSensorList "temperature0" num;
     # Generate humidity
     mkHumidity = num: kentixFuncs.genSensorList "humidity0" num;
     # Generate dewpoint
