@@ -169,30 +169,30 @@ let
       name = "${name}${builtins.toString n}";
     } // obj) (builtins.genList (x: x) num);
     ## Same as above, but does not take an additional object.
-    genSensorList = name: num: (genSensorListExt name num {});
+    genSensorList = name: num: (kentixFuncs.genSensorListExt name num {});
 
     ## Generate tagged Sensors
-    mkMultisensor = num: genSensorListExt "sensorname0" num { is_tag = true; };
+    mkMultisensor = num: kentixFuncs.genSensorListExt "sensorname0" num { is_tag = true; };
     ## Generate temperatures
-    mkTemerature = num: genSensorList "temperature0" num;
+    mkTemerature = num: kentixFuncs.genSensorList "temperature0" num;
     # Generate humidity
-    mkHumidity = num: genSensorList "humidity0" num;
+    mkHumidity = num: kentixFuncs.genSensorList "humidity0" num;
     # Generate dewpoint
-    mkDewpoint = num: genSensorList "dewpoint0" num;
+    mkDewpoint = num: kentixFuncs.genSensorList "dewpoint0" num;
     ## Generate alarm pairs
-    mkAlarm = num: genSensorList "alarm" num;
+    mkAlarm = num: kentixFuncs.genSensorList "alarm" num;
     ## Generate CO2 pairs
-    mkCo2 = num: genSensorList "co0" num;
+    mkCo2 = num: kentixFuncs.genSensorList "co0" num;
     ## Generate Motion
-    mkMotion = num: genSensorList "motion0" num;
+    mkMotion = num: kentixFuncs.genSensorList "motion0" num;
     # Generate pairs for Digital IN 1
-    mkDigiIn1 = num: genSensorList "digitalin10" num;
+    mkDigiIn1 = num: kentixFuncs.genSensorList "digitalin10" num;
     # Generate pairs for Digital IN 2
-    mkDigiIn2 = num: genSensorList "digitalin20" num;
+    mkDigiIn2 = num: kentixFuncs.genSensorList "digitalin20" num;
     # Generate pairs for Digital OUT 2
-    mkDigiOut1 = num: genSensorList "digitalout20" num;
+    mkDigiOut1 = num: kentixFuncs.genSensorList "digitalout20" num;
     ## Generate Initialization error pairs
-    mkInitErrors = num: genSensorList "comError0" num;
+    mkInitErrors = num: kentixFuncs.genSensorList "comError0" num;
   };
 
 in {
