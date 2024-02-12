@@ -166,7 +166,7 @@ let
     ##
     genSensorListExt = name: num: obj: map (n: {
       oid = "KAM-PRO::${name}${builtins.toString (n + 1)}";
-      name = "${name}${builtins.toString (n + 1)}";
+      name = "kentix.sensors.${name}${builtins.toString (n + 1)}";
     } // obj) (builtins.genList (x: x) num);
     ## Same as above, but does not take an additional object.
     genSensorList = name: num: (kentixFuncs.genSensorListExt name num {});
@@ -1021,19 +1021,19 @@ in {
                 { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
 
                 # Kentix specific:
-                { name = "serverstate"; oid = "KAM-PRO::serverstate"; }
-                { name = "sensorcommunication"; oid = "KAM-PRO::sensorcommunication"; }
-                { name = "extalarm"; oid = "KAM-PRO::extalarm"; }
-                { name = "extarmed"; oid = "KAM-PRO::extarmed"; }
-                { name = "extpower"; oid = "KAM-PRO::extpower"; }
-                { name = "sabotage"; oid = "KAM-PRO::sabotage"; }
-                { name = "gsmsignal"; oid = "KAM-PRO::gsmsignal"; }
-                { name = "gsmok"; oid = "KAM-PRO::gsmok"; }
-                { name = "systemarmed"; oid = "KAM-PRO::systemarmed"; }
-                { name = "alarmtemp"; oid = "KAM-PRO::alarmtemp"; }
-                { name = "alarmhum"; oid = "KAM-PRO::alarmhum"; }
-                { name = "alarmdewpoint"; oid = "KAM-PRO::alarmdewpoint"; }
-                { name = "alarmco"; oid = "KAM-PRO::alarmco"; }
+                { name = "kentix.sensors.serverstate"; oid = "KAM-PRO::serverstate"; }
+                { name = "kentix.sensors.sensorcommunication"; oid = "KAM-PRO::sensorcommunication"; }
+                { name = "kentix.sensors.extalarm"; oid = "KAM-PRO::extalarm"; }
+                { name = "kentix.sensors.extarmed"; oid = "KAM-PRO::extarmed"; }
+                { name = "kentix.sensors.extpower"; oid = "KAM-PRO::extpower"; }
+                { name = "kentix.sensors.sabotage"; oid = "KAM-PRO::sabotage"; }
+                { name = "kentix.sensors.gsmsignal"; oid = "KAM-PRO::gsmsignal"; }
+                { name = "kentix.sensors.gsmok"; oid = "KAM-PRO::gsmok"; }
+                { name = "kentix.sensors.systemarmed"; oid = "KAM-PRO::systemarmed"; }
+                { name = "kentix.sensors.alarmtemp"; oid = "KAM-PRO::alarmtemp"; }
+                { name = "kentix.sensors.alarmhum"; oid = "KAM-PRO::alarmhum"; }
+                { name = "kentix.sensors.alarmdewpoint"; oid = "KAM-PRO::alarmdewpoint"; }
+                { name = "kentix.sensors.alarmco"; oid = "KAM-PRO::alarmco"; }
               ]
               # Plus multisensors; generated
               ++ (kentixFuncs.mkMultisensor cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.multisensors)
