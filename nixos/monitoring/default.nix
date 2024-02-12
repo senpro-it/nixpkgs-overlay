@@ -1038,8 +1038,8 @@ in {
               # Plus multisensors; generated
               ++ (kentixFuncs.mkMultisensor cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.multisensors)
               ++ (kentixFuncs.mkTemperature cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.temperatures)
-              ++ (kentixFuncs.humidity cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.humiditys)
-              ++ (kentixFuncs.dewpoint cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.dewpoints)
+              ++ (kentixFuncs.mkHumidity cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.humiditys)
+              ++ (kentixFuncs.mkDewpoint cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.dewpoints)
               ++ (kentixFuncs.mkAlarm cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.alarms)
               ++ (kentixFuncs.mkCo2 cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.co2s)
               ++ (kentixFuncs.mkMotion cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.motions)
