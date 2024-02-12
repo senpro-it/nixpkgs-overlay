@@ -165,8 +165,8 @@ let
     # Note: If you need 0-prefixing, make it part of the name!
     ##
     genSensorListExt = name: num: obj: map (n: {
-      oid = "KAM-PRO::${name}${builtins.toString n}";
-      name = "${name}${builtins.toString n}";
+      oid = "KAM-PRO::${name}${builtins.toString (n + 1)}";
+      name = "${name}${builtins.toString (n + 1)}";
     } // obj) (builtins.genList (x: x) num);
     ## Same as above, but does not take an additional object.
     genSensorList = name: num: (kentixFuncs.genSensorListExt name num {});
