@@ -141,6 +141,59 @@ let
       };
     };
   };
+  telegrafOptions.authSNMPv2 = with types; {
+    community = mkOption {
+      type = types.str;
+      example = "public";
+      default = "public"; # This actually is the default...
+      description = lib.mdDoc ''
+        "Community" string used to authenticate via SNMPv2
+      '';
+    };
+  };
+
+  # Kentix-specific
+  kentixFuncs = {
+    ##
+    # Returns a list of generated oid/name pairs.
+    #
+    # @param name:    Name of the sensor prefix
+    # @param num:     Amount of sensors to generate
+    # @param ext:     Specify object to merge with the generated one
+    # @return         A list (aka. array) of oid-name pairs.
+    #
+    # Note: If you need 0-prefixing, make it part of the name!
+    ##
+    genSensorListExt = name: num: obj: map (n: {
+      oid = "KAM-PRO::${name}${builtins.toString (n + 1)}.0";
+      name = "${name}${builtins.toString (n + 1)}";
+    } // obj) (builtins.genList (x: x) num);
+    ## Same as above, but does not take an additional object.
+    genSensorList = name: num: (kentixFuncs.genSensorListExt name num {});
+
+    ## Generate tagged Sensors
+    mkMultisensor = num: kentixFuncs.genSensorListExt "sensorname0" num { is_tag = true; };
+    ## Generate temperatures
+    mkTemperature = num: kentixFuncs.genSensorList "temperature0" num;
+    # Generate humidity
+    mkHumidity = num: kentixFuncs.genSensorList "humidity0" num;
+    # Generate dewpoint
+    mkDewpoint = num: kentixFuncs.genSensorList "dewpoint0" num;
+    ## Generate alarm pairs
+    mkAlarm = num: kentixFuncs.genSensorList "alarm" num;
+    ## Generate CO2 pairs
+    mkCo2 = num: kentixFuncs.genSensorList "co0" num;
+    ## Generate Motion
+    mkMotion = num: kentixFuncs.genSensorList "motion0" num;
+    # Generate pairs for Digital IN 1
+    mkDigiIn1 = num: kentixFuncs.genSensorList "digitalin10" num;
+    # Generate pairs for Digital IN 2
+    mkDigiIn2 = num: kentixFuncs.genSensorList "digitalin20" num;
+    # Generate pairs for Digital OUT 2
+    mkDigiOut2 = num: kentixFuncs.genSensorList "digitalout20" num;
+    ## Generate Initialization error pairs
+    mkInitErrors = num: kentixFuncs.genSensorList "comError0" num;
+  };
 
 in {
 
@@ -357,6 +410,72 @@ in {
                     };
                   };
                   credentials = telegrafOptions.authSNMPv3;
+                };
+                sensors = {
+                  endpoints = {
+                    self = {
+                      enable = mkEnableOption ''
+                        Whether to enable the Kentix Sensor monitoring via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    };
+                    multisensors = mkOption {
+                      default = 0;
+                      type = types.int;
+                      description = "How many Multisensors? (Max 9)";
+                    };
+                    temperatures = mkOption {
+                      default = 0;
+                      type = types.int;
+                      description = "How many temperature sensors? (Max 9)";
+                    };
+                    humiditys = mkOption {
+                      default = 0;
+                      type = types.int;
+                      description = "How many humidity sensors? (Max 9)";
+                    };
+                    dewpoints = mkOption {
+                      default = 0;
+                      type = types.int;
+                      description = "How many dewpoint? (Max 9)";
+                    };
+                    alarms = mkOption {
+                      default = 0;
+                      type = types.int;
+                      description = "How many alarms? (Max 2)";
+                    };
+                    co2s = mkOption {
+                      default = 0;
+                      type = types.int;
+                      description = "How many CO2 sensors? (Max 9)";
+                    };
+                    motions = mkOption {
+                      default = 0;
+                      type = types.int;
+                      description = "How many motion sensors? (Max 9)";
+                    };
+                    digitalIn1s = mkOption {
+                      default = 0;
+                      type = types.int;
+                      description = "How many Digital IN 1? (Max 9)";
+                    };
+                    digitalIn2s = mkOption {
+                      default = 0;
+                      type = types.int;
+                      description = "How many Digital IN 2? (Max 9)";
+                    };
+                    digitalOut2s = mkOption {
+                      default = 0;
+                      type = types.int;
+                      description = "How many Digital OUT 2? (Max 9)";
+                    };
+                    initErrors = mkOption {
+                      default = 0;
+                      type = types.int;
+                      description = "How many Initialization Errors? (Max 9)";
+                    };
+                  };
+                  credentials = telegrafOptions.authSNMPv2;
                 };
               };
               qnap = {
@@ -885,6 +1004,50 @@ in {
                 ]; }
                 { name = "fs.switch.nmspmCPUTotalTable"; oid = "NMS-PROCESS-MIB::nmspmCPUTotalTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
               ];
+            })
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.self.enable {
+              name = "kentix.sensors";
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.self.agents;
+              interval = "60s";
+              timeout = "20s";
+              version = 2;
+              community = "${cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.credentials.community}";
+              field = [
+                # Defaults:
+                { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
+                { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
+                { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
+                { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
+
+                # Kentix specific:
+                { name = "serverstate"; oid = "KAM-PRO::serverstate.0"; }
+                { name = "sensorcommunication"; oid = "KAM-PRO::sensorcommunication.0"; }
+                { name = "extalarm"; oid = "KAM-PRO::extalarm.0"; }
+                { name = "extarmed"; oid = "KAM-PRO::extarmed.0"; }
+                { name = "extpower"; oid = "KAM-PRO::extpower.0"; }
+                { name = "sabotage"; oid = "KAM-PRO::sabotage.0"; }
+                { name = "gsmsignal"; oid = "KAM-PRO::gsmsignal.0"; }
+                { name = "gsmok"; oid = "KAM-PRO::gsmok.0"; }
+                { name = "systemarmed"; oid = "KAM-PRO::systemarmed.0"; }
+                { name = "alarmtemp"; oid = "KAM-PRO::alarmtemp.0"; }
+                { name = "alarmhum"; oid = "KAM-PRO::alarmhum.0"; }
+                { name = "alarmdewpoint"; oid = "KAM-PRO::alarmdewpoint.0"; }
+                { name = "alarmco"; oid = "KAM-PRO::alarmco.0"; }
+              ]
+              # Plus multisensors; generated
+              ++ (kentixFuncs.mkMultisensor cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.multisensors)
+              ++ (kentixFuncs.mkTemperature cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.temperatures)
+              ++ (kentixFuncs.mkHumidity cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.humiditys)
+              ++ (kentixFuncs.mkDewpoint cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.dewpoints)
+              ++ (kentixFuncs.mkAlarm cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.alarms)
+              ++ (kentixFuncs.mkCo2 cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.co2s)
+              ++ (kentixFuncs.mkMotion cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.motions)
+              ++ (kentixFuncs.mkDigiIn1 cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.digitalIn1s)
+              ++ (kentixFuncs.mkDigiIn2 cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.digitalIn2s)
+              ++ (kentixFuncs.mkDigiOut2 cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.digitalOut2s)
+              ++ (kentixFuncs.mkInitErrors cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.initErrors)
+              ; # Hide and seek champion.
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.endpoints.self.enable {
               name = "qnap.nas";
