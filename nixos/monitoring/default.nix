@@ -190,7 +190,7 @@ let
     # Generate pairs for Digital IN 2
     mkDigiIn2 = num: kentixFuncs.genSensorList "digitalin20" num;
     # Generate pairs for Digital OUT 2
-    mkDigiOut1 = num: kentixFuncs.genSensorList "digitalout20" num;
+    mkDigiOut2 = num: kentixFuncs.genSensorList "digitalout20" num;
     ## Generate Initialization error pairs
     mkInitErrors = num: kentixFuncs.genSensorList "comError0" num;
   };
