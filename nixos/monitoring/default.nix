@@ -142,15 +142,13 @@ let
     };
   };
   telegrafOptions.authSNMPv2 = with types; {
-    community = {
-      name = mkOption {
-        type = types.str;
-        example = "public";
-        default = "public"; # This actually is the default...
-        description = lib.mdDoc ''
-          "Community" string used to authenticate via SNMPv2
-        '';
-      };
+    community = mkOption {
+      type = types.str;
+      example = "public";
+      default = "public"; # This actually is the default...
+      description = lib.mdDoc ''
+        "Community" string used to authenticate via SNMPv2
+      '';
     };
   };
 
