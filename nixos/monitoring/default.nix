@@ -193,6 +193,25 @@ let
     mkDigiOut2 = num: kentixFuncs.genSensorList "digitalout20" num;
     ## Generate Initialization error pairs
     mkInitErrors = num: kentixFuncs.genSensorList "comError0" num;
+    # WIP: Force a table.
+    /*
+    mkSensorTable' = g: [{
+      name_override = "kentix.sensors.group${g}.sensorname";
+      oid = "KAM-PRO::sensorname${g}";
+      is_tag = true;
+    }] ++ (map(key: {
+      name_override = "kentix.sensors.group${g}.${key}";
+      oid = "KAM-PRO::${key}${g}";
+    }) [
+      "temperature", "humidity", "dewpoint", 
+      "co2", "motion", 
+      "digitalin1", "digitalin2", 
+      "digitalout2",
+      "comError"
+    ]);
+    mkSensorTable groups: map(g: (mkSensorTable' g) groups);
+    // i.e. mkSensorTable ["01", "02"]
+    */
   };
 
 in {
@@ -1545,17 +1564,51 @@ in {
               priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.credentials.privacy.password}";
               retries = 5;
               field = [
+                # Defaults
                 { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
                 { name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
                 { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
                 { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
                 { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
-                { name = "serialNumber"; oid = "ZYXEL-SYSTEM-MIB::zySysSerialNumber.0"; }
-                { name = "fwVersionMajor"; oid = "ZYXEL-SYSTEM-MIB::zySysSwPlatformMajorVers.0"; }
-                { name = "fwVersionMinor"; oid = "ZYXEL-SYSTEM-MIB::zySysSwPlatformMinorVers.0"; }
-                { name = "cpuUsage"; oid = "ZYXEL-SYSTEM-MGMT-MIB::zySysMgmtCPUUsage.0"; }
-                { name = "sysStatus"; oid = "ZYXEL-SYSTEM-MGMT-MIB::zySysMgmtSysStatus.0"; }
+                # Generated:
+                { name = "sysSwPlatform"; oid = "ZYXEL-ES-COMMON-INFO::sysSwPlatform.0"; }
+                { name = "sysSwMajorVersion"; oid = "ZYXEL-ES-COMMON-INFO::sysSwMajorVersion.0"; }
+                { name = "sysSwMinorVersion"; oid = "ZYXEL-ES-COMMON-INFO::sysSwMinorVersion.0"; }
+                { name = "sysSwModel"; oid = "ZYXEL-ES-COMMON-INFO::sysSwModel.0"; }
+                { name = "sysSwPatchNumber"; oid = "ZYXEL-ES-COMMON-INFO::sysSwPatchNumber.0"; }
+                { name = "sysSwVersionString"; oid = "ZYXEL-ES-COMMON-INFO::sysSwVersionString.0"; }
+                { name = "sysSwDay"; oid = "ZYXEL-ES-COMMON-INFO::sysSwDay.0"; }
+                { name = "sysSwMonth"; oid = "ZYXEL-ES-COMMON-INFO::sysSwMonth.0"; }
+                { name = "sysSwYear"; oid = "ZYXEL-ES-COMMON-INFO::sysSwYear.0"; }
+                { name = "sysProductFamily"; oid = "ZYXEL-ES-COMMON-INFO::sysProductFamily.0"; }
+                { name = "sysProductModel"; oid = "ZYXEL-ES-COMMON-INFO::sysProductModel.0"; }
+                { name = "sysProductSerialNumber"; oid = "ZYXEL-ES-COMMON-INFO::sysProductSerialNumber.0"; }
+                { name = "sysHwMajorVersion"; oid = "ZYXEL-ES-COMMON-INFO::sysHwMajorVersion.0"; }
+                { name = "sysHwMinorVersion"; oid = "ZYXEL-ES-COMMON-INFO::sysHwMinorVersion.0"; }
+                { name = "sysHwVersionString"; oid = "ZYXEL-ES-COMMON-INFO::sysHwVersionString.0"; }
+                { name = "sysCountryCode"; oid = "ZYXEL-ES-COMMON-INFO::sysCountryCode.0"; }
+                { name = "sysActiveSessionNum"; oid = "ZYXEL-ES-COMMON-INFO::sysActiveSessionNum.0"; }
+                { name = "sysNebulaManaged"; oid = "ZYXEL-ES-COMMON-INFO::sysNebulaManaged.0"; }
+                { name = "sysMgmtReboot"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtReboot.0"; }
+                { name = "sysMgmtConfigSave"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtConfigSave.0"; }
+                { name = "sysMgmtRestoreDefaultConfig"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtRestoreDefaultConfig.0"; }
+                { name = "sysMgmtCPUUsage"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtCPUUsage.0"; }
+                { name = "sysMgmtMemUsage"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtMemUsage.0"; }
+                { name = "sysMgmtFlashUsage"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtFlashUsage.0"; }
+                { name = "sysMgmtCPU5SecUsage"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtCPU5SecUsage.0"; }
+                { name = "sysMgmtCPU1MinUsage"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtCPU1MinUsage.0"; }
+                { name = "sysMgmtCPU5MinUsage"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtCPU5MinUsage.0"; }
+                { name = "sysMgmtBootupConfigIndex"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtBootupConfigIndex.0"; }
+                { name = "sysMgmtBootupImageIndex"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtBootupImageIndex.0"; }
+                { name = "sysMgmtAlarmStatus"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtAlarmStatus.0"; }
+                { name = "sysMgmtVLANControl"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtVLANControl.0"; }
+                { name = "sysMgmtVLANID"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtVLANID.0"; }
+                { name = "sys8021QControl"; oid = "ZYXEL-ES-COMMON-MGMT::sys8021QControl.0"; }
+                { name = "sysMgmtNebulaControlCenterDiscovery"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtNebulaControlCenterDiscovery.0"; }
               ];
+
+              # NOTE(KI): Keine Ahnung ob wir die hier behalten sollten oder nicht.
+              #           Dem entsprechend lass ich die mal stehen.
               table = [
                 { name = "zyxel.switch.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "IF-MIB::ifDescr"; is_tag = true; }
