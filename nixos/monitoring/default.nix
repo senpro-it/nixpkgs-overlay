@@ -1612,38 +1612,17 @@ in {
                 { name = "sysSwModel"; oid = "ZYXEL-ES-COMMON-INFO::sysSwModel.0"; }
                 { name = "sysSwPatchNumber"; oid = "ZYXEL-ES-COMMON-INFO::sysSwPatchNumber.0"; }
                 { name = "sysSwVersionString"; oid = "ZYXEL-ES-COMMON-INFO::sysSwVersionString.0"; }
-                { name = "sysSwDay"; oid = "ZYXEL-ES-COMMON-INFO::sysSwDay.0"; }
-                { name = "sysSwMonth"; oid = "ZYXEL-ES-COMMON-INFO::sysSwMonth.0"; }
-                { name = "sysSwYear"; oid = "ZYXEL-ES-COMMON-INFO::sysSwYear.0"; }
                 { name = "sysProductFamily"; oid = "ZYXEL-ES-COMMON-INFO::sysProductFamily.0"; }
                 { name = "sysProductModel"; oid = "ZYXEL-ES-COMMON-INFO::sysProductModel.0"; }
                 { name = "sysProductSerialNumber"; oid = "ZYXEL-ES-COMMON-INFO::sysProductSerialNumber.0"; }
-                { name = "sysHwMajorVersion"; oid = "ZYXEL-ES-COMMON-INFO::sysHwMajorVersion.0"; }
-                { name = "sysHwMinorVersion"; oid = "ZYXEL-ES-COMMON-INFO::sysHwMinorVersion.0"; }
-                { name = "sysHwVersionString"; oid = "ZYXEL-ES-COMMON-INFO::sysHwVersionString.0"; }
-                { name = "sysCountryCode"; oid = "ZYXEL-ES-COMMON-INFO::sysCountryCode.0"; }
-                { name = "sysActiveSessionNum"; oid = "ZYXEL-ES-COMMON-INFO::sysActiveSessionNum.0"; }
                 { name = "sysNebulaManaged"; oid = "ZYXEL-ES-COMMON-INFO::sysNebulaManaged.0"; }
-                { name = "sysMgmtReboot"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtReboot.0"; }
-                { name = "sysMgmtConfigSave"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtConfigSave.0"; }
-                { name = "sysMgmtRestoreDefaultConfig"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtRestoreDefaultConfig.0"; }
                 { name = "sysMgmtCPUUsage"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtCPUUsage.0"; }
                 { name = "sysMgmtMemUsage"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtMemUsage.0"; }
                 { name = "sysMgmtFlashUsage"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtFlashUsage.0"; }
-                { name = "sysMgmtCPU5SecUsage"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtCPU5SecUsage.0"; }
                 { name = "sysMgmtCPU1MinUsage"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtCPU1MinUsage.0"; }
-                { name = "sysMgmtCPU5MinUsage"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtCPU5MinUsage.0"; }
-                { name = "sysMgmtBootupConfigIndex"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtBootupConfigIndex.0"; }
-                { name = "sysMgmtBootupImageIndex"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtBootupImageIndex.0"; }
                 { name = "sysMgmtAlarmStatus"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtAlarmStatus.0"; }
-                { name = "sysMgmtVLANControl"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtVLANControl.0"; }
                 { name = "sysMgmtVLANID"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtVLANID.0"; }
-                { name = "sys8021QControl"; oid = "ZYXEL-ES-COMMON-MGMT::sys8021QControl.0"; }
-                { name = "sysMgmtNebulaControlCenterDiscovery"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtNebulaControlCenterDiscovery.0"; }
               ];
-
-              # NOTE(KI): Keine Ahnung ob wir die hier behalten sollten oder nicht.
-              #           Dem entsprechend lass ich die mal stehen.
               table = [
                 { name = "zyxel.switch.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "IF-MIB::ifDescr"; is_tag = true; }
@@ -1656,12 +1635,10 @@ in {
                 ]; }
                 { name = "zyxel.switch.portTable"; oid = "ZYXEL-PORT-MIB::zyxelPortTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
                 { name = "zyxel.switch.portInfoTable"; oid = "ZYXEL-PORT-MIB::zyxelPortInfoTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
-                #{ name = "zyxel.switch.accessControlSetup"; oid = "ZYXEL-ACCESS-CONTROL-MIB::zyxelAccessControlTable"; inherit_tags = [ "host" ]; }
                 { name = "zyxel.switch.hwMonitorFan"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorFanRpmTable"; inherit_tags = [ "host" ]; }
                 { name = "zyxel.switch.hwMonitorTemp"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorTemperatureTable"; inherit_tags = [ "host" ]; }
                 { name = "zyxel.switch.hwMonitorVolt"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorVoltageTable"; inherit_tags = [ "host" ]; }
                 { name = "zyxel.switch.hwMonitorPower"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorPowerSourceTable"; inherit_tags = [ "host" ]; }
-                { name = "zyxel.switch.sysMemory"; oid = "ZYXEL-SYS-MEMORY-MIB::zyxelSysMemoryPoolTable"; inherit_tags = [ "host" ]; }
               ];
             })
           ];
