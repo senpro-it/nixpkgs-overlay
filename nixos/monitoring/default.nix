@@ -1635,10 +1635,14 @@ in {
                 ]; }
                 { name = "zyxel.switch.portTable"; oid = "ZYXEL-PORT-MIB::zyxelPortTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
                 { name = "zyxel.switch.portInfoTable"; oid = "ZYXEL-PORT-MIB::zyxelPortInfoTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
-                { name = "zyxel.switch.hwMonitorFan"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorFanRpmTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
-                { name = "zyxel.switch.hwMonitorTemp"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorTemperatureTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
-                { name = "zyxel.switch.hwMonitorVolt"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorVoltageTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
-                { name = "zyxel.switch.hwMonitorPower"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorPowerSourceTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+                { name = "zyxel.switch.hwMonitorFan"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorFanRpmTable"; inherit_tags = [ "host" ]; field = [
+                  { oid = "ZYXEL-HW-MONITOR-MIB::zyHwMonitorFanRpmDescription"; is_tag = true; }
+                { name = "zyxel.switch.hwMonitorTemp"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorTemperatureTable"; inherit_tags = [ "host" ]; field = [
+                  { oid = "ZYXEL-HW-MONITOR-MIB::zyHwMonitorTemperatureDescription"; is_tag = true; }
+                { name = "zyxel.switch.hwMonitorVolt"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorVoltageTable"; inherit_tags = [ "host" ]; field = [
+                  { oid = "ZYXEL-HW-MONITOR-MIB::zyHwMonitorVoltageDescription"; is_tag = true; }
+                { name = "zyxel.switch.hwMonitorPower"; oid = "ZYXEL-HW-MONITOR-MIB::zyxelHwMonitorPowerSourceTable"; inherit_tags = [ "host" ]; field = [
+                  { oid = "ZYXEL-HW-MONITOR-MIB::zyHwMonitorPowerSourceDescription"; is_tag = true; }
               ];
             })
           ];
