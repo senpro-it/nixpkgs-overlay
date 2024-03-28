@@ -1612,6 +1612,9 @@ in {
                 { name = "sysSwModel"; oid = "ZYXEL-ES-COMMON-INFO::sysSwModel.0"; }
                 { name = "sysSwPatchNumber"; oid = "ZYXEL-ES-COMMON-INFO::sysSwPatchNumber.0"; }
                 { name = "sysSwVersionString"; oid = "ZYXEL-ES-COMMON-INFO::sysSwVersionString.0"; }
+                { name = "sysSwVersionString"; oid = "ZYXEL-ES-COMMON-INFO::sysSwDay.0"; }
+                { name = "sysSwVersionString"; oid = "ZYXEL-ES-COMMON-INFO::sysSwMonth.0"; }
+                { name = "sysSwVersionString"; oid = "ZYXEL-ES-COMMON-INFO::sysSwYear.0"; }
                 { name = "sysProductFamily"; oid = "ZYXEL-ES-COMMON-INFO::sysProductFamily.0"; }
                 { name = "sysProductModel"; oid = "ZYXEL-ES-COMMON-INFO::sysProductModel.0"; }
                 { name = "sysProductSerialNumber"; oid = "ZYXEL-ES-COMMON-INFO::sysProductSerialNumber.0"; }
