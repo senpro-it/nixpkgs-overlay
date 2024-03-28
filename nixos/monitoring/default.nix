@@ -1620,8 +1620,6 @@ in {
                 { name = "sysMgmtMemUsage"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtMemUsage.0"; }
                 { name = "sysMgmtFlashUsage"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtFlashUsage.0"; }
                 { name = "sysMgmtCPU1MinUsage"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtCPU1MinUsage.0"; }
-                { name = "sysMgmtAlarmStatus"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtAlarmStatus.0"; }
-                { name = "sysMgmtVLANID"; oid = "ZYXEL-ES-COMMON-MGMT::sysMgmtVLANID.0"; }
               ];
               table = [
                 { name = "zyxel.switch.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
