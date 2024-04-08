@@ -1025,7 +1025,6 @@ in {
               agents = cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.endpoints.self.agents;
               timeout = "20s";
               version = 3;
-              context_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.credentials.context.name}";
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.credentials.security.level}";
               sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.credentials.security.username}";
               auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.credentials.authentication.protocol}";
