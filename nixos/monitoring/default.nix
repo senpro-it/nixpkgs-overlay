@@ -1185,6 +1185,16 @@ in {
                 { name = "hardwareInfoSwVersion"; oid = "LCOS-MIB::lcsStatusHardwareInfoSwVersion.0"; }
                 { name = "hardwareInfoTemperature"; oid = "LCOS-MIB::lcsStatusHardwareInfoTemperatureDegrees.0"; }
                 { name = "hardwareInfoProductionDate"; oid = "LCOS-MIB::lcsStatusHardwareInfoProductionDate.0"; }
+                { name = "vdslLineState"; oid = "LCOS-MIB::lcsStatusVdslLineState.0"; }
+                { name = "vdslLineType"; oid = "LCOS-MIB::lcsStatusVdslLineType.0"; }
+                { name = "vdslStandard"; oid = "LCOS-MIB::lcsStatusVdslStandard.0"; }
+                { name = "vdslDataRateUpstreamKbps"; oid = "LCOS-MIB::lcsStatusVdslDataRateUpstreamKbps.0"; }
+                { name = "vdslDataRateDownstreamKbps"; oid = "LCOS-MIB::lcsStatusVdslDataRateDownstreamKbps.0"; }
+                { name = "vdslDslamChipsetManufacturer"; oid = "LCOS-MIB::lcsStatusVdslDslamChipsetManufacturer.0"; }
+                { name = "vdslModemType"; oid = "LCOS-MIB::lcsStatusVdslModemType.0"; }
+                { name = "vdslAttenuationUpstreamDb"; oid = "LCOS-MIB::lcsStatusVdslAttenuationUpstreamDb.0"; }
+                { name = "vdslAttenuationDownstreamDb"; oid = "LCOS-MIB::lcsStatusVdslAttenuationDownstreamDb.0"; }
+                { name = "vdslConnectionDuration"; oid = "LCOS-MIB::lcsStatusVdslConnectionDuration.0"; }
               ];
               table = [
                 { name = "lancom.router.wanIpAddressTable"; oid = "LCOS-MIB::lcsStatusWanIpAddressesIpv4Table"; inherit_tags = [ "host" ]; field = [
@@ -1196,12 +1206,6 @@ in {
                 { name = "lancom.router.lanInterfaceTable"; oid = "LCOS-MIB::lcsStatusLanInterfacesTable"; inherit_tags = [ "host" ]; field = [
                   { oid = "LCOS-MIB::lcsStatusLanInterfacesEntryIfc"; is_tag = true; }
                 ]; }
-                { name = "qnap.nas.interfaces"; oid = "NAS-MIB::systemIfTable"; inherit_tags = [ "host" ]; }
-                { name = "qnap.nas.lun"; oid = "QTS-MIB::lunTable"; inherit_tags = [ "host" ]; }
-                { name = "qnap.nas.raid"; oid = "QTS-MIB::raidTable"; inherit_tags = [ "host" ]; }
-                { name = "qnap.nas.systemFan"; oid = "QTS-MIB::systemFanTable"; inherit_tags = [ "host" ]; }
-                { name = "qnap.nas.target"; oid = "QTS-MIB::targeTable"; inherit_tags = [ "host" ]; }
-                { name = "qnap.nas.volume"; oid = "QTS-MIB::volumeTable"; inherit_tags = [ "host" ]; }
               ];
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.endpoints.self.enable {
