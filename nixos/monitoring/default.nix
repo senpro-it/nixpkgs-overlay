@@ -430,11 +430,11 @@ in {
                 };
               };
               kentix = {
-                doorlocks = {
+                accessmanager = {
                   endpoints = {
                     self = {
                       enable = mkEnableOption ''
-                        Whether to enable the Kentix doorlock monitoring via SNMP.
+                        Whether to enable the Kentix AccessManager monitoring via SNMP.
                       '';
                       agents = telegrafOptions.agentConfig;
                     };
@@ -1068,6 +1068,33 @@ in {
                   { oid = "NMS-IP-ADDRESS-MIB::nmsIpEntAddr"; is_tag = true; }
                 ]; }
                 { name = "fs.switch.nmspmCPUTotalTable"; oid = "NMS-PROCESS-MIB::nmspmCPUTotalTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+              ];
+            })
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.accessmanager.endpoints.self.enable {
+              name = "kentix.accessmanager";
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.accessmanager.endpoints.self.agents;
+              interval = "60s";
+              timeout = "20s";
+              version = 3;
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.accessmanager.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.accessmanager.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.accessmanager.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.accessmanager.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.accessmanager.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.accessmanager.credentials.privacy.password}";
+              retries = 5;
+              field = [
+                { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
+                { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
+                { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
+                { name = "uptime"; oid = "SNMPv2-MIB::sysUptime.0"; }
+                { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
+              ];
+              table = [
+                { name = "kentix.accessmanager.generalTable"; oid = "KENTIXDEVICES::generalTable"; inherit_tags = [ "host" ]; field = [
+                  { oid = "KENTIXDEVICES::sensorName"; is_tag = true; }
+                ]; }
               ];
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.self.enable {
