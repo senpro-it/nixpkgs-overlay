@@ -1197,6 +1197,12 @@ in {
                 { name = "vdslConnectionDuration"; oid = "LCOS-MIB::lcsStatusVdslConnectionDuration.0"; }
               ];
               table = [
+                { name = "lancom.router.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "IF-MIB::ifDescr"; is_tag = true; }
+                ]; }
+                { name = "lancom.router.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "IF-MIB::ifName"; is_tag = true; }
+                ]; }
                 { name = "lancom.router.wanIpAddressTable"; oid = "LCOS-MIB::lcsStatusWanIpAddressesIpv4Table"; inherit_tags = [ "host" ]; field = [
                   { oid = "LCOS-MIB::lcsStatusWanIpAddressesIpv4EntryPeer"; is_tag = true; }
                 ]; }
