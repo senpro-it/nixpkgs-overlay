@@ -1175,6 +1175,16 @@ in {
                 { name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
                 { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
                 { name = "wanBackupActive"; oid = "LCOS-MIB::lcsStatusWanBackupActive.0"; }
+                { name = "hardwareInfoCpuType"; oid = "LCOS-MIB::lcsStatusHardwareInfoCpuType.0"; }
+                { name = "hardwareInfoCpuClockMhz"; oid = "LCOS-MIB::lcsStatusHardwareInfoCpuClockMhz.0"; }
+                { name = "hardwareInfoCpuLoadPercent"; oid = "LCOS-MIB::lcsStatusHardwareInfoCpuLoadPercent.0"; }
+                { name = "hardwareInfoModelNumber"; oid = "LCOS-MIB::lcsStatusHardwareInfoModelNumber.0"; }
+                { name = "hardwareInfoTotalMemoryKbytes"; oid = "LCOS-MIB::lcsStatusHardwareInfoTotalMemoryKbytes.0"; }
+                { name = "hardwareInfoFreeMemoryKbytes"; oid = "LCOS-MIB::lcsStatusHardwareInfoFreeMemoryKbytes.0"; }
+                { name = "hardwareInfoSerialNumber"; oid = "LCOS-MIB::lcsStatusHardwareInfoSerialNumber.0"; }
+                { name = "hardwareInfoSwVersion"; oid = "LCOS-MIB::lcsStatusHardwareInfoSwVersion.0"; }
+                { name = "hardwareInfoTemperature"; oid = "LCOS-MIB::lcsStatusHardwareInfoTemperatureDegrees.0"; }
+                { name = "hardwareInfoProductionDate"; oid = "LCOS-MIB::lcsStatusHardwareInfoProductionDate.0"; }
               ];
               table = [
                 { name = "lancom.router.wanIpAddressTable"; oid = "LCOS-MIB::lcsStatusWanIpAddressesIpv4Table"; inherit_tags = [ "host" ]; field = [
@@ -1182,6 +1192,9 @@ in {
                 ]; }
                 { name = "lancom.router.wanVlanTable"; oid = "LCOS-MIB::lcsStatusWanIpAddressesIpv4Table"; inherit_tags = [ "host" ]; field = [
                   { oid = "LCOS-MIB::lcsStatusWanVlansVlansEntryPeer"; is_tag = true; }
+                ]; }
+                { name = "lancom.router.lanInterfaceTable"; oid = "LCOS-MIB::lcsStatusLanInterfacesTable"; inherit_tags = [ "host" ]; field = [
+                  { oid = "LCOS-MIB::lcsStatusLanInterfacesEntryIfc"; is_tag = true; }
                 ]; }
                 { name = "qnap.nas.interfaces"; oid = "NAS-MIB::systemIfTable"; inherit_tags = [ "host" ]; }
                 { name = "qnap.nas.lun"; oid = "QTS-MIB::lunTable"; inherit_tags = [ "host" ]; }
