@@ -508,6 +508,19 @@ in {
                   credentials = telegrafOptions.authSNMPv2;
                 };
               };
+              lancom = {
+                router = {
+                  endpoints = {
+                    self = {
+                      enable = mkEnableOption ''
+                        Whether to enable the LANCOM router monitoring via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    };
+                  };
+                  credentials = telegrafOptions.authSNMPv3;
+                };
+              };
               qnap = {
                 nas = {
                   endpoints = {
@@ -1140,6 +1153,43 @@ in {
               ++ (kentixFuncs.mkDigiOut2 cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.digitalOut2s)
               ++ (kentixFuncs.mkInitErrors cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.initErrors)
               ; # Hide and seek champion.
+            })
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.lancom.router.endpoints.self.enable {
+              name = "lancom.router";
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.lancom.router.endpoints.self.agents;
+              interval = "60s";
+              timeout = "20s";
+              version = 3;
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.lancom.router.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.lancom.router.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.lancom.router.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.lancom.router.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.lancom.router.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.lancom.router.credentials.privacy.password}";
+              retries = 5;
+              field = [
+                { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
+                { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
+                { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
+                { name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
+                { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
+                { name = "wanBackupActive"; oid = "LCOS-MIB::lcsStatusWanBackupActive.0"; }
+              ];
+              table = [
+                { name = "lancom.router.wanIpAddressTable"; oid = "LCOS-MIB::lcsStatusWanIpAddressesIpv4Table"; inherit_tags = [ "host" ]; field = [
+                  { oid = "LCOS-MIB::lcsStatusWanIpAddressesIpv4EntryPeer"; is_tag = true; }
+                ]; }
+                { name = "lancom.router.wanVlanTable"; oid = "LCOS-MIB::lcsStatusWanIpAddressesIpv4Table"; inherit_tags = [ "host" ]; field = [
+                  { oid = "LCOS-MIB::lcsStatusWanVlansVlansEntryPeer"; is_tag = true; }
+                ]; }
+                { name = "qnap.nas.interfaces"; oid = "NAS-MIB::systemIfTable"; inherit_tags = [ "host" ]; }
+                { name = "qnap.nas.lun"; oid = "QTS-MIB::lunTable"; inherit_tags = [ "host" ]; }
+                { name = "qnap.nas.raid"; oid = "QTS-MIB::raidTable"; inherit_tags = [ "host" ]; }
+                { name = "qnap.nas.systemFan"; oid = "QTS-MIB::systemFanTable"; inherit_tags = [ "host" ]; }
+                { name = "qnap.nas.target"; oid = "QTS-MIB::targeTable"; inherit_tags = [ "host" ]; }
+                { name = "qnap.nas.volume"; oid = "QTS-MIB::volumeTable"; inherit_tags = [ "host" ]; }
+              ];
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.endpoints.self.enable {
               name = "qnap.nas";
