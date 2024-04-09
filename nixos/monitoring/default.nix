@@ -1088,7 +1088,7 @@ in {
                 { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
                 { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
                 { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
-                { name = "uptime"; oid = "SNMPv2-MIB::sysUptime.0"; }
+                { name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
                 { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
               ];
               table = [
