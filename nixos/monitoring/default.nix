@@ -1108,6 +1108,9 @@ in {
                 { name = "kentix.accessmanager.generalTable"; oid = "KENTIXDEVICES::generalTable"; inherit_tags = [ "host" ]; field = [
                   { oid = "KENTIXDEVICES::sensorName"; is_tag = true; }
                 ]; }
+                { name = "kentix.accessmanager.batteryTable"; oid = "KENTIXDEVICES::batteryTable"; inherit_tags = [ "host" ]; field = [
+                  { oid = "KENTIXDEVICES::batteryIndex"; is_tag = true; }
+                ]; }
               ];
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.self.enable {
