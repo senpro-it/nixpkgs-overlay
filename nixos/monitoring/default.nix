@@ -151,7 +151,7 @@ let
     };
   };
   telegrafOptions.httpListener = with types; {
-    name = mkOption {
+    name_override = mkOption {
       type = str;
       default = "webhook";
       description = mdDoc ''
