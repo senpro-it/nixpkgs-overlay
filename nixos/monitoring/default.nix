@@ -42,8 +42,7 @@ let
     };
   };
 
-  createFritzInfluxDBContainer = opts: name:
-    {
+  createFritzInfluxDBContainer = opts: name: {
       image = "docker.io/bbricardo/fritzinfluxdb:latest";
       autoStart = true;
       environment = {
@@ -150,6 +149,95 @@ let
         "Community" string used to authenticate via SNMPv2
       '';
     };
+  };
+  telegrafOptions.httpListener = with types; mkOption {
+    name_override = mkOption {
+      type = str;
+      default = "webhook";
+      description = mdDoc ''
+        Wird als Name der Messung verwendet.
+        Bei mehreren HTTP Servern sollten auch verschiedene Namen
+        verwendet werden, damit sich diese nicht überschreiben.
+        Wichtig: namepass in den Output Optiions!
+      '';
+    };
+    service_address = mkOption {
+      type = str;
+      default = ":8080";
+      example = ":8080";
+      description = mdDoc ''
+        HTTP-Addresse auf der gelauscht wird.
+        Wird ein Host vor dem Port angegeben (127.0.0.1:8080), dann
+        ist dieser HTTP Server nur dort erreichbar.
+        Wird dieser allerdings weggelassen, wird auf allen IPs
+        gelauscht; das ist der Default.
+      '';
+    };
+    paths = mkOption {
+      type = listOf str;
+      default = [ "/telegraf" ];
+      description = mdDoc ''
+        Liste der HTTP Pfade.
+        "/telegraf" ist der Default.
+        Nützlich, um mehrere Endpunkte anzulegen, insbesondere wenn path_tag=true ist.
+      '';
+    };
+    path_tag = mkOption {
+      type = bool;
+      default = false;
+      description = mdDoc ''
+        Legt den HTTP-Pfad als Tag an.
+      '';
+    };
+    methods = mkOption {
+      type = listOf str;
+      default = ["POST"];
+      description = mdDoc ''
+        Definiert die HTTP Methoden, die akzeptiert werden.
+        POST ist der Standart, PUT ist relativ neu (http/1.1)
+        und manche besonderen Endpunkte benutzen vielleicht obskure Methoden.
+      '';
+    };
+    basic_username = mkOption {
+      type = str;
+      default = "";
+      example = "bobderbaumeister";
+      description = mdDoc ''
+        Kann optional verwendet werden, um einen Benutzernamen festzulegen.
+        Nicht alle Hook-Sender können damit umgehen.
+        Es ist möglich, mit http://user:password@host.tld/path diese Creds
+        einfach zu übergeben. Aber, wie gesagt, nicht alle Sender können damit umgehen.
+      '';
+    };
+    basic_password = mkOption {
+      type = str;
+      default = "";
+      example = "#K0nnenWirDasSchaffen?!";
+      description = mdDoc ''
+        Ein Passwort zum Username.
+        Diese werden meist zusammengenommen und als Base64 encodiert.
+        Die beiden obigen Beispiele ergeben als Teil der HTTP-Abfrage:
+
+        > echo "Authorization: $(echo "bobderbaumeister:#K0nnenWirDasSchaffen?!" | base64)"
+        Authorization: Ym9iZGVyYmF1bWVpc3RlcjojSzBubmVuV2lyRGFzU2NoYWZmZW4/IQo=
+      '';
+    };
+    data_format = mkOption {
+      type = str;
+      default = "json";
+      description = mdDoc ''
+        Bestimmt, welches Datenformat erwartet wird.
+        Mögliche Werte: https://github.com/influxdata/telegraf/blob/master/docs/DATA_FORMATS_INPUT.md
+      '';
+    };
+    # NOTE(KI): Folgende Optionen sind nicht implementiert;
+    # http_headers     : Ausgelassen, kaum benutzt.
+    # http_header_tags : Definiert header als tags, kommt nur in Nieche vor.
+    # read_timeout     : Vorerst irrelevant. {type = types.str; default = "20s";}
+    # write_timeout    : Gleiche wie oben
+    # max_body_size    : Standart ist 500MB, sollte dicke reichen.
+    # data_source      : Standart ist "body" - gibt kaum Hooks für die "query" gut währe.
+    # tls_*            : Theoretisch für SSL/TLS - aber hier muss eine acme.sh Anbindung her.
   };
 
   # Kentix-specific
@@ -713,6 +801,30 @@ in {
               };
             };
           };
+
+          webhook = {
+            enable = mkEnableOption "Use Webhooks?";
+            endpoints = mkOption {
+              type = types.listOf types.submodule telegrafOptions.httpListener;
+              default = [];
+              example = literalExpression ''
+                senpro-it.monitoring.telegraf.inputs.webhook.endpoints = [
+                  {
+                    name = "odd_thing_without_snmp";
+                    port = ":42096";
+                    paths = ["/thing-a", "/thing-b"];
+                    path_tags = true;
+                  }
+                  {
+                    name = "xml_example";
+                    port = ":9999";
+                    paths = ["/"];
+                    format = "xml";
+                  }
+                ]
+              '';
+            };
+          }
         };
       };
 
@@ -2071,36 +2183,39 @@ in {
 
           ## Local Raspberry Pi Configuration
           cpu = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.cpu.enable [{
-              name_override = "${cfg.monitoring.telegraf.inputs.local_pi.name_override}.cpu";
-              percpu = true;
-              totalcpu = true;
-              collect_cpu_time = false;
-              report_active = false;
-              core_tags = true;
-            }];
-            disk = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.disk.enable [{
-              name_override = "${cfg.monitoring.telegraf.inputs.local_pi.name_override}.disk";
-              # NixOS verwendet btrfs; und das spammt die aktiven Mounts leider.
-              # Daher wird nur Bezug auf die MicroSD (rootFS bei einem Pi) verwendet.
-              # Die Boot Partition (/boot) wird komplett ignoriert - sind ca 200mb weil EFI GPT
-              mount_points = [ "/" ];
-            }];
-            mem = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.mem.enable [{
-              name_override = "${cfg.monitoring.telegraf.inputs.local_pi.name_override}.mem";
-              # Keine Konfiguration nötig.
-            }];
-            kernel = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.kernel.enable [{
-              name_override = "${cfg.monitoring.telegraf.inputs.local_pi.name_override}.kernel";
-              collect = [ "*" ];
-            }];
-            processes = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.processes.enable [{
-              name_override = "${cfg.monitoring.telegraf.inputs.local_pi.name_override}.proc";
-              # Keine Konfiguration nötig.
-            }];
-            system = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.system.enable [{
-              name_override = "${cfg.monitoring.telegraf.inputs.local_pi.name_override}.sys";
-              # Keine Konfiguration nötig.
-            }];
+            name_override = "${cfg.monitoring.telegraf.inputs.local_pi.name_override}.cpu";
+            percpu = true;
+            totalcpu = true;
+            collect_cpu_time = false;
+            report_active = false;
+            core_tags = true;
+          }];
+          disk = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.disk.enable [{
+            name_override = "${cfg.monitoring.telegraf.inputs.local_pi.name_override}.disk";
+            # NixOS verwendet btrfs; und das spammt die aktiven Mounts leider.
+            # Daher wird nur Bezug auf die MicroSD (rootFS bei einem Pi) verwendet.
+            # Die Boot Partition (/boot) wird komplett ignoriert - sind ca 200mb weil EFI GPT
+            mount_points = [ "/" ];
+          }];
+          mem = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.mem.enable [{
+            name_override = "${cfg.monitoring.telegraf.inputs.local_pi.name_override}.mem";
+            # Keine Konfiguration nötig.
+          }];
+          kernel = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.kernel.enable [{
+            name_override = "${cfg.monitoring.telegraf.inputs.local_pi.name_override}.kernel";
+            collect = [ "*" ];
+          }];
+          processes = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.processes.enable [{
+            name_override = "${cfg.monitoring.telegraf.inputs.local_pi.name_override}.proc";
+            # Keine Konfiguration nötig.
+          }];
+          system = lib.mkIf cfg.monitoring.telegraf.inputs.local_pi.stats.system.enable [{
+            name_override = "${cfg.monitoring.telegraf.inputs.local_pi.name_override}.sys";
+            # Keine Konfiguration nötig.
+          }];
+
+          http_listener_v2 = lib.mkIf cfg.monitoring.telegraf.inputs.webhook.enable
+            cfg.monitoring.telegraf.inputs.webhook.endpoints;
         };
         outputs = cfg.monitoring.telegraf.outputs;
       };
