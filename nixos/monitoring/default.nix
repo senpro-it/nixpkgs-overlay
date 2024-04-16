@@ -805,7 +805,7 @@ in {
           webhook = {
             enable = mkEnableOption "Use Webhooks?";
             endpoints = mkOption {
-              type = types.listOf types.submodule telegrafOptions.httpListener;
+              type = types.listOf (types.submodule telegrafOptions.httpListener);
               default = [];
               example = literalExpression ''
                 senpro-it.monitoring.telegraf.inputs.webhook.endpoints = [
