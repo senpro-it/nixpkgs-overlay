@@ -151,7 +151,7 @@ let
     };
   };
   telegrafOptions.httpListener = with types; {
-    name_override = mkOption {
+    name_prefix = mkOption {
       type = str;
       default = "webhook";
       description = mdDoc ''
@@ -812,14 +812,14 @@ in {
               example = literalExpression ''
                 senpro-it.monitoring.telegraf.inputs.webhook.endpoints = [
                   {
-                    name = "odd_thing_without_snmp";
-                    port = ":42096";
+                    name_override = "odd_thing_without_snmp";
+                    service_address = ":42096";
                     paths = ["/thing-a", "/thing-b"];
                     path_tags = true;
                   }
                   {
-                    name = "xml_example";
-                    port = ":9999";
+                    name_override = "xml_example";
+                    service_address = ":9999";
                     paths = ["/"];
                     format = "xml";
                   }
