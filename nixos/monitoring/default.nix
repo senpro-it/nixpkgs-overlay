@@ -150,7 +150,7 @@ let
       '';
     };
   };
-  telegrafOptions.httpListener = with types; mkOption {
+  telegrafOptions.httpListener = with types; {
     name_override = mkOption {
       type = str;
       default = "webhook";
