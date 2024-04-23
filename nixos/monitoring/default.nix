@@ -151,7 +151,7 @@ let
     };
   };
   telegrafOptions.httpListener = with types; {
-    name_prefix = mkOption {
+    name_override = mkOption {
       type = str;
       default = "webhook";
       description = mdDoc ''
@@ -224,10 +224,19 @@ let
     };
     data_format = mkOption {
       type = str;
-      default = "json";
+      default = "json_v2";
       description = mdDoc ''
         Bestimmt, welches Datenformat erwartet wird.
         Mögliche Werte: https://github.com/influxdata/telegraf/blob/master/docs/DATA_FORMATS_INPUT.md
+        Vorsicht, je nach Option müssen zusätzliche Optionen hinzugefügt werden!
+      '';
+    };
+    json_v2 = {
+      type = attrs;
+      default = {};
+      description = mdDoc ''
+        JSONv2 options
+        Ref: https://github.com/influxdata/telegraf/tree/master/plugins/parsers/json_v2
       '';
     };
     # NOTE(KI): Folgende Optionen sind nicht implementiert;
