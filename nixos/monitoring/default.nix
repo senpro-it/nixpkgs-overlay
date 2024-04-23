@@ -231,7 +231,7 @@ let
         Vorsicht, je nach Option müssen zusätzliche Optionen hinzugefügt werden!
       '';
     };
-    json_v2 = {
+    json_v2 = mkOption {
       type = anything;
       default = {};
       description = mdDoc ''
