@@ -232,7 +232,7 @@ let
       '';
     };
     json_v2 = {
-      type = any;
+      type = anything;
       default = {};
       description = mdDoc ''
         JSONv2 options
