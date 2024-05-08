@@ -1670,10 +1670,20 @@ in {
                 { name = "firmwareVersion"; oid = "VMWARE-SYSTEM-MIB::vmwProdVersion.0"; }
                 { name = "firmwareBuild"; oid = "VMWARE-SYSTEM-MIB::vmwProdBuild.0"; }
                 { name = "firmwareUpdateLevel"; oid = "VMWARE-SYSTEM-MIB::vmwProdUpdate.0"; }
-                { name = "firmwarePatchLevel"; oid = "VMWARE-SYSTEM-MIB::vmwProdPatch.0"; }		
+                { name = "firmwarePatchLevel"; oid = "VMWARE-SYSTEM-MIB::vmwProdPatch.0"; }
+                { name = "memorySize"; oid = "HOST-RESOURCES-MIB::hrMemorySize.0"; }
               ];
               table = [
                 { name = "vmware.esxi.vmTable"; oid = "VMWARE-VMINFO-MIB::vmwVmTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+                { name = "vmware.esxi.storageTable"; oid = "HOST-RESOURCES-MIB::hrStorageTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+                { name = "vmware.esxi.deviceTable"; oid = "HOST-RESOURCES-MIB::hrDeviceTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+                { name = "vmware.esxi.processorTable"; oid = "HOST-RESOURCES-MIB::hrProcessorTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+                { name = "vmware.esxi.diskStorageTable"; oid = "HOST-RESOURCES-MIB::hrDiskStorageTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+                { name = "vmware.esxi.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "IF-MIB::ifDescr"; is_tag = true; }
+                ]; }
+                { name = "vmware.esxi.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "IF-MIB::ifName"; is_tag = true; }
               ];
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.endpoints.self.enable {
