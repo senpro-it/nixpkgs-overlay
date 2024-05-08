@@ -1684,6 +1684,7 @@ in {
                 ]; }
                 { name = "vmware.esxi.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "IF-MIB::ifName"; is_tag = true; }
+                ]; }
               ];
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.endpoints.self.enable {
