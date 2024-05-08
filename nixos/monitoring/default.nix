@@ -1675,7 +1675,9 @@ in {
               ];
               table = [
                 { name = "vmware.esxi.vmTable"; oid = "VMWARE-VMINFO-MIB::vmwVmTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
-                { name = "vmware.esxi.storageTable"; oid = "HOST-RESOURCES-MIB::hrStorageTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+                { name = "vmware.esxi.storageTable"; oid = "HOST-RESOURCES-MIB::hrStorageTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "HOST-RESOURCES-MIB::hrStorageDescr"; is_tag = true; }
+                ]; }
                 { name = "vmware.esxi.deviceTable"; oid = "HOST-RESOURCES-MIB::hrDeviceTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
                 { name = "vmware.esxi.processorTable"; oid = "HOST-RESOURCES-MIB::hrProcessorTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
                 { name = "vmware.esxi.diskStorageTable"; oid = "HOST-RESOURCES-MIB::hrDiskStorageTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
