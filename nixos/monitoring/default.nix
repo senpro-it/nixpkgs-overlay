@@ -1674,7 +1674,9 @@ in {
                 { name = "memorySize"; oid = "HOST-RESOURCES-MIB::hrMemorySize.0"; }
               ];
               table = [
-                { name = "vmware.esxi.vmTable"; oid = "VMWARE-VMINFO-MIB::vmwVmTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+                { name = "vmware.esxi.vmTable"; oid = "VMWARE-VMINFO-MIB::vmwVmTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "VMWARE-VMINFO-MIB::vmwVmDisplayName"; is_tag = true; }
+                ]; }
                 { name = "vmware.esxi.storageTable"; oid = "HOST-RESOURCES-MIB::hrStorageTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "HOST-RESOURCES-MIB::hrStorageDescr"; is_tag = true; }
                 ]; }
