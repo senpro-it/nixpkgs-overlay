@@ -1495,7 +1495,7 @@ in {
               priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.privacy.password}";
               retries = 5;
               field = [
-                { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
+                { name = "apHost"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
                 { name = "apNumber"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicWirelessApNumber.0"; }
               ];
               table = [
