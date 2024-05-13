@@ -664,6 +664,12 @@ in {
                       '';
                       agents = telegrafOptions.agentConfig;
                     };
+                    accessPoints = {
+                      enable = mkEnableOption ''
+                        Whether to enable the SonicWall AP monitoring (through Firewall) via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    };
                   };
                   credentials = telegrafOptions.authSNMPv3;
                 };
@@ -1459,8 +1465,9 @@ in {
                 { name = "cpuUsageInspect"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCurrentFwdAndInspectCPUUtil.0"; }
                 { name = "memUsage"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCurrentRAMUtil.0"; }
                 { name = "contentFilter"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCFS.0"; }
+                { name = "currentConnections"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCurrentConnCacheEntries.0"; }
               ];
-            table = [
+              table = [
                 { name = "sonicWall.fwTzNsa.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "IF-MIB::ifDescr"; is_tag = true; }
                 ]; }
@@ -1470,8 +1477,30 @@ in {
                 { name = "sonicWall.fwTzNsa.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; field = [
                   { oid = "IP-MIB::ipAdEntIfIndex"; is_tag = true; }
                 ]; }
-                { name = "sonicWall.fwTzNsa.vpnIpsecStats"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicSAStatTable"; inherit_tags = [ "host" ]; }
-                { name = "sonicWall.fwTzNsa.zoneStats"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicwallFwZoneTable"; inherit_tags = [ "host" ]; }
+                { name = "sonicWall.fwTzNsa.vpnIpsecStats"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicSAStatTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+                { name = "sonicWall.fwTzNsa.zoneStats"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicwallFwZoneTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+              ];
+            })
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.endpoints.accessPoints.enable {
+              name = "sonicWall.fwTzNsa.accessPoints";
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.endpoints.accessPoints.agents;
+              timeout = "20s";
+              version = 3;
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.privacy.password}";
+              retries = 5;
+              field = [
+                { name = "apNumber"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicWirelessApNumber.0"; }
+              ];
+              table = [
+                { name = "sonicWall.fwTzNsa.accessPoints.apTable"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicWirelessApTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+                { name = "sonicWall.fwTzNsa.accessPoints.vapTable"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicWirelessVapTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+                { name = "sonicWall.fwTzNsa.accessPoints.statTable"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicWirelessStaTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
               ];
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.sg.endpoints.self.enable {
