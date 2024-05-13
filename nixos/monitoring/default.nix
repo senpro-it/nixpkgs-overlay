@@ -1498,7 +1498,9 @@ in {
                 { name = "apNumber"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicWirelessApNumber.0"; }
               ];
               table = [
-                { name = "sonicWall.fwTzNsa.accessPoints.apTable"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicWirelessApTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+                { name = "sonicWall.fwTzNsa.accessPoints.apTable"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicWirelessApTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "IF-SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicApName"; is_tag = true; }
+                ]; }
                 { name = "sonicWall.fwTzNsa.accessPoints.vapTable"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicWirelessVapTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
                 { name = "sonicWall.fwTzNsa.accessPoints.statTable"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicWirelessStaTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
               ];
