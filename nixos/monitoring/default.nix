@@ -1505,7 +1505,9 @@ in {
                 { name = "sonicWall.fwTzNsa.accessPoints.vapTable"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicWirelessVapTable"; index_as_tag = true; inherit_tags = [ "apHost" ]; field = [
                   { oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicWirelessVapSsid"; is_tag = true; }
                 ]; }
-                { name = "sonicWall.fwTzNsa.accessPoints.statTable"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicWirelessStaTable"; index_as_tag = true; inherit_tags = [ "apHost" ]; }
+                { name = "sonicWall.fwTzNsa.accessPoints.statTable"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicWirelessStaTable"; index_as_tag = true; inherit_tags = [ "apHost" ]; field = [
+                  { oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicStaIpAddress"; is_tag = true; }
+                ]; }
               ];
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.sg.endpoints.self.enable {
