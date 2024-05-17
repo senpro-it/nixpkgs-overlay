@@ -1627,6 +1627,7 @@ in {
                   { oid = "SFOS-FIREWALL-MIB::sfosIPSecVpnActivated"; is_tag = true; }
                 ]; }
                 { name = "sophos.xg.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
+                { name = "sophos.xg.processorTable"; oid = "HOST-RESOURCES-MIB::hrProcessorTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
               ];
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.synology.dsm.endpoints.self.enable {
