@@ -1621,12 +1621,14 @@ in {
                 { name = "sophos.xg.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "IF-MIB::ifName"; is_tag = true; }
                 ]; }
+                { name = "sophos.xg.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; field = [
+                  { oid = "IP-MIB::ipAdEntIfIndex"; is_tag = true; }
+                ]; }
                 { name = "sophos.xg.vpnIpsecTable"; oid = "SFOS-FIREWALL-MIB::sfosIPSecVpnTunnelTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "SFOS-FIREWALL-MIB::sfosIPSecVpnConnName"; is_tag = true; }
                   { oid = "SFOS-FIREWALL-MIB::sfosIPSecVpnConnType"; is_tag = true; }
                   { oid = "SFOS-FIREWALL-MIB::sfosIPSecVpnActivated"; is_tag = true; }
                 ]; }
-                { name = "sophos.xg.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
                 { name = "sophos.xg.processorTable"; oid = "HOST-RESOURCES-MIB::hrProcessorTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
               ];
             })
