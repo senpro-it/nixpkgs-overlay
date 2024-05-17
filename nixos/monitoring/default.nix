@@ -1621,6 +1621,9 @@ in {
                 { name = "sophos.xg.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "IF-MIB::ifName"; is_tag = true; }
                 ]; }
+                { name = "sophos.xg.vpnIpsecTable"; oid = "SFOS-FIREWALL-MIB::sfosIPSecVPNTunnelTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "SFOS-FIREWALL-MIB::sfosIPSecVPNConnName"; is_tag = true; }
+                ]; }
                 { name = "sophos.xg.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
               ];
             })
