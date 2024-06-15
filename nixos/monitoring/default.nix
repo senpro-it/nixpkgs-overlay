@@ -154,7 +154,7 @@ let
     name_override = mkOption {
       type = str;
       default = "webhook";
-      description = mdDoc ''
+      description = ''
         Wird als Name der Messung verwendet.
         Bei mehreren HTTP Servern sollten auch verschiedene Namen
         verwendet werden, damit sich diese nicht überschreiben.
@@ -165,7 +165,7 @@ let
       type = str;
       default = ":8080";
       example = ":8080";
-      description = mdDoc ''
+      description = ''
         HTTP-Addresse auf der gelauscht wird.
         Wird ein Host vor dem Port angegeben (127.0.0.1:8080), dann
         ist dieser HTTP Server nur dort erreichbar.
@@ -176,7 +176,7 @@ let
     paths = mkOption {
       type = listOf str;
       default = [ "/telegraf" ];
-      description = mdDoc ''
+      description = ''
         Liste der HTTP Pfade.
         "/telegraf" ist der Default.
         Nützlich, um mehrere Endpunkte anzulegen, insbesondere wenn path_tag=true ist.
@@ -185,14 +185,14 @@ let
     path_tag = mkOption {
       type = bool;
       default = false;
-      description = mdDoc ''
+      description = ''
         Legt den HTTP-Pfad als Tag an.
       '';
     };
     methods = mkOption {
       type = listOf str;
       default = ["POST"];
-      description = mdDoc ''
+      description = ''
         Definiert die HTTP Methoden, die akzeptiert werden.
         POST ist der Standart, PUT ist relativ neu (http/1.1)
         und manche besonderen Endpunkte benutzen vielleicht obskure Methoden.
@@ -202,7 +202,7 @@ let
       type = str;
       default = "";
       example = "bobderbaumeister";
-      description = mdDoc ''
+      description = ''
         Kann optional verwendet werden, um einen Benutzernamen festzulegen.
         Nicht alle Hook-Sender können damit umgehen.
         Es ist möglich, mit http://user:password@host.tld/path diese Creds
@@ -213,7 +213,7 @@ let
       type = str;
       default = "";
       example = "#K0nnenWirDasSchaffen?!";
-      description = mdDoc ''
+      description = ''
         Ein Passwort zum Username.
         Diese werden meist zusammengenommen und als Base64 encodiert.
         Die beiden obigen Beispiele ergeben als Teil der HTTP-Abfrage:
@@ -225,7 +225,7 @@ let
     data_format = mkOption {
       type = str;
       default = "json_v2";
-      description = mdDoc ''
+      description = ''
         Bestimmt, welches Datenformat erwartet wird.
         Mögliche Werte: https://github.com/influxdata/telegraf/blob/master/docs/DATA_FORMATS_INPUT.md
         Vorsicht, je nach Option müssen zusätzliche Optionen hinzugefügt werden!
@@ -234,7 +234,7 @@ let
     json_v2 = mkOption {
       type = anything;
       default = {};
-      description = mdDoc ''
+      description = ''
         JSONv2 options
         Ref: https://github.com/influxdata/telegraf/tree/master/plugins/parsers/json_v2
       '';
