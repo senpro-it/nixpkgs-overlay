@@ -18,13 +18,13 @@ let cfg = config.senpro; in {
                   email = mkOption {
                     example = "example@example.com";
                     type = types.str;
-                    description = lib.mdDoc "Mail address for alerts regarding expiring certificates.";
+                    description = "Mail address for alerts regarding expiring certificates.";
                   };
                   dnsChallenge = {
                     provider = mkOption {
                       example = "ionos";
                       type = types.str;
-                      description = lib.mdDoc "Provider code for the ACME DNS challenge. Don't forget to provide eventually needed environment variables through ";
+                      description = "Provider code for the ACME DNS challenge. Don't forget to provide eventually needed environment variables through ";
                     };
                   };
                 };
@@ -34,12 +34,12 @@ let cfg = config.senpro; in {
           dynamic = mkOption {
             default = "";
             type = types.lines;
-            description = lib.mdDoc "Additional, user-provided dynamic configuration for Traefik.";
+            description = "Additional, user-provided dynamic configuration for Traefik.";
           };
           environment = mkOption {
             type = with types; attrsOf str;
             default = {};
-            description = lib.mdDoc "Environment variables to set for the Traefik container.";
+            description = "Environment variables to set for the Traefik container.";
             example = literalExpression ''
               {
                 IONOS_API_KEY = "43swm2sdxiamsa0djssd6435ccss";
