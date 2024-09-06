@@ -618,6 +618,19 @@ in {
                   credentials = telegrafOptions.authSNMPv3;
                 };
               };
+              lenovo = {
+                storage = {
+                  endpoints = {
+                    self = {
+                      enable = mkEnableOption ''
+                        Whether to enable the Lenovo storage monitoring via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    };
+                  };
+                  credentials = telegrafOptions.authSNMPv3;
+                };
+              };
               qnap = {
                 nas = {
                   endpoints = {
@@ -1344,6 +1357,31 @@ in {
                 { name = "lancom.router.lanInterfaceTable"; oid = "LCOS-MIB::lcsStatusLanInterfacesTable"; inherit_tags = [ "host" ]; field = [
                   { oid = "LCOS-MIB::lcsStatusLanInterfacesEntryIfc"; is_tag = true; }
                 ]; }
+              ];
+            })
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.lenovo.storage.endpoints.self.enable {
+              name = "lenovo.storage";
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
+              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.lenovo.storage.endpoints.self.agents;
+              interval = "60s";
+              timeout = "20s";
+              version = 3;
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.lenovo.storage.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.lenovo.storage.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.lenovo.storage.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.lenovo.storage.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.lenovo.storage.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.lenovo.storage.credentials.privacy.password}";
+              retries = 5;
+              field = [
+                { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
+                { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
+                { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
+                { name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
+                { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
+                { name = "serialNumber"; oid = "ES-NETAPP-06-MIB::ssChassisSerialNumber.0"; }
+                { name = "productFamily"; oid = "ES-NETAPP-06-MIB::ssProductID.0"; }
+                { name = "status"; oid = "ES-NETAPP-06-MIB::ssStorageArrayNeedsAttention.0"; }
               ];
             })
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.endpoints.self.enable {
