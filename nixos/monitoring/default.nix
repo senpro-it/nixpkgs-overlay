@@ -830,15 +830,15 @@ in {
             };
           };
 
-          webhook = {
-            enable = mkEnableOption "Use Webhooks?";
+          http_listener_v2 = {
+            enable = mkEnableOption "Use HTTP Listener?";
             endpoints = mkOption {
               type = types.listOf (types.submodule {
                 options = telegrafOptions.httpListener;
               });
               default = [];
               example = literalExpression ''
-                senpro-it.monitoring.telegraf.inputs.webhook.endpoints = [
+                senpro-it.monitoring.telegraf.inputs.http_listener_v2.endpoints = [
                   {
                     name_override = "odd_thing_without_snmp";
                     service_address = ":42096";
