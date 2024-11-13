@@ -831,7 +831,7 @@ in {
           };
 
           webhook = {
-            enable = mkEnableOption "Use HTTP Listener?";
+            enable = mkEnableOption "Use Webhooks?";
             endpoints = mkOption {
               type = types.listOf (types.submodule {
                 options = telegrafOptions.httpListener;
