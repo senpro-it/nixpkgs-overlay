@@ -1081,10 +1081,10 @@ in {
             })
           ];
           snmp = lib.mkIf cfg.monitoring.telegraf.inputs.snmp.enable [
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.self.enable {
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.self.enable (map (agent: {
               name = "aruba.mobilityGateway";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.self.agents;
+              agents = [ agent ];
               timeout = "20s";
               version = 3;
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.security.level}";
@@ -1117,11 +1117,11 @@ in {
                 ]; }
                 { name = "aruba.mobilityGateway.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.accessPoints.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.self.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.accessPoints.enable (map (agent: {
               name = "aruba.mobilityGateway.accessPoints";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.accessPoints.agents;
+              agents = [ agent ];
               timeout = "20s";
               version = 3;
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.credentials.security.level}";
@@ -1143,11 +1143,11 @@ in {
                 { name = "aruba.mobilityGateway.accessPoints.radioStatsTable"; oid = "WLSX-WLAN-MIB::wlsxWlanAPRadioStatsTable"; index_as_tag = true; }
                 { name = "aruba.mobilityGateway.accessPoints.stationStatsTable"; oid = "WLSX-WLAN-MIB::wlsxWlanStationStatsTable"; index_as_tag = true; }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.switch.endpoints.self.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.accessPoints.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.switch.endpoints.self.enable (map (agent: {
               name = "aruba.switch";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.switch.endpoints.self.agents;
+              agents = [ agent ];
               timeout = "20s";
               version = 2;
               community = "${cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.switch.credentials.community}";
@@ -1167,11 +1167,11 @@ in {
                   { oid = "IF-MIB::ifName"; is_tag = true; }
                 ]; }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.cisco.switch.endpoints.self.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.switch.endpoints.self.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.cisco.switch.endpoints.self.enable (map (agent: {
               name = "cisco.switch";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.cisco.switch.endpoints.self.agents;
+              agents = [ agent ];
               timeout = "20s";
               version = 3;
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.cisco.switch.credentials.security.level}";
@@ -1196,11 +1196,11 @@ in {
                   { oid = "IF-MIB::ifName"; is_tag = true; }
                 ]; }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.fortinet.firewall.endpoints.self.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.cisco.switch.endpoints.self.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.fortinet.firewall.endpoints.self.enable (map (agent: {
               name = "fortinet.firewall";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.fortinet.firewall.endpoints.self.agents;
+              agents = [ agent ];
               timeout = "20s";
               version = 3;
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.fortinet.firewall.credentials.security.level}";
@@ -1260,11 +1260,11 @@ in {
                 { name = "fortinet.firewall.IpsStatsTable"; oid = "FORTINET-FORTIGATE-MIB::fgIpsStatsTable"; inherit_tags = [ "host" ]; }
                 { name = "fortinet.firewall.haStatsTable"; oid = "FORTINET-FORTIGATE-MIB::fgHaStatsTable"; inherit_tags = [ "host" ]; }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.endpoints.self.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.fortinet.firewall.endpoints.self.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.endpoints.self.enable (map (agent: {
               name = "fs.switch";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.endpoints.self.agents;
+              agents = [ agent ];
               timeout = "20s";
               version = 3;
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.credentials.security.level}";
@@ -1299,11 +1299,11 @@ in {
                 ]; }
                 { name = "fs.switch.nmspmCPUTotalTable"; oid = "NMS-PROCESS-MIB::nmspmCPUTotalTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.accessmanager.endpoints.self.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.fs.switch.endpoints.self.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.accessmanager.endpoints.self.enable (map (agent: {
               name = "kentix.accessmanager";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.accessmanager.endpoints.self.agents;
+              agents = [ agent ];
               interval = "60s";
               timeout = "20s";
               version = 3;
@@ -1329,11 +1329,11 @@ in {
                   { oid = "KENTIXDEVICES::batteryIndex"; is_tag = true; }
                 ]; }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.self.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.accessmanager.endpoints.self.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.self.enable (map (agent: {
               name = "kentix.sensors";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.self.agents;
+              agents = [ agent ];
               interval = "60s";
               timeout = "20s";
               version = 2;
@@ -1373,11 +1373,11 @@ in {
               ++ (kentixFuncs.mkDigiOut2 cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.digitalOut2s)
               ++ (kentixFuncs.mkInitErrors cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.initErrors)
               ; # Hide and seek champion.
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.lancom.router.endpoints.self.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors.endpoints.self.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.lancom.router.endpoints.self.enable (map (agent: {
               name = "lancom.router";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.lancom.router.endpoints.self.agents;
+              agents = [ agent ];
               interval = "60s";
               timeout = "20s";
               version = 3;
@@ -1433,11 +1433,11 @@ in {
                   { oid = "LCOS-MIB::lcsStatusLanInterfacesEntryIfc"; is_tag = true; }
                 ]; }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.lenovo.storage.endpoints.self.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.lancom.router.endpoints.self.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.lenovo.storage.endpoints.self.enable (map (agent: {
               name = "lenovo.storage";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.lenovo.storage.endpoints.self.agents;
+              agents = [ agent ];
               interval = "60s";
               timeout = "20s";
               version = 3;
@@ -1458,11 +1458,11 @@ in {
                 { name = "productFamily"; oid = "ES-NETAPP-06-MIB::ssProductID.0"; }
                 { name = "status"; oid = "ES-NETAPP-06-MIB::ssStorageArrayNeedsAttention.0"; }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.endpoints.self.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.lenovo.storage.endpoints.self.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.endpoints.self.enable (map (agent: {
               name = "qnap.nas";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.endpoints.self.agents;
+              agents = [ agent ];
               interval = "60s";
               timeout = "20s";
               version = 3;
@@ -1500,11 +1500,11 @@ in {
                 { name = "qnap.nas.target"; oid = "QTS-MIB::targeTable"; inherit_tags = [ "host" ]; }
                 { name = "qnap.nas.volume"; oid = "QTS-MIB::volumeTable"; inherit_tags = [ "host" ]; }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.schneiderElectric.apc.endpoints.self.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.qnap.nas.endpoints.self.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.schneiderElectric.apc.endpoints.self.enable (map (agent: {
               name = "schneiderElectric.apc";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.schneiderElectric.apc.endpoints.self.agents;
+              agents = [ agent ];
               timeout = "20s";
               version = 3;
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.schneiderElectric.apc.credentials.security.level}";
@@ -1549,11 +1549,11 @@ in {
               table = [
                 { name = "schneiderElectric.apc.configDevice"; oid = "PowerNet-MIB::upsBasicConfigDeviceTable"; inherit_tags = [ "host" ]; }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.endpoints.self.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.schneiderElectric.apc.endpoints.self.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.endpoints.self.enable (map (agent: {
               name = "sonicWall.fwTzNsa";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.endpoints.self.agents;
+              agents = [ agent ];
               timeout = "20s";
               version = 3;
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.security.level}";
@@ -1593,11 +1593,11 @@ in {
                 { name = "sonicWall.fwTzNsa.vpnIpsecStats"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicSAStatTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
                 { name = "sonicWall.fwTzNsa.zoneStats"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicwallFwZoneTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.endpoints.accessPoints.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.endpoints.self.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.endpoints.accessPoints.enable (map (agent: {
               name = "sonicWall.fwTzNsa.accessPoints";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.endpoints.accessPoints.agents;
+              agents = [ agent ];
               timeout = "20s";
               version = 3;
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.credentials.security.level}";
@@ -1622,11 +1622,11 @@ in {
                   { oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicStaIpAddress"; is_tag = true; }
                 ]; }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.sg.endpoints.self.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa.endpoints.accessPoints.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.sg.endpoints.self.enable (map (agent: {
               name = "sophos.sg";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.sg.endpoints.self.agents;
+              agents = [ agent ];
               timeout = "20s";
               version = 3;
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.sg.credentials.security.level}";
@@ -1661,11 +1661,11 @@ in {
                 ]; }
                 { name = "sophos.sg.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.xg.endpoints.self.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.sg.endpoints.self.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.xg.endpoints.self.enable (map (agent: {
               name = "sophos.xg";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.xg.endpoints.self.agents;
+              agents = [ agent ];
               timeout = "20s";
               version = 3;
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.xg.credentials.security.level}";
@@ -1744,11 +1744,11 @@ in {
                 ]; }
                 { name = "sophos.xg.processorTable"; oid = "HOST-RESOURCES-MIB::hrProcessorTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.synology.dsm.endpoints.self.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.sophos.xg.endpoints.self.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.synology.dsm.endpoints.self.enable (map (agent: {
               name = "synology.dsm";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.synology.dsm.endpoints.self.agents;
+              agents = [ agent ];
               timeout = "20s";
               version = 3;
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.synology.dsm.credentials.security.level}";
@@ -1803,11 +1803,11 @@ in {
                 ]; }
                 { name = "synology.dsm.serviceTable"; oid = "SYNOLOGY-SERVICES-MIB::serviceTable"; inherit_tags = [ "host" ]; }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.vmware.esxi.endpoints.self.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.synology.dsm.endpoints.self.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.vmware.esxi.endpoints.self.enable (map (agent: {
               name = "vmware.esxi";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.vmware.esxi.endpoints.self.agents;
+              agents = [ agent ];
               timeout = "20s";
               version = 3;
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.vmware.esxi.credentials.security.level}";
@@ -1847,11 +1847,11 @@ in {
                   { oid = "IF-MIB::ifName"; is_tag = true; }
                 ]; }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.endpoints.self.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.vmware.esxi.endpoints.self.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.endpoints.self.enable (map (agent: {
               name = "reddoxx";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.endpoints.self.agents;
+              agents = [ agent ];
               timeout = "20s";
               version = 3;
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.credentials.security.level}";
@@ -1993,11 +1993,11 @@ in {
                   }];
                 }
               ];
-            })
-            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.endpoints.self.enable {
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.reddoxx.endpoints.self.agents))
+            (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.endpoints.self.enable (map (agent: {
               name = "zyxel.switch";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
-              agents = cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.endpoints.self.agents;
+              agents = [ agent ];
               timeout = "20s";
               version = 3;
               sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.credentials.security.level}";
@@ -2058,7 +2058,7 @@ in {
                   { oid = "ZYXEL-HW-MONITOR-MIB::zyHwMonitorPowerSourceDescription"; is_tag = true; }
                 ]; }
               ];
-            })
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.endpoints.self.agents))
           ];
           vsphere = lib.mkIf cfg.monitoring.telegraf.inputs.api.vendors.vmware.vsphere.enable [
             {
