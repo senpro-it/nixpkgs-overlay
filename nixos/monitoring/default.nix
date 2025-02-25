@@ -1080,7 +1080,7 @@ in {
               data_format = "influx";
             })
           ];
-          snmp = lib.mkIf cfg.monitoring.telegraf.inputs.snmp.enable [
+          snmp = lib.mkIf cfg.monitoring.telegraf.inputs.snmp.enable builtins.concatLists([
             (lib.mkIf cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.self.enable (map (agent: {
               name = "aruba.mobilityGateway";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
@@ -2059,7 +2059,7 @@ in {
                 ]; }
               ];
             }) cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.endpoints.self.agents))
-          ];
+          ]);
           vsphere = lib.mkIf cfg.monitoring.telegraf.inputs.api.vendors.vmware.vsphere.enable [
             {
               interval = "60s";
