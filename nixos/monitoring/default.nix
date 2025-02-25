@@ -1080,7 +1080,7 @@ in {
               data_format = "influx";
             })
           ];
-          snmp = lib.mkIf cfg.monitoring.telegraf.inputs.snmp.enable builtins.concatLists([
+          snmp = builtins.concatLists (lib.optional cfg.monitoring.telegraf.inputs.snmp.enable [
             (lib.optionals cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.self.enable (map (agent: {
               name = "aruba.mobilityGateway";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
