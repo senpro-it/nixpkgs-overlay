@@ -500,6 +500,19 @@ in {
                   credentials = telegrafOptions.authSNMPv3;
                 };
               };
+              dell = {
+                storage = {
+                  endpoints = {
+                    self = {
+                      enable = mkEnableOption ''
+                        Whether to enable the Dell storage monitoring via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    };
+                  };
+                  credentials = telegrafOptions.authSNMPv3;
+                };
+              };
               fortinet = {
                 firewall = {
                   endpoints = {
@@ -1197,6 +1210,47 @@ in {
                 ]; }
               ];
             }) cfg.monitoring.telegraf.inputs.snmp.vendors.cisco.switch.endpoints.self.agents))
+            (lib.optionals cfg.monitoring.telegraf.inputs.snmp.vendors.dell.storage.endpoints.self.enable (map (agent: {
+              name = "dell.storage";
+              path = [ "${pkgs.mib-library}/opt/mib-library/" ];
+              agents = [ agent ];
+              timeout = "20s";
+              version = 3;
+              sec_level = "${cfg.monitoring.telegraf.inputs.snmp.vendors.dell.storage.credentials.security.level}";
+              sec_name = "${cfg.monitoring.telegraf.inputs.snmp.vendors.dell.storage.credentials.security.username}";
+              auth_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.dell.storage.credentials.authentication.protocol}";
+              auth_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.dell.storage.credentials.authentication.password}";
+              priv_protocol = "${cfg.monitoring.telegraf.inputs.snmp.vendors.dell.storage.credentials.privacy.protocol}";
+              priv_password = "${cfg.monitoring.telegraf.inputs.snmp.vendors.dell.storage.credentials.privacy.password}";
+              retries = 5;
+              field = [
+                { name = "host"; oid = "SNMPv2-MIB::sysName.0"; is_tag = true; }
+                { name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
+                { name = "contact"; oid = "SNMPv2-MIB::sysContact.0"; }
+                { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
+                { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
+              ];
+              table = [
+                { name = "dell.storage.ifTable"; oid = "IF-MIB::ifTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "IF-MIB::ifDescr"; is_tag = true; }
+                ]; }
+                { name = "dell.storage.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "IF-MIB::ifName"; is_tag = true; }
+                ]; }
+                { name = "dell.storage.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; field = [
+                  { oid = "IP-MIB::ipAdEntIfIndex"; is_tag = true; }
+                ]; }
+                { name = "dell.storage.connUnitTable"; oid = "FCMGMT-MIB::connUnitTable"; inherit_tags = [ "host" ]; field = [
+                  { oid = "FCMGMT-MIB::connUnitName"; is_tag = true; }
+                ]; }
+                { name = "dell.storage.connUnitSensorTable"; oid = "FCMGMT-MIB::connUnitSensorTable"; inherit_tags = [ "host" ]; field = [
+                  { oid = "FCMGMT-MIB::connUnitSensorName"; is_tag = true; }
+                ]; }
+                { name = "dell.storage.connUnitPortTable"; oid = "FCMGMT-MIB::connUnitPortTable"; inherit_tags = [ "host" ]; field = [
+                  { oid = "FCMGMT-MIB::connUnitPortName"; is_tag = true; }
+                ]; }
+              ];
+            }) cfg.monitoring.telegraf.inputs.snmp.vendors.dell.storage.endpoints.self.agents))
             (lib.optionals cfg.monitoring.telegraf.inputs.snmp.vendors.fortinet.firewall.endpoints.self.enable (map (agent: {
               name = "fortinet.firewall";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
