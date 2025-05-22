@@ -1635,6 +1635,8 @@ in {
                 { name = "uptime"; oid = "SNMPv2-MIB::sysUpTime.0"; }
                 { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
                 { name = "cpuUsage"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCurrentCPUUtil.0"; }
+                { name = "cpuUsageMgmt"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCurrentManagementCPUUtil.0"; }
+                { name = "cpuUsageInspect"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCurrentFwdAndInspectCPUUtil.0"; }
                 { name = "memUsage"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCurrentRAMUtil.0"; }
                 { name = "contentFilter"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCFS.0"; }
                 { name = "currentConnections"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCurrentConnCacheEntries.0"; }
