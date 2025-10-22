@@ -452,6 +452,25 @@ in {
               };
             };
           };
+          internet_speed = {
+            enable = mkEnableOption ''
+              Whether to enable internet speed monitoring.
+            '';
+            settings = mkOption {
+              type = settingsFormat.type;
+              default = {};
+              description = "Options passed straight into [[inputs.internet_speed]].";
+              example = {
+                interval = "60m";
+                cache = true;
+                memory_saving_mode = true;
+                test_mode = "multi";
+                connections = 4;
+                # server_id_include = [ 54619 ];
+                # server_id_exclude = [ 9999 ];
+              };
+            };
+          };
           snmp = {
             enable = mkEnableOption ''
               Whether to enable SNMP monitoring.
@@ -1092,6 +1111,20 @@ in {
               interval = "900s";
               data_format = "influx";
             })
+          ];
+          internet_speed = lib.optionals cfg.monitoring.telegraf.inputs.internet_speed.enable [
+            (let
+              s = cfg.monitoring.telegraf.inputs.internet_speed.settings;
+            in
+              # merge user settings with defaults (only when not provided)
+              s
+              // { name_override = "internet.speed"; }
+              // lib.optionalAttrs (!(s ? interval))              { interval = "60m"; }
+              // lib.optionalAttrs (!(s ? memory_saving_mode))    { memory_saving_mode = true; }
+              // lib.optionalAttrs (!(s ? cache))                 { cache = true; }
+              // lib.optionalAttrs (!(s ? test_mode))             { test_mode = "multi"; }
+              // lib.optionalAttrs (!(s ? connections))           { connections = 4; }
+            )
           ];
           snmp = builtins.concatLists (builtins.filter (x: x != []) (lib.optionals cfg.monitoring.telegraf.inputs.snmp.enable [
             (lib.optionals cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.self.enable (map (agent: {
