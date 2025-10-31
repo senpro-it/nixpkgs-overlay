@@ -1103,19 +1103,17 @@ in {
           interval = "60s";
           snmp_translator = "gosmi";
         };
-        inputs = {
-          exec = lib.mkIf cfg.monitoring.telegraf.inputs.api.vendors.sophos.central.enable [
-            (lib.mkIf cfg.monitoring.telegraf.inputs.api.vendors.sophos.central.enable {
-              commands = [ "${pkgs.line-exporters}/bin/lxp-sophos-central '${cfg.monitoring.telegraf.inputs.api.vendors.sophos.central.client.id}' '${cfg.monitoring.telegraf.inputs.api.vendors.sophos.central.client.secret}'" ];
-              timeout = "5m";
-              interval = "900s";
-              data_format = "influx";
-            })
+        processors = {
+          converter = [
+            {
+              namepass = [ "internet.speed" ];
+              tags = { string = [ "source" "server_id" "test_mode" ]; };
+            }
           ];
-          internet_speed = lib.optionals cfg.monitoring.telegraf.inputs.internet_speed.enable [
-            (let
-              s = cfg.monitoring.telegraf.inputs.internet_speed.settings;
-            in
+        };
+        inputs = {
+          internet_speed = lib.mkIf cfg.monitoring.telegraf.inputs.internet_speed.enable [
+            (let s = cfg.monitoring.telegraf.inputs.internet_speed.settings; in
               # merge user settings with defaults (only when not provided)
               s
               // { name_override = "internet.speed"; }
@@ -1125,6 +1123,14 @@ in {
               // lib.optionalAttrs (!(s ? test_mode))             { test_mode = "multi"; }
               // lib.optionalAttrs (!(s ? connections))           { connections = 4; }
             )
+          ];
+          exec = lib.mkIf cfg.monitoring.telegraf.inputs.api.vendors.sophos.central.enable [
+            (lib.mkIf cfg.monitoring.telegraf.inputs.api.vendors.sophos.central.enable {
+              commands = [ "${pkgs.line-exporters}/bin/lxp-sophos-central '${cfg.monitoring.telegraf.inputs.api.vendors.sophos.central.client.id}' '${cfg.monitoring.telegraf.inputs.api.vendors.sophos.central.client.secret}'" ];
+              timeout = "5m";
+              interval = "900s";
+              data_format = "influx";
+            })
           ];
           snmp = builtins.concatLists (builtins.filter (x: x != []) (lib.optionals cfg.monitoring.telegraf.inputs.snmp.enable [
             (lib.optionals cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.self.enable (map (agent: {
