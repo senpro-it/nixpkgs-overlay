@@ -300,9 +300,9 @@ let
       name_override = "kentix.sensors.group${g}.${key}";
       oid = "KAM-PRO::${key}${g}";
     }) [
-      "temperature", "humidity", "dewpoint", 
-      "co2", "motion", 
-      "digitalin1", "digitalin2", 
+      "temperature", "humidity", "dewpoint",
+      "co2", "motion",
+      "digitalin1", "digitalin2",
       "digitalout2",
       "comError"
     ]);
@@ -504,7 +504,7 @@ in {
                     };
                   };
                   credentials = telegrafOptions.authSNMPv2;
-                }; 
+                };
               };
               cisco = {
                 switch = {
@@ -897,10 +897,10 @@ in {
                       // Name des Schlüssels mit Zeitstempel:
                       timestamp_path = "time_at";
                       // Zeitstempel Format:
-                      // ref: 
+                      // ref:
                       timestamp_format = "";
                       // Zeitzone:
-                      // ref: 
+                      // ref:
                       timestamp_timezone = "";
                       // Tags:
                       tag = [
@@ -1132,7 +1132,8 @@ in {
               data_format = "influx";
             })
           ];
-          snmp = builtins.concatLists (builtins.filter (x: x != []) (lib.optionals cfg.monitoring.telegraf.inputs.snmp.enable [
+          snmp = lib.mkIf cfg.monitoring.telegraf.inputs.snmp.enable [
+          #snmp = builtins.concatLists (builtins.filter (x: x != []) (lib.optionals cfg.monitoring.telegraf.inputs.snmp.enable [
             (lib.optionals cfg.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway.endpoints.self.enable (map (agent: {
               name = "aruba.mobilityGateway";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
@@ -2064,19 +2065,19 @@ in {
                   ];
                 }
                 {
-                  name = "reddoxx.ifTable"; 
-                  oid = "IF-MIB::ifTable"; 
-                  index_as_tag = true; 
-                  inherit_tags = [ "host" ]; 
+                  name = "reddoxx.ifTable";
+                  oid = "IF-MIB::ifTable";
+                  index_as_tag = true;
+                  inherit_tags = [ "host" ];
                   field = [
                     { oid = "IF-MIB::ifDescr"; is_tag = true; }
                   ];
                 }
                 {
-                  name = "reddoxx.ifXTable"; 
-                  oid = "IF-MIB::ifXTable"; 
-                  index_as_tag = true; 
-                  inherit_tags = [ "host" ]; 
+                  name = "reddoxx.ifXTable";
+                  oid = "IF-MIB::ifXTable";
+                  index_as_tag = true;
+                  inherit_tags = [ "host" ];
                   field = [
                     { oid = "IF-MIB::ifName"; is_tag = true; }
                   ];
@@ -2159,7 +2160,8 @@ in {
                 ]; }
               ];
             }) cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.endpoints.self.agents))
-          ]));
+          #]));
+          ];
           vsphere = lib.mkIf cfg.monitoring.telegraf.inputs.api.vendors.vmware.vsphere.enable [
             {
               interval = "60s";
