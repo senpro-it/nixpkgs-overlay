@@ -15,9 +15,9 @@
     };
 
     # Disable auto upgrades; we do tem ourself.
-    system.autoUpgrade.enable = false;
+    system.autoUpgrade.enable = lib.mkDefault false;
 
     # Do not run this.
-    nix.gc.automatic = false;
+    nix.gc.automatic = lib.mkDefault false;
   };
 }
