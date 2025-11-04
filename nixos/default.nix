@@ -1,4 +1,4 @@
-{ system, config, ... }:
+{ system, config, lib, ... }:
 
 {
 
@@ -12,4 +12,10 @@
       echo "[TODO] Config backup goes here..."
     '';
   };
+
+  # Disable auto upgrades; we do tem ourself.
+  system.autoUpgrade.enable = false;
+
+  # Do not run this.
+  nix.gc.automatic = false;
 }
