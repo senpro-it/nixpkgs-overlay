@@ -462,7 +462,7 @@ in {
               description = "Options passed straight into [[inputs.internet_speed]].";
               example = {
                 interval = "60m";
-                cache = true;
+                cache = false;
                 memory_saving_mode = true;
                 test_mode = "multi";
                 connections = 4;
@@ -1119,7 +1119,7 @@ in {
               // { name_override = "internet.speed"; }
               // lib.optionalAttrs (!(s ? interval))              { interval = "60m"; }
               // lib.optionalAttrs (!(s ? memory_saving_mode))    { memory_saving_mode = true; }
-              // lib.optionalAttrs (!(s ? cache))                 { cache = true; }
+              // lib.optionalAttrs (!(s ? cache))                 { cache = false; }
               // lib.optionalAttrs (!(s ? test_mode))             { test_mode = "multi"; }
               // lib.optionalAttrs (!(s ? connections))           { connections = 4; }
             )
