@@ -2172,7 +2172,8 @@ in {
               username = "${cfg.monitoring.telegraf.inputs.api.vendors.vmware.vsphere.sdk.username}";
               password = "${cfg.monitoring.telegraf.inputs.api.vendors.vmware.vsphere.sdk.password}";
               insecure_skip_verify = true;
-              force_discover_on_init = true;
+              # NOTE(KI): Possibly quietly deprecated
+              # force_discover_on_init = true;
               host_metric_include = [
                 "cpu.corecount.contention.average"
                 "cpu.usage.average"
@@ -2358,7 +2359,8 @@ in {
               username = "${cfg.monitoring.telegraf.inputs.api.vendors.vmware.vsphere.sdk.username}";
               password = "${cfg.monitoring.telegraf.inputs.api.vendors.vmware.vsphere.sdk.password}";
               insecure_skip_verify = true;
-              force_discover_on_init = true;
+              # NOTE(KI): Possibly quietly deprecated
+              # force_discover_on_init = true;
               datastore_metric_include = [
                 "datastore.numberReadAveraged.average"
                 "datastore.throughput.contention.average"
