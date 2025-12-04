@@ -11,6 +11,7 @@
     system.activationScripts = {
       senpro_backupConfig = ''
         echo "[TODO] Config backup goes here..."
+        exit 0
       '';
     };
 
@@ -21,3 +22,4 @@
     nix.gc.automatic = lib.mkDefault false;
   };
 }
+
