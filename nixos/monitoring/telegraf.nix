@@ -9,9 +9,11 @@ let
   inputsCfg = cfg.monitoring.telegraf.inputs;
   apiCfg = inputsCfg.api;
   vsphereCfg = apiCfg.vendors.vmware.vsphere;
+  internetSpeedCfg = internetSpeedCfg;
   pingCfg = inputsCfg.ping;
   localPiCfg = inputsCfg.local_pi;
   webhookCfg = inputsCfg.webhook;
+  outputsCfg = cfg.monitoring.telegraf.outputs;
 
 in {
   imports = [
@@ -324,8 +326,8 @@ in {
           ];
         };
         inputs = {
-          internet_speed = lib.mkIf inputsCfg.internet_speed.enable [
-            (let s = inputsCfg.internet_speed.settings; in
+          internet_speed = lib.mkIf internetSpeedCfg.enable [
+            (let s = internetSpeedCfg.settings; in
               # merge user settings with defaults (only when not provided)
               s
               // { name_override = "internet.speed"; }
@@ -687,7 +689,7 @@ in {
           http_listener_v2 = lib.mkIf webhookCfg.enable
             webhookCfg.endpoints;
         };
-        outputs = cfg.monitoring.telegraf.outputs;
+        outputs = outputsCfg;
       };
     };
   };
