@@ -9,17 +9,10 @@ let
   snmpCfg = cfg.monitoring.telegraf.inputs.snmp;
 
 in {
-  options.senpro.monitoring.telegraf.inputs.snmp.vendors.reddoxx = {
-    endpoints = {
-      self = {
-        enable = mkEnableOption ''
-          Whether to enable REDDOXX monitoring via SNMP.
-        '';
-        agents = telegrafOptions.agentConfig;
-      };
-    };
-    credentials = telegrafOptions.authSNMPv3;
-  };
+  options.senpro.monitoring.telegraf.inputs.snmp.vendors.reddoxx =
+    telegrafOptions.mkSnmpV3Options ''
+      Whether to enable REDDOXX monitoring via SNMP.
+    '';
 
   config = {
     services.telegraf.extraConfig.inputs.snmp = lib.mkIf (snmpCfg.enable && vendorCfg.endpoints.self.enable) (

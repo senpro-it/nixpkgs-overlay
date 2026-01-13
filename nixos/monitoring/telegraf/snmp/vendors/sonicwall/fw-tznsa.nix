@@ -9,23 +9,19 @@ let
   snmpCfg = cfg.monitoring.telegraf.inputs.snmp;
 
 in {
-  options.senpro.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa = {
-    endpoints = {
-      self = {
-        enable = mkEnableOption ''
-          Whether to enable the SonicWall TZ & NSa monitoring via SNMP.
-        '';
-        agents = telegrafOptions.agentConfig;
-      };
-      accessPoints = {
+  options.senpro.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa = lib.mkMerge [
+    (telegrafOptions.mkSnmpV3Options ''
+      Whether to enable the SonicWall TZ & NSa monitoring via SNMP.
+    '')
+    {
+      endpoints.accessPoints = {
         enable = mkEnableOption ''
           Whether to enable the SonicWall AP monitoring (through Firewall) via SNMP.
         '';
         agents = telegrafOptions.agentConfig;
       };
-    };
-    credentials = telegrafOptions.authSNMPv3;
-  };
+    }
+  ];
 
   config = {
     services.telegraf.extraConfig.inputs.snmp = lib.mkIf snmpCfg.enable (

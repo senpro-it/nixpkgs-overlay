@@ -9,23 +9,19 @@ let
   snmpCfg = cfg.monitoring.telegraf.inputs.snmp;
 
 in {
-  options.senpro.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway = {
-    endpoints = {
-      self = {
-        enable = mkEnableOption ''
-          Whether to enable the Aruba Mobility Gateway monitoring via SNMP.
-        '';
-        agents = telegrafOptions.agentConfig;
-      };
-      accessPoints = {
+  options.senpro.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway = lib.mkMerge [
+    (telegrafOptions.mkSnmpV3Options ''
+      Whether to enable the Aruba Mobility Gateway monitoring via SNMP.
+    '')
+    {
+      endpoints.accessPoints = {
         enable = mkEnableOption ''
           Whether to enable the Aruba AP monitoring (through Mobility Gateway) via SNMP.
         '';
         agents = telegrafOptions.agentConfig;
       };
-    };
-    credentials = telegrafOptions.authSNMPv3;
-  };
+    }
+  ];
 
   config = {
     services.telegraf.extraConfig.inputs.snmp = lib.mkIf snmpCfg.enable (

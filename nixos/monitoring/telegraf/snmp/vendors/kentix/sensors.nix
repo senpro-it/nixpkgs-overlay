@@ -10,72 +10,70 @@ let
   snmpCfg = cfg.monitoring.telegraf.inputs.snmp;
 
 in {
-  options.senpro.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors = {
-    endpoints = {
-      self = {
-        enable = mkEnableOption ''
-          Whether to enable the Kentix Sensor monitoring via SNMP.
-        '';
-        agents = telegrafOptions.agentConfig;
+  options.senpro.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors = lib.mkMerge [
+    (telegrafOptions.mkSnmpV2Options ''
+      Whether to enable the Kentix Sensor monitoring via SNMP.
+    '')
+    {
+      endpoints = {
+        multisensors = mkOption {
+          default = 0;
+          type = types.int;
+          description = "How many Multisensors? (Max 9)";
+        };
+        temperatures = mkOption {
+          default = 0;
+          type = types.int;
+          description = "How many temperature sensors? (Max 9)";
+        };
+        humiditys = mkOption {
+          default = 0;
+          type = types.int;
+          description = "How many humidity sensors? (Max 9)";
+        };
+        dewpoints = mkOption {
+          default = 0;
+          type = types.int;
+          description = "How many dewpoint? (Max 9)";
+        };
+        alarms = mkOption {
+          default = 0;
+          type = types.int;
+          description = "How many alarms? (Max 2)";
+        };
+        co2s = mkOption {
+          default = 0;
+          type = types.int;
+          description = "How many CO2 sensors? (Max 9)";
+        };
+        motions = mkOption {
+          default = 0;
+          type = types.int;
+          description = "How many motion sensors? (Max 9)";
+        };
+        digitalIn1s = mkOption {
+          default = 0;
+          type = types.int;
+          description = "How many Digital IN 1? (Max 9)";
+        };
+        digitalIn2s = mkOption {
+          default = 0;
+          type = types.int;
+          description = "How many Digital IN 2? (Max 9)";
+        };
+        digitalOut2s = mkOption {
+          default = 0;
+          type = types.int;
+          description = "How many Digital OUT 2? (Max 9)";
+        };
+        initErrors = mkOption {
+          default = 0;
+          type = types.int;
+          description = "How many Initialization Errors? (Max 9)";
+        };
       };
-      multisensors = mkOption {
-        default = 0;
-        type = types.int;
-        description = "How many Multisensors? (Max 9)";
-      };
-      temperatures = mkOption {
-        default = 0;
-        type = types.int;
-        description = "How many temperature sensors? (Max 9)";
-      };
-      humiditys = mkOption {
-        default = 0;
-        type = types.int;
-        description = "How many humidity sensors? (Max 9)";
-      };
-      dewpoints = mkOption {
-        default = 0;
-        type = types.int;
-        description = "How many dewpoint? (Max 9)";
-      };
-      alarms = mkOption {
-        default = 0;
-        type = types.int;
-        description = "How many alarms? (Max 2)";
-      };
-      co2s = mkOption {
-        default = 0;
-        type = types.int;
-        description = "How many CO2 sensors? (Max 9)";
-      };
-      motions = mkOption {
-        default = 0;
-        type = types.int;
-        description = "How many motion sensors? (Max 9)";
-      };
-      digitalIn1s = mkOption {
-        default = 0;
-        type = types.int;
-        description = "How many Digital IN 1? (Max 9)";
-      };
-      digitalIn2s = mkOption {
-        default = 0;
-        type = types.int;
-        description = "How many Digital IN 2? (Max 9)";
-      };
-      digitalOut2s = mkOption {
-        default = 0;
-        type = types.int;
-        description = "How many Digital OUT 2? (Max 9)";
-      };
-      initErrors = mkOption {
-        default = 0;
-        type = types.int;
-        description = "How many Initialization Errors? (Max 9)";
-      };
-    };
-    credentials = telegrafOptions.authSNMPv2;
-  };
+    }
+  ];
 
   config = {
     services.telegraf.extraConfig.inputs.snmp = lib.mkIf (snmpCfg.enable && deviceCfg.endpoints.self.enable) (

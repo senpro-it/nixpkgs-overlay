@@ -9,17 +9,10 @@ let
   snmpCfg = cfg.monitoring.telegraf.inputs.snmp;
 
 in {
-  options.senpro.monitoring.telegraf.inputs.snmp.vendors.lenovo.storage = {
-    endpoints = {
-      self = {
-        enable = mkEnableOption ''
-          Whether to enable the Lenovo storage monitoring via SNMP.
-        '';
-        agents = telegrafOptions.agentConfig;
-      };
-    };
-    credentials = telegrafOptions.authSNMPv3;
-  };
+  options.senpro.monitoring.telegraf.inputs.snmp.vendors.lenovo.storage =
+    telegrafOptions.mkSnmpV3Options ''
+      Whether to enable the Lenovo storage monitoring via SNMP.
+    '';
 
   config = {
     services.telegraf.extraConfig.inputs.snmp = lib.mkIf (snmpCfg.enable && deviceCfg.endpoints.self.enable) (

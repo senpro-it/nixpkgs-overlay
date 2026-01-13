@@ -9,17 +9,10 @@ let
   snmpCfg = cfg.monitoring.telegraf.inputs.snmp;
 
 in {
-  options.senpro.monitoring.telegraf.inputs.snmp.vendors.aruba.switch = {
-    endpoints = {
-      self = {
-        enable = mkEnableOption ''
-          Whether to enable the Aruba switch monitoring via SNMP.
-        '';
-        agents = telegrafOptions.agentConfig;
-      };
-    };
-    credentials = telegrafOptions.authSNMPv2;
-  };
+  options.senpro.monitoring.telegraf.inputs.snmp.vendors.aruba.switch =
+    telegrafOptions.mkSnmpV2Options ''
+      Whether to enable the Aruba switch monitoring via SNMP.
+    '';
 
   config = {
     services.telegraf.extraConfig.inputs.snmp = lib.mkIf (snmpCfg.enable && deviceCfg.endpoints.self.enable) (
