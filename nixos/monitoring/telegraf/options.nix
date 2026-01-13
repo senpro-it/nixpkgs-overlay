@@ -3,12 +3,16 @@
 with lib;
 
 rec {
+  # Wraps input plugin settings in a reusable submodule option.
+  # Reference: https://github.com/influxdata/telegraf/tree/master/plugins/inputs
   mkInputSettingsOption = options: description: mkOption {
     type = types.submodule { inherit options; };
     default = {};
     description = description;
   };
 
+  # Shared SNMP endpoint option shape for vendor modules.
+  # Reference: https://github.com/influxdata/telegraf/tree/master/plugins/inputs/snmp
   mkSnmpEndpointOptions = { description, credentials }: {
     endpoints = {
       self = {
@@ -19,11 +23,15 @@ rec {
     credentials = credentials;
   };
 
+  # SNMPv3 vendor schema wrapper.
+  # Reference: https://github.com/influxdata/telegraf/tree/master/plugins/inputs/snmp
   mkSnmpV3Options = description: mkSnmpEndpointOptions {
     inherit description;
     credentials = authSNMPv3;
   };
 
+  # SNMPv2 vendor schema wrapper.
+  # Reference: https://github.com/influxdata/telegraf/tree/master/plugins/inputs/snmp
   mkSnmpV2Options = description: mkSnmpEndpointOptions {
     inherit description;
     credentials = authSNMPv2;
