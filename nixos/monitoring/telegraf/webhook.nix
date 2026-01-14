@@ -1,12 +1,10 @@
-{ config, lib, ... }:
+{ config, lib, telegrafOptions, ... }:
 
 with lib;
 
 let
   /* Webhook input configuration subtree. */
   webhookCfg = config.senpro.monitoring.telegraf.inputs.webhook;
-  /* Shared Telegraf option helpers. */
-  telegrafOptions = import ./options.nix { inherit lib; };
   /* Allowed JSON v2 field type strings. */
   jsonV2FieldTypes = [ "int" "uint" "float" "string" "bool" ];
   /* Normalize JSON v2 entries to a list.

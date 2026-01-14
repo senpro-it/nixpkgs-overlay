@@ -1,10 +1,8 @@
-{ config, lib, ... }:
+{ config, lib, mkInputConfig, telegrafOptions, ... }:
 
 with lib;
 
 let
-  /* Shared Telegraf option helpers. */
-  telegrafOptions = import ./options.nix { inherit lib; };
   /* Local Pi input configuration subtree. */
   localPiCfg = config.senpro.monitoring.telegraf.inputs.local_pi;
   /* Default CPU input configuration for the local host. */
@@ -38,27 +36,6 @@ let
   systemDefaults = {
     name_override = "${localPiCfg.name_override}.sys";
   };
-  /* Merge defaults with per-input overrides. */
-  cpuSettings = cpuDefaults // localPiCfg.stats.cpu.settings;
-  diskSettings = diskDefaults // localPiCfg.stats.disk.settings;
-  memSettings = memDefaults // localPiCfg.stats.mem.settings;
-  kernelSettings = kernelDefaults // localPiCfg.stats.kernel.settings;
-  processesSettings = processesDefaults // localPiCfg.stats.processes.settings;
-  systemSettings = systemDefaults // localPiCfg.stats.system.settings;
-  /* Strip null values before serializing. */
-  cpuConfig = lib.filterAttrs (_: v: v != null) cpuSettings;
-  diskConfig = lib.filterAttrs (_: v: v != null) diskSettings;
-  memConfig = lib.filterAttrs (_: v: v != null) memSettings;
-  kernelConfig = lib.filterAttrs (_: v: v != null) kernelSettings;
-  processesConfig = lib.filterAttrs (_: v: v != null) processesSettings;
-  systemConfig = lib.filterAttrs (_: v: v != null) systemSettings;
-  /* Sanitized Telegraf configs for each input. */
-  cpuInputConfig = telegrafOptions.sanitizeToml cpuConfig;
-  diskInputConfig = telegrafOptions.sanitizeToml diskConfig;
-  memInputConfig = telegrafOptions.sanitizeToml memConfig;
-  kernelInputConfig = telegrafOptions.sanitizeToml kernelConfig;
-  processesInputConfig = telegrafOptions.sanitizeToml processesConfig;
-  systemInputConfig = telegrafOptions.sanitizeToml systemConfig;
 
 in {
   /* Local Pi input options. */
@@ -126,22 +103,22 @@ in {
 
   config = {
     services.telegraf.extraConfig.inputs.cpu = lib.mkIf localPiCfg.stats.cpu.enable [
-      cpuInputConfig
+      (mkInputConfig (cpuDefaults // localPiCfg.stats.cpu.settings))
     ];
     services.telegraf.extraConfig.inputs.disk = lib.mkIf localPiCfg.stats.disk.enable [
-      diskInputConfig
+      (mkInputConfig (diskDefaults // localPiCfg.stats.disk.settings))
     ];
     services.telegraf.extraConfig.inputs.mem = lib.mkIf localPiCfg.stats.mem.enable [
-      memInputConfig
+      (mkInputConfig (memDefaults // localPiCfg.stats.mem.settings))
     ];
     services.telegraf.extraConfig.inputs.kernel = lib.mkIf localPiCfg.stats.kernel.enable [
-      kernelInputConfig
+      (mkInputConfig (kernelDefaults // localPiCfg.stats.kernel.settings))
     ];
     services.telegraf.extraConfig.inputs.processes = lib.mkIf localPiCfg.stats.processes.enable [
-      processesInputConfig
+      (mkInputConfig (processesDefaults // localPiCfg.stats.processes.settings))
     ];
     services.telegraf.extraConfig.inputs.system = lib.mkIf localPiCfg.stats.system.enable [
-      systemInputConfig
+      (mkInputConfig (systemDefaults // localPiCfg.stats.system.settings))
     ];
   };
 }

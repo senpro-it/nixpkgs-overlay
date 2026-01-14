@@ -1,10 +1,8 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, mkInputConfig, telegrafOptions, pkgs, ... }:
 
 with lib;
 
 let
-  /* Shared Telegraf option helpers. */
-  telegrafOptions = import ../../../options.nix { inherit lib; };
   /* Sophos Central API config subtree. */
   sophosCfg = config.senpro.monitoring.telegraf.inputs.api.vendors.sophos.central;
   /* Default exec input settings for the exporter wrapper. */
@@ -14,12 +12,8 @@ let
     interval = "900s";
     data_format = "influx";
   };
-  /* Merge defaults with user overrides. */
-  execSettings = execDefaults // sophosCfg.exec;
-  /* Strip null values before serializing. */
-  execConfig = lib.filterAttrs (_: v: v != null) execSettings;
   /* Sanitized Telegraf exec input configuration. */
-  execInputConfig = telegrafOptions.sanitizeToml execConfig;
+  execInputConfig = mkInputConfig (execDefaults // sophosCfg.exec);
 
 in {
   /* Sophos Central API input options. */

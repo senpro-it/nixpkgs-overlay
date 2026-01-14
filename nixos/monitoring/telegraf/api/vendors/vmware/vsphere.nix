@@ -1,10 +1,8 @@
-{ config, lib, ... }:
+{ config, lib, mkInputConfig, telegrafOptions, ... }:
 
 with lib;
 
 let
-  /* Shared Telegraf option helpers. */
-  telegrafOptions = import ../../../options.nix { inherit lib; };
   /* vSphere API config subtree. */
   vsphereCfg = config.senpro.monitoring.telegraf.inputs.api.vendors.vmware.vsphere;
   /* Default realtime collection settings. */
@@ -303,15 +301,15 @@ let
      @param settings: Merged settings for a vsphere input.
      @return Sanitized settings with credentials injected.
   */
-  mkVsphereConfig = settings: lib.filterAttrs (_: v: v != null) (settings // {
+  mkVsphereConfig = settings: mkInputConfig (settings // {
     vcenters = vsphereCfg.sdk.endpoints;
     username = vsphereCfg.sdk.username;
     password = vsphereCfg.sdk.password;
   });
   /* Sanitized Telegraf config for realtime collection. */
-  vsphereRealtimeConfig = telegrafOptions.sanitizeToml (mkVsphereConfig vsphereRealtimeSettings);
+  vsphereRealtimeConfig = mkVsphereConfig vsphereRealtimeSettings;
   /* Sanitized Telegraf config for historical collection. */
-  vsphereHistoricalConfig = telegrafOptions.sanitizeToml (mkVsphereConfig vsphereHistoricalSettings);
+  vsphereHistoricalConfig = mkVsphereConfig vsphereHistoricalSettings;
 
 in {
   /* vSphere API input options. */

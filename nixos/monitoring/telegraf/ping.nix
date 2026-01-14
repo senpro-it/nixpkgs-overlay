@@ -1,10 +1,8 @@
-{ config, lib, ... }:
+{ config, lib, mkInputConfig, telegrafOptions, ... }:
 
 with lib;
 
 let
-  /* Shared Telegraf option helpers. */
-  telegrafOptions = import ./options.nix { inherit lib; };
   /* Ping input configuration subtree. */
   pingCfg = config.senpro.monitoring.telegraf.inputs.ping;
   /* Default Telegraf settings for the ping input. */
@@ -12,16 +10,10 @@ let
     name_override = "ping";
     method = "native";
   };
-  /* Merge defaults with user overrides. */
-  pingSettings = pingDefaults // pingCfg.settings;
-  /* Attach URLs to the settings payload. */
-  pingSettingsWithUrls = pingSettings // {
-    urls = pingCfg.urls;
-  };
-  /* Strip null values before serializing. */
-  pingConfig = lib.filterAttrs (_: v: v != null) pingSettingsWithUrls;
   /* Sanitized Telegraf config for the ping input. */
-  pingInputConfig = telegrafOptions.sanitizeToml pingConfig;
+  pingInputConfig = mkInputConfig (pingDefaults // pingCfg.settings // {
+    urls = pingCfg.urls;
+  });
 
 in {
   /* Ping input options. */

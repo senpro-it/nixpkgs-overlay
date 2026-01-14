@@ -7,12 +7,18 @@ let
   telegrafCfg = config.senpro.monitoring.telegraf;
   /* Shared helpers for building Telegraf option schemas. */
   telegrafOptions = import ./telegraf/options.nix { inherit lib; };
+  /* Helper for sanitizing Telegraf input payloads. */
+  mkInputConfig = settings: telegrafOptions.sanitizeToml settings;
   /* TOML format helper for output options. */
   settingsFormat = pkgs.formats.toml {};
   /* Sanitized Telegraf output configuration. */
   outputsCfg = telegrafOptions.sanitizeToml telegrafCfg.outputs;
 
 in {
+  _module.args = {
+    inherit telegrafOptions mkInputConfig;
+  };
+
   imports = [
     ./telegraf/api.nix
     ./telegraf/internet-speed.nix

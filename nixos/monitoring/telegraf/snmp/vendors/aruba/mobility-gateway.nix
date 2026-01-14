@@ -1,10 +1,8 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, telegrafOptions, ... }:
 
 with lib;
 
 let
-  /* Shared Telegraf option helpers. */
-  telegrafOptions = import ../../../options.nix { inherit lib; };
   /* Global SNMP input toggle. */
   snmpCfg = config.senpro.monitoring.telegraf.inputs.snmp;
   /* Aruba Mobility Gateway config subtree. */

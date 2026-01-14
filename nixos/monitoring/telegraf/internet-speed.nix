@@ -1,10 +1,8 @@
-{ config, lib, ... }:
+{ config, lib, mkInputConfig, telegrafOptions, ... }:
 
 with lib;
 
 let
-  /* Shared Telegraf option helpers. */
-  telegrafOptions = import ./options.nix { inherit lib; };
   /* Internet speed input configuration subtree. */
   internetSpeedCfg = config.senpro.monitoring.telegraf.inputs.internet_speed;
   /* Default Telegraf settings for the internet_speed input. */
@@ -19,12 +17,10 @@ let
   };
   /* Merge defaults with user-specified overrides. */
   speedSettings = speedDefaults // internetSpeedCfg.settings;
-  /* Strip null values before serializing to TOML. */
-  speedConfig = lib.filterAttrs (_: v: v != null) speedSettings;
   /* Sanitized Telegraf config for the input. */
-  speedInputConfig = telegrafOptions.sanitizeToml speedConfig;
+  speedInputConfig = mkInputConfig speedSettings;
   /* Converter processor to coerce tags into strings. */
-  converterConfig = telegrafOptions.sanitizeToml {
+  converterConfig = mkInputConfig {
     namepass = [ speedSettings.name_override ];
     tags = { string = [ "source" "server_id" "test_mode" ]; };
   };
