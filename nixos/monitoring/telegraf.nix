@@ -3,10 +3,14 @@
 with lib;
 
 let
-  cfg = config.senpro;
+  /* Root config subtree for the Telegraf module. */
+  telegrafCfg = config.senpro.monitoring.telegraf;
+  /* Shared helpers for building Telegraf option schemas. */
   telegrafOptions = import ./telegraf/options.nix { inherit lib; };
+  /* TOML format helper for output options. */
   settingsFormat = pkgs.formats.toml {};
-  outputsCfg = telegrafOptions.sanitizeToml cfg.monitoring.telegraf.outputs;
+  /* Sanitized Telegraf output configuration. */
+  outputsCfg = telegrafOptions.sanitizeToml telegrafCfg.outputs;
 
 in {
   imports = [
@@ -39,7 +43,7 @@ in {
   };
 
   config = {
-    services.telegraf = lib.mkIf cfg.monitoring.telegraf.enable {
+    services.telegraf = lib.mkIf telegrafCfg.enable {
       enable = true;
       extraConfig = {
         agent = {

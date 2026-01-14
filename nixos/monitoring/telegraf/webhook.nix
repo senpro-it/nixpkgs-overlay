@@ -3,22 +3,41 @@
 with lib;
 
 let
-  cfg = config.senpro;
+  /* Webhook input configuration subtree. */
+  webhookCfg = config.senpro.monitoring.telegraf.inputs.webhook;
+  /* Shared Telegraf option helpers. */
   telegrafOptions = import ./options.nix { inherit lib; };
-  webhookCfg = cfg.monitoring.telegraf.inputs.webhook;
+  /* Allowed JSON v2 field type strings. */
   jsonV2FieldTypes = [ "int" "uint" "float" "string" "bool" ];
+  /* Normalize JSON v2 entries to a list.
+     @param sanitizer: Function applied to each entry.
+     @param value: Single entry or list of entries.
+     @return List of sanitized entries.
+  */
   sanitizeJsonV2Items = sanitizer: value:
     let
       list = if isList value then value else [ value ];
     in map sanitizer list;
+  /* Sanitize JSON v2 tag entries.
+     @param tag: Tag definition attrset.
+     @return Sanitized tag entry without type metadata.
+  */
   sanitizeJsonV2Tag = tag:
     removeAttrs (telegrafOptions.sanitizeToml tag) [ "type" ];
+  /* Sanitize JSON v2 field entries and validate types.
+     @param field: Field definition attrset.
+     @return Sanitized field entry with valid type.
+  */
   sanitizeJsonV2Field = field:
     let
       sanitized = telegrafOptions.sanitizeToml field;
     in if sanitized ? type && !(builtins.elem sanitized.type jsonV2FieldTypes)
       then removeAttrs sanitized [ "type" ]
       else sanitized;
+  /* Sanitize JSON v2 object entries.
+     @param object: Object definition attrset.
+     @return Sanitized object entry with nested lists.
+  */
   sanitizeJsonV2Object = object:
     let
       sanitized = telegrafOptions.sanitizeToml object;
@@ -27,6 +46,10 @@ let
     in sanitized
       // optionalAttrs (tagList != null) { tag = tagList; }
       // optionalAttrs (fieldList != null) { field = fieldList; };
+  /* Sanitize JSON v2 top-level entry.
+     @param entry: JSON v2 entry attrset.
+     @return Sanitized entry with normalized lists.
+  */
   sanitizeJsonV2Entry = entry:
     let
       sanitized = telegrafOptions.sanitizeToml entry;
@@ -37,6 +60,10 @@ let
       // optionalAttrs (tagList != null) { tag = tagList; }
       // optionalAttrs (fieldList != null) { field = fieldList; }
       // optionalAttrs (objectList != null) { object = objectList; };
+  /* Sanitize webhook endpoint definitions for Telegraf.
+     @param endpoint: Raw endpoint attrset from module options.
+     @return Sanitized endpoint with JSON v2 defaults applied.
+  */
   sanitizeWebhookEndpoint = endpoint:
     let
       sanitized = telegrafOptions.sanitizeToml endpoint;
@@ -54,9 +81,11 @@ let
     in if formatOverride != null && dataFormat == null
       then removeAttrs base [ "format" ] // { data_format = formatOverride; }
       else removeAttrs base [ "format" ];
+  /* Final list of sanitized webhook endpoints. */
   webhookEndpoints = map sanitizeWebhookEndpoint webhookCfg.endpoints;
 
 in {
+  /* Webhook input options for Telegraf HTTP listener. */
   options.senpro.monitoring.telegraf.inputs.webhook = {
     enable = mkEnableOption "Use Webhooks?";
     endpoints = mkOption {

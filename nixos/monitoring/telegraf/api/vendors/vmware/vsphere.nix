@@ -3,8 +3,11 @@
 with lib;
 
 let
+  /* Shared Telegraf option helpers. */
   telegrafOptions = import ../../../options.nix { inherit lib; };
+  /* vSphere API config subtree. */
   vsphereCfg = config.senpro.monitoring.telegraf.inputs.api.vendors.vmware.vsphere;
+  /* Default realtime collection settings. */
   vsphereRealtimeDefaults = {
     interval = "60s";
     name_prefix = "vmware.";
@@ -187,6 +190,7 @@ let
     discover_concurrency = 4;
     insecure_skip_verify = true;
   };
+  /* Default historical collection settings. */
   vsphereHistoricalDefaults = {
     interval = "300s";
     name_prefix = "vmware.";
@@ -291,15 +295,26 @@ let
     discover_concurrency = 4;
     insecure_skip_verify = true;
   };
+  /* Merge realtime defaults with user overrides. */
   vsphereRealtimeSettings = vsphereRealtimeDefaults // vsphereCfg.realtime;
+  /* Merge historical defaults with user overrides. */
   vsphereHistoricalSettings = vsphereHistoricalDefaults // vsphereCfg.historical;
+  /* Build the Telegraf vsphere input configuration.
+     @param settings: Merged settings for a vsphere input.
+     @return Sanitized settings with credentials injected.
+  */
   mkVsphereConfig = settings: lib.filterAttrs (_: v: v != null) (settings // {
     vcenters = vsphereCfg.sdk.endpoints;
     username = vsphereCfg.sdk.username;
     password = vsphereCfg.sdk.password;
   });
+  /* Sanitized Telegraf config for realtime collection. */
+  vsphereRealtimeConfig = telegrafOptions.sanitizeToml (mkVsphereConfig vsphereRealtimeSettings);
+  /* Sanitized Telegraf config for historical collection. */
+  vsphereHistoricalConfig = telegrafOptions.sanitizeToml (mkVsphereConfig vsphereHistoricalSettings);
 
 in {
+  /* vSphere API input options. */
   options.senpro.monitoring.telegraf.inputs.api.vendors.vmware.vsphere = {
     enable = mkEnableOption ''
       Whether to enable the vSphere monitoring.
@@ -337,8 +352,8 @@ in {
 
   config = {
     services.telegraf.extraConfig.inputs.vsphere = lib.mkIf vsphereCfg.enable [
-      (telegrafOptions.sanitizeToml (mkVsphereConfig vsphereRealtimeSettings))
-      (telegrafOptions.sanitizeToml (mkVsphereConfig vsphereHistoricalSettings))
+      vsphereRealtimeConfig
+      vsphereHistoricalConfig
     ];
   };
 }

@@ -3,6 +3,10 @@
 with lib;
 
 rec {
+  /* Remove nulls and empty items from TOML-ready data.
+     @param value: Attribute set/list/value to sanitize.
+     @return Sanitized value with nulls stripped.
+  */
   sanitizeToml = value:
     if value == null then null
     else if isList value then
@@ -11,16 +15,24 @@ rec {
       filterAttrs (_: v: v != null) (mapAttrs (_: v: sanitizeToml v) value)
     else value;
 
-  # Wraps input plugin settings in a reusable submodule option.
-  # Reference: https://github.com/influxdata/telegraf/tree/master/plugins/inputs
+  /* Wrap input plugin settings in a reusable submodule option.
+     @param options: Submodule option definitions.
+     @param description: Human-readable option description.
+     @return mkOption schema for the input settings.
+     Reference: https://github.com/influxdata/telegraf/tree/master/plugins/inputs
+  */
   mkInputSettingsOption = options: description: mkOption {
     type = types.submodule { inherit options; };
     default = {};
     description = description;
   };
 
-  # Shared SNMP endpoint option shape for vendor modules.
-  # Reference: https://github.com/influxdata/telegraf/tree/master/plugins/inputs/snmp
+  /* Shared SNMP endpoint option shape for vendor modules.
+     @param description: Description used for endpoint enable toggle.
+     @param credentials: Option schema for SNMP credentials.
+     @return Attrset with endpoints and credential options.
+     Reference: https://github.com/influxdata/telegraf/tree/master/plugins/inputs/snmp
+  */
   mkSnmpEndpointOptions = { description, credentials }: {
     endpoints = {
       self = {
@@ -31,20 +43,29 @@ rec {
     credentials = credentials;
   };
 
-  # SNMPv3 vendor schema wrapper.
-  # Reference: https://github.com/influxdata/telegraf/tree/master/plugins/inputs/snmp
+  /* SNMPv3 vendor schema wrapper.
+     @param description: Description used for endpoint enable toggle.
+     @return Attrset with v3 endpoint + credentials options.
+     Reference: https://github.com/influxdata/telegraf/tree/master/plugins/inputs/snmp
+  */
   mkSnmpV3Options = description: mkSnmpEndpointOptions {
     inherit description;
     credentials = authSNMPv3;
   };
 
-  # SNMPv2 vendor schema wrapper.
-  # Reference: https://github.com/influxdata/telegraf/tree/master/plugins/inputs/snmp
+  /* SNMPv2 vendor schema wrapper.
+     @param description: Description used for endpoint enable toggle.
+     @return Attrset with v2 endpoint + credentials options.
+     Reference: https://github.com/influxdata/telegraf/tree/master/plugins/inputs/snmp
+  */
   mkSnmpV2Options = description: mkSnmpEndpointOptions {
     inherit description;
     credentials = authSNMPv2;
   };
 
+  /* List of SNMP agent endpoints.
+     @return mkOption schema for agent list.
+  */
   agentConfig = mkOption {
     type = types.listOf types.str;
     default = [];
@@ -56,6 +77,9 @@ rec {
     '';
   };
 
+  /* Shared SNMP input settings (intervals, retries, etc).
+     @return Attrset of mkOption entries for SNMP inputs.
+  */
   snmpInput = with types; {
     interval = mkOption {
       type = types.nullOr types.str;
@@ -104,6 +128,9 @@ rec {
     };
   };
 
+  /* SNMPv3 credential options.
+     @return Attrset describing auth/privacy/security schema.
+  */
   authSNMPv3 = with types; {
     context = {
       name = mkOption {
@@ -164,6 +191,9 @@ rec {
     };
   };
 
+  /* SNMPv2 community credential options.
+     @return Attrset describing community schema.
+  */
   authSNMPv2 = with types; {
     community = mkOption {
       type = types.str;
@@ -174,6 +204,9 @@ rec {
     };
   };
 
+  /* Shared Telegraf exec input settings.
+     @return Attrset of mkOption entries for exec inputs.
+  */
   execInput = with types; {
     commands = mkOption {
       type = types.listOf types.str;
@@ -207,6 +240,9 @@ rec {
     };
   };
 
+  /* Shared Telegraf vSphere input settings.
+     @return Attrset of mkOption entries for vSphere inputs.
+  */
   vsphereInput = with types; {
     interval = mkOption {
       type = types.nullOr types.str;
@@ -274,6 +310,9 @@ rec {
     http_proxy_url = mkOption { type = types.nullOr types.str; default = null; };
   };
 
+  /* Shared Telegraf internet speed input settings.
+     @return Attrset of mkOption entries for internet speed inputs.
+  */
   internetSpeedInput = with types; {
     name_override = mkOption {
       type = types.nullOr types.str;
@@ -290,6 +329,9 @@ rec {
     server_id_include = mkOption { type = types.nullOr (types.listOf types.int); default = null; };
   };
 
+  /* Shared Telegraf ping input settings.
+     @return Attrset of mkOption entries for ping inputs.
+  */
   pingInput = with types; {
     name_override = mkOption { type = types.nullOr types.str; default = null; };
     method = mkOption { type = types.nullOr (types.enum [ "exec" "native" ]); default = null; };
@@ -306,6 +348,9 @@ rec {
     size = mkOption { type = types.nullOr types.int; default = null; };
   };
 
+  /* Shared Telegraf CPU input settings.
+     @return Attrset of mkOption entries for CPU inputs.
+  */
   cpuInput = with types; {
     name_override = mkOption { type = types.nullOr types.str; default = null; };
     percpu = mkOption { type = types.nullOr types.bool; default = null; };
@@ -315,6 +360,9 @@ rec {
     core_tags = mkOption { type = types.nullOr types.bool; default = null; };
   };
 
+  /* Shared Telegraf disk input settings.
+     @return Attrset of mkOption entries for disk inputs.
+  */
   diskInput = with types; {
     name_override = mkOption { type = types.nullOr types.str; default = null; };
     mount_points = mkOption { type = types.nullOr (types.listOf types.str); default = null; };
@@ -322,24 +370,39 @@ rec {
     ignore_mount_opts = mkOption { type = types.nullOr (types.listOf types.str); default = null; };
   };
 
+  /* Shared Telegraf kernel input settings.
+     @return Attrset of mkOption entries for kernel inputs.
+  */
   kernelInput = with types; {
     name_override = mkOption { type = types.nullOr types.str; default = null; };
     collect = mkOption { type = types.nullOr (types.listOf types.str); default = null; };
   };
 
+  /* Shared Telegraf processes input settings.
+     @return Attrset of mkOption entries for processes inputs.
+  */
   processesInput = with types; {
     name_override = mkOption { type = types.nullOr types.str; default = null; };
     use_sudo = mkOption { type = types.nullOr types.bool; default = null; };
   };
 
+  /* Shared Telegraf memory input settings.
+     @return Attrset of mkOption entries for memory inputs.
+  */
   memInput = with types; {
     name_override = mkOption { type = types.nullOr types.str; default = null; };
   };
 
+  /* Shared Telegraf system input settings.
+     @return Attrset of mkOption entries for system inputs.
+  */
   systemInput = with types; {
     name_override = mkOption { type = types.nullOr types.str; default = null; };
   };
 
+  /* Shared Telegraf HTTP listener input settings.
+     @return Attrset of mkOption entries for HTTP listener inputs.
+  */
   httpListener = with types; {
     name_override = mkOption { type = types.nullOr types.str; default = null; };
     service_address = mkOption { type = types.nullOr types.str; default = null; };

@@ -3,19 +3,28 @@
 with lib;
 
 let
-  cfg = config.senpro;
+  /* Shared Telegraf option helpers. */
   telegrafOptions = import ./options.nix { inherit lib; };
-  pingCfg = cfg.monitoring.telegraf.inputs.ping;
+  /* Ping input configuration subtree. */
+  pingCfg = config.senpro.monitoring.telegraf.inputs.ping;
+  /* Default Telegraf settings for the ping input. */
   pingDefaults = {
     name_override = "ping";
     method = "native";
   };
+  /* Merge defaults with user overrides. */
   pingSettings = pingDefaults // pingCfg.settings;
-  pingConfig = lib.filterAttrs (_: v: v != null) (pingSettings // {
+  /* Attach URLs to the settings payload. */
+  pingSettingsWithUrls = pingSettings // {
     urls = pingCfg.urls;
-  });
+  };
+  /* Strip null values before serializing. */
+  pingConfig = lib.filterAttrs (_: v: v != null) pingSettingsWithUrls;
+  /* Sanitized Telegraf config for the ping input. */
+  pingInputConfig = telegrafOptions.sanitizeToml pingConfig;
 
 in {
+  /* Ping input options. */
   options.senpro.monitoring.telegraf.inputs.ping = {
     enable = mkEnableOption ''
       Whether to enable Ping.
@@ -35,7 +44,7 @@ in {
 
   config = {
     services.telegraf.extraConfig.inputs.ping = lib.mkIf pingCfg.enable [
-      (telegrafOptions.sanitizeToml pingConfig)
+      pingInputConfig
     ];
   };
 }

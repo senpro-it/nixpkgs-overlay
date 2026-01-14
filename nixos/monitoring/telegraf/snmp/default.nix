@@ -3,12 +3,14 @@
 with lib;
 
 {
+  /* Enable/disable Telegraf SNMP-based input modules. */
   options.senpro.monitoring.telegraf.inputs.snmp = {
     enable = mkEnableOption ''
       Whether to enable SNMP monitoring.
     '';
   };
 
+  /* Vendor-specific SNMP modules. */
   imports = [
     ./vendors/aruba/mobility-gateway.nix
     ./vendors/aruba/switch.nix
