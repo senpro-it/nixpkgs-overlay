@@ -3,9 +3,11 @@
 with lib;
 
 let
-  cfg = config.senpro;
+  /* SVCi config subtree. */
+  svciCfg = config.senpro.monitoring.svci;
 
 in {
+  /* SVCi options. */
   options.senpro.monitoring.svci = {
     enable = mkEnableOption ''
       Whether to enable SVCi (Spectrum Virtualize Insights).
@@ -71,8 +73,9 @@ in {
   };
 
   config = {
+    /* SVCi container definition. */
     virtualisation.oci-containers.containers = {
-      svci = lib.mkIf cfg.monitoring.svci.enable {
+      svci = lib.mkIf svciCfg.enable {
         image = "ghcr.io/senpro-it/svci:main";
         autoStart = true;
         volumes = [
@@ -83,7 +86,7 @@ in {
     };
 
     systemd.services = {
-      docker-svci-provisioner = lib.mkIf cfg.monitoring.svci.enable {
+      docker-svci-provisioner = lib.mkIf svciCfg.enable {
         enable = true;
         description = "Provisioner for SVCi docker container.";
         requiredBy = [ "docker-svci.service" ];
@@ -100,15 +103,15 @@ in {
             "###" \
             "" \
             "[influx]" \
-            "url = \"${cfg.monitoring.svci.output.influxdb_v2.url}\"" \
-            "org = \"${cfg.monitoring.svci.output.influxdb_v2.organization}\"" \
-            "token = \"${cfg.monitoring.svci.output.influxdb_v2.token}\"" \
-            "bucket = \"${cfg.monitoring.svci.output.influxdb_v2.bucket}\"" \
+            "url = \"${svciCfg.output.influxdb_v2.url}\"" \
+            "org = \"${svciCfg.output.influxdb_v2.organization}\"" \
+            "token = \"${svciCfg.output.influxdb_v2.token}\"" \
+            "bucket = \"${svciCfg.output.influxdb_v2.bucket}\"" \
             "" \
             "[svc.ibm]" \
-            "url = \"https://${cfg.monitoring.svci.input.svc.host}:7443\"" \
-            "username = \"${cfg.monitoring.svci.input.svc.user}\"" \
-            "password = \"${cfg.monitoring.svci.input.svc.pass}\"" \
+            "url = \"https://${svciCfg.input.svc.host}:7443\"" \
+            "username = \"${svciCfg.input.svc.user}\"" \
+            "password = \"${svciCfg.input.svc.pass}\"" \
             "refresh = 30   # How often to query SVC for data - in seconds" \
             "trust = true   # Ignore SSL cert. errors (due to default self-signed cert.)" > /var/lib/docker/volumes/svci/_data/svci.toml
         '';

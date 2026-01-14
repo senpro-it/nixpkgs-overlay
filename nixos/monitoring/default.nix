@@ -1,5 +1,6 @@
 { ... }:
 {
+  /* Aggregate all monitoring-related modules. */
   imports = [
     ./fritzinfluxdb.nix
     ./telegraf.nix

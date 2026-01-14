@@ -3,9 +3,11 @@
 with lib;
 
 let
-  cfg = config.senpro;
+  /* UniFi poller config subtree. */
+  unifiPollerCfg = config.senpro.monitoring.unifi-poller;
 
 in {
+  /* UniFi poller options. */
   options.senpro.monitoring.unifi-poller = {
     enable = mkEnableOption ''
       Whether to enable the UniFi poller (Ubiquiti monitoring agent).
@@ -71,18 +73,19 @@ in {
   };
 
   config = {
+    /* Container definition for the UniFi poller. */
     virtualisation.oci-containers.containers = {
-      unifi-poller = lib.mkIf cfg.monitoring.unifi-poller.enable {
+      unifi-poller = lib.mkIf unifiPollerCfg.enable {
         image = "ghcr.io/unpoller/unpoller:latest-arm64v8";
         autoStart = true;
         environment = {
-          UP_INFLUXDB_URL = "${cfg.monitoring.unifi-poller.output.influxdb_v2.url}";
-          UP_INFLUXDB_ORG = "${cfg.monitoring.unifi-poller.output.influxdb_v2.organization}";
-          UP_INFLUXDB_BUCKET = "${cfg.monitoring.unifi-poller.output.influxdb_v2.bucket}";
-          UP_INFLUXDB_AUTH_TOKEN = "${cfg.monitoring.unifi-poller.output.influxdb_v2.token}";
-          UP_UNIFI_DEFAULT_USER = "${cfg.monitoring.unifi-poller.input.unifi-controller.user}";
-          UP_UNIFI_DEFAULT_PASS = "${cfg.monitoring.unifi-poller.input.unifi-controller.pass}";
-          UP_UNIFI_DEFAULT_URL = "${cfg.monitoring.unifi-poller.input.unifi-controller.url}";
+          UP_INFLUXDB_URL = "${unifiPollerCfg.output.influxdb_v2.url}";
+          UP_INFLUXDB_ORG = "${unifiPollerCfg.output.influxdb_v2.organization}";
+          UP_INFLUXDB_BUCKET = "${unifiPollerCfg.output.influxdb_v2.bucket}";
+          UP_INFLUXDB_AUTH_TOKEN = "${unifiPollerCfg.output.influxdb_v2.token}";
+          UP_UNIFI_DEFAULT_USER = "${unifiPollerCfg.input.unifi-controller.user}";
+          UP_UNIFI_DEFAULT_PASS = "${unifiPollerCfg.input.unifi-controller.pass}";
+          UP_UNIFI_DEFAULT_URL = "${unifiPollerCfg.input.unifi-controller.url}";
           UP_POLLER_DEBUG = "true";
         };
       };
