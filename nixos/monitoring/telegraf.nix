@@ -4,8 +4,9 @@ with lib;
 
 let
   cfg = config.senpro;
+  telegrafOptions = import ./telegraf/options.nix { inherit lib; };
   settingsFormat = pkgs.formats.toml {};
-  outputsCfg = cfg.monitoring.telegraf.outputs;
+  outputsCfg = telegrafOptions.sanitizeToml cfg.monitoring.telegraf.outputs;
 
 in {
   imports = [

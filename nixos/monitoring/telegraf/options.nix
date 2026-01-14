@@ -3,6 +3,14 @@
 with lib;
 
 rec {
+  sanitizeToml = value:
+    if value == null then null
+    else if isList value then
+      builtins.filter (item: item != null) (map sanitizeToml value)
+    else if isAttrs value then
+      filterAttrs (_: v: v != null) (mapAttrs (_: v: sanitizeToml v) value)
+    else value;
+
   # Wraps input plugin settings in a reusable submodule option.
   # Reference: https://github.com/influxdata/telegraf/tree/master/plugins/inputs
   mkInputSettingsOption = options: description: mkOption {
