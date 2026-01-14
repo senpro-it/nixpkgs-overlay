@@ -9,7 +9,7 @@ let
   snmpCfg = cfg.monitoring.telegraf.inputs.snmp;
 
 in {
-  options.senpro.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa = lib.mkMerge [
+  options.senpro.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa = lib.recursiveUpdate
     (telegrafOptions.mkSnmpV3Options ''
       Whether to enable the SonicWall TZ & NSa monitoring via SNMP.
     '')
@@ -20,8 +20,7 @@ in {
         '';
         agents = telegrafOptions.agentConfig;
       };
-    }
-  ];
+    };
 
   config = {
     services.telegraf.extraConfig.inputs.snmp = lib.mkIf snmpCfg.enable (

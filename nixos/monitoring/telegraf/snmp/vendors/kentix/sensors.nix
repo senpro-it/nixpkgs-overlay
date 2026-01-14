@@ -10,7 +10,7 @@ let
   snmpCfg = cfg.monitoring.telegraf.inputs.snmp;
 
 in {
-  options.senpro.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors = lib.mkMerge [
+  options.senpro.monitoring.telegraf.inputs.snmp.vendors.kentix.sensors = lib.recursiveUpdate
     (telegrafOptions.mkSnmpV2Options ''
       Whether to enable the Kentix Sensor monitoring via SNMP.
     '')
@@ -72,8 +72,7 @@ in {
           description = "How many Initialization Errors? (Max 9)";
         };
       };
-    }
-  ];
+    };
 
   config = {
     services.telegraf.extraConfig.inputs.snmp = lib.mkIf (snmpCfg.enable && deviceCfg.endpoints.self.enable) (
