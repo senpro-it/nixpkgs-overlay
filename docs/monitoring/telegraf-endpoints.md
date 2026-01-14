@@ -12,25 +12,24 @@ This guide documents how to add new Telegraf “device/endpoint” modules under
 
 Each endpoint module should follow the same pattern:
 
-1. Define a config subtree and shared helpers in the `let` block.
+1. Define a config subtree and input builders in the `let` block.
 2. Define the `options` in a single section.
-3. Define `config` entries that add Telegraf inputs using `snmpInputs`.
+3. Define `config` entries that append raw inputs under `senpro.monitoring.telegraf.rawInputs`.
 
 ### Skeleton module
 
 ```nix
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, telegrafOptions, ... }:
 
 with lib;
 
 let
-  # Shared helpers and config subtree.
-  telegrafOptions = import ../../../options.nix { inherit lib; };
+  # Shared config subtree.
   snmpCfg = config.senpro.monitoring.telegraf.inputs.snmp;
-  deviceCfg = config.senpro.monitoring.telegraf.inputs.snmp.vendors.vendor.device;
+  deviceCfg = snmpCfg.vendors.vendor.device;
 
   # Build the per-agent SNMP input.
-  mkSnmpInput = agent: telegrafOptions.sanitizeToml {
+  mkSnmpInput = agent: {
     name = "vendor.device";
     path = [ "${pkgs.mib-library}/opt/mib-library/" ];
     agents = [ agent ];
@@ -50,8 +49,7 @@ let
   };
 
   # Assemble enabled inputs.
-  snmpInputs = lib.optionals deviceCfg.endpoints.self.enable
-    (map mkSnmpInput deviceCfg.endpoints.self.agents);
+  snmpInputs = telegrafOptions.mkSnmpInputs deviceCfg.endpoints.self mkSnmpInput;
 
 in {
   options.senpro.monitoring.telegraf.inputs.snmp.vendors.vendor.device =
@@ -60,7 +58,7 @@ in {
     '';
 
   config = {
-    services.telegraf.extraConfig.inputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
+    senpro.monitoring.telegraf.rawInputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
   };
 }
 ```
@@ -86,16 +84,15 @@ in {
 ### Module snippet
 
 ```nix
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, telegrafOptions, ... }:
 
 with lib;
 
 let
-  telegrafOptions = import ../../../options.nix { inherit lib; };
   snmpCfg = config.senpro.monitoring.telegraf.inputs.snmp;
-  deviceCfg = config.senpro.monitoring.telegraf.inputs.snmp.vendors.example.enterpriseAppliance;
+  deviceCfg = snmpCfg.vendors.example.enterpriseAppliance;
 
-  mkSnmpInput = agent: telegrafOptions.sanitizeToml {
+  mkSnmpInput = agent: {
     name = "example.enterpriseAppliance";
     path = [ "${pkgs.mib-library}/opt/mib-library/" ];
     agents = [ agent ];
@@ -120,8 +117,7 @@ let
     ];
   };
 
-  snmpInputs = lib.optionals deviceCfg.endpoints.self.enable
-    (map mkSnmpInput deviceCfg.endpoints.self.agents);
+  snmpInputs = telegrafOptions.mkSnmpInputs deviceCfg.endpoints.self mkSnmpInput;
 
 in {
   options.senpro.monitoring.telegraf.inputs.snmp.vendors.example.enterpriseAppliance =
@@ -130,7 +126,7 @@ in {
     '';
 
   config = {
-    services.telegraf.extraConfig.inputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
+    senpro.monitoring.telegraf.rawInputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
   };
 }
 ```
@@ -159,7 +155,7 @@ senpro.monitoring.telegraf.inputs.snmp.vendors.example.enterpriseAppliance = {
 
 ## Tips and conventions
 
-- Prefer `telegrafOptions.sanitizeToml` for any Telegraf configuration payloads.
+- Emit raw input payloads under `senpro.monitoring.telegraf.rawInputs` (sanitized in `nixos/monitoring/telegraf.nix`).
 - Keep `name` consistent (`vendor.device`) so dashboards and output filters stay predictable.
-- If you need multiple endpoint types (e.g., access points), create two `mk...` helpers and combine them with `lib.optionals`.
+- If you need multiple endpoint types (e.g., access points), create two `mk...` helpers and combine `telegrafOptions.mkSnmpInputs` lists with `++`.
 - Update `nixos/monitoring/telegraf/snmp/default.nix` whenever a new module is added.
