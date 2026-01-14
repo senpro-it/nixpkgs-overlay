@@ -6,6 +6,14 @@ let
   cfg = config.senpro;
   telegrafOptions = import ./options.nix { inherit lib; };
   webhookCfg = cfg.monitoring.telegraf.inputs.webhook;
+  sanitizeToml = value:
+    if value == null then null
+    else if lib.isList value then
+      builtins.filter (item: item != null) (map sanitizeToml value)
+    else if lib.isAttrs value then
+      lib.filterAttrs (_: v: v != null) (lib.mapAttrs (_: v: sanitizeToml v) value)
+    else value;
+  webhookEndpoints = map sanitizeToml webhookCfg.endpoints;
 
 in {
   options.senpro.monitoring.telegraf.inputs.webhook = {
@@ -111,6 +119,6 @@ in {
 
   config = {
     services.telegraf.extraConfig.inputs.http_listener_v2 = lib.mkIf webhookCfg.enable
-      webhookCfg.endpoints;
+      webhookEndpoints;
   };
 }
