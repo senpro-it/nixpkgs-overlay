@@ -16,7 +16,7 @@ let
     connections = 4;
   };
   /* Merge defaults with user-specified overrides. */
-  speedSettings = speedDefaults // internetSpeedCfg.settings;
+  speedSettings = speedDefaults // (telegrafOptions.sanitizeToml internetSpeedCfg.settings);
   /* Telegraf config for the input. */
   speedInputConfig = speedSettings;
   /* Converter processor to coerce tags into strings. */
