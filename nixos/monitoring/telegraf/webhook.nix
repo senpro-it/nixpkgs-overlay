@@ -6,7 +6,55 @@ let
   cfg = config.senpro;
   telegrafOptions = import ./options.nix { inherit lib; };
   webhookCfg = cfg.monitoring.telegraf.inputs.webhook;
-  webhookEndpoints = map telegrafOptions.sanitizeToml webhookCfg.endpoints;
+  jsonV2FieldTypes = [ "int" "uint" "float" "string" "bool" ];
+  sanitizeJsonV2Items = sanitizer: value:
+    let
+      list = if isList value then value else [ value ];
+    in map sanitizer list;
+  sanitizeJsonV2Tag = tag:
+    removeAttrs (telegrafOptions.sanitizeToml tag) [ "type" ];
+  sanitizeJsonV2Field = field:
+    let
+      sanitized = telegrafOptions.sanitizeToml field;
+    in if sanitized ? type && !(builtins.elem sanitized.type jsonV2FieldTypes)
+      then removeAttrs sanitized [ "type" ]
+      else sanitized;
+  sanitizeJsonV2Object = object:
+    let
+      sanitized = telegrafOptions.sanitizeToml object;
+      tagList = if sanitized ? tag then sanitizeJsonV2Items sanitizeJsonV2Tag sanitized.tag else null;
+      fieldList = if sanitized ? field then sanitizeJsonV2Items sanitizeJsonV2Field sanitized.field else null;
+    in sanitized
+      // optionalAttrs (tagList != null) { tag = tagList; }
+      // optionalAttrs (fieldList != null) { field = fieldList; };
+  sanitizeJsonV2Entry = entry:
+    let
+      sanitized = telegrafOptions.sanitizeToml entry;
+      tagList = if sanitized ? tag then sanitizeJsonV2Items sanitizeJsonV2Tag sanitized.tag else null;
+      fieldList = if sanitized ? field then sanitizeJsonV2Items sanitizeJsonV2Field sanitized.field else null;
+      objectList = if sanitized ? object then sanitizeJsonV2Items sanitizeJsonV2Object sanitized.object else null;
+    in sanitized
+      // optionalAttrs (tagList != null) { tag = tagList; }
+      // optionalAttrs (fieldList != null) { field = fieldList; }
+      // optionalAttrs (objectList != null) { object = objectList; };
+  sanitizeWebhookEndpoint = endpoint:
+    let
+      sanitized = telegrafOptions.sanitizeToml endpoint;
+      jsonV2Value = sanitized.json_v2 or null;
+      jsonV2List = if jsonV2Value == null
+        then null
+        else sanitizeJsonV2Items sanitizeJsonV2Entry jsonV2Value;
+      dataFormat = if jsonV2Value != null && (sanitized.data_format or null) == null
+        then "json_v2"
+        else sanitized.data_format or null;
+      formatOverride = sanitized.format or null;
+      base = sanitized
+        // optionalAttrs (jsonV2List != null) { json_v2 = jsonV2List; }
+        // optionalAttrs (dataFormat != null) { data_format = dataFormat; };
+    in if formatOverride != null && dataFormat == null
+      then removeAttrs base [ "format" ] // { data_format = formatOverride; }
+      else removeAttrs base [ "format" ];
+  webhookEndpoints = map sanitizeWebhookEndpoint webhookCfg.endpoints;
 
 in {
   options.senpro.monitoring.telegraf.inputs.webhook = {
