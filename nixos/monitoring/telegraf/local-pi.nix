@@ -1,4 +1,4 @@
-{ config, lib, mkInputConfig, telegrafOptions, ... }:
+{ config, lib, telegrafOptions, ... }:
 
 with lib;
 
@@ -102,23 +102,23 @@ in {
   };
 
   config = {
-    services.telegraf.extraConfig.inputs.cpu = lib.mkIf localPiCfg.stats.cpu.enable [
-      (mkInputConfig (cpuDefaults // localPiCfg.stats.cpu.settings))
+    senpro.monitoring.telegraf.rawInputs.cpu = lib.mkIf localPiCfg.stats.cpu.enable [
+      (cpuDefaults // localPiCfg.stats.cpu.settings)
     ];
-    services.telegraf.extraConfig.inputs.disk = lib.mkIf localPiCfg.stats.disk.enable [
-      (mkInputConfig (diskDefaults // localPiCfg.stats.disk.settings))
+    senpro.monitoring.telegraf.rawInputs.disk = lib.mkIf localPiCfg.stats.disk.enable [
+      (diskDefaults // localPiCfg.stats.disk.settings)
     ];
-    services.telegraf.extraConfig.inputs.mem = lib.mkIf localPiCfg.stats.mem.enable [
-      (mkInputConfig (memDefaults // localPiCfg.stats.mem.settings))
+    senpro.monitoring.telegraf.rawInputs.mem = lib.mkIf localPiCfg.stats.mem.enable [
+      (memDefaults // localPiCfg.stats.mem.settings)
     ];
-    services.telegraf.extraConfig.inputs.kernel = lib.mkIf localPiCfg.stats.kernel.enable [
-      (mkInputConfig (kernelDefaults // localPiCfg.stats.kernel.settings))
+    senpro.monitoring.telegraf.rawInputs.kernel = lib.mkIf localPiCfg.stats.kernel.enable [
+      (kernelDefaults // localPiCfg.stats.kernel.settings)
     ];
-    services.telegraf.extraConfig.inputs.processes = lib.mkIf localPiCfg.stats.processes.enable [
-      (mkInputConfig (processesDefaults // localPiCfg.stats.processes.settings))
+    senpro.monitoring.telegraf.rawInputs.processes = lib.mkIf localPiCfg.stats.processes.enable [
+      (processesDefaults // localPiCfg.stats.processes.settings)
     ];
-    services.telegraf.extraConfig.inputs.system = lib.mkIf localPiCfg.stats.system.enable [
-      (mkInputConfig (systemDefaults // localPiCfg.stats.system.settings))
+    senpro.monitoring.telegraf.rawInputs.system = lib.mkIf localPiCfg.stats.system.enable [
+      (systemDefaults // localPiCfg.stats.system.settings)
     ];
   };
 }

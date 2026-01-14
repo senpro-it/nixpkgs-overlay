@@ -6,13 +6,13 @@ let
   /* Global SNMP input toggle. */
   snmpCfg = config.senpro.monitoring.telegraf.inputs.snmp;
   /* Lenovo storage config subtree. */
-  deviceCfg = config.senpro.monitoring.telegraf.inputs.snmp.vendors.lenovo.storage;
+  deviceCfg = snmpCfg.vendors.lenovo.storage;
 
   /* Build the Telegraf SNMP input for one storage agent.
      @param agent: SNMP agent address.
      @return Sanitized Telegraf input configuration.
   */
-  mkSnmpInput = agent: telegrafOptions.sanitizeToml {
+  mkSnmpInput = agent: {
     name = "lenovo.storage";
     path = [ "${pkgs.mib-library}/opt/mib-library/" ];
     agents = [ agent ];
@@ -39,8 +39,7 @@ let
   };
 
   /* Assemble all configured SNMP inputs for Lenovo storage. */
-  snmpInputs = lib.optionals deviceCfg.endpoints.self.enable
-    (map mkSnmpInput deviceCfg.endpoints.self.agents);
+  snmpInputs = telegrafOptions.mkSnmpInputs deviceCfg.endpoints.self mkSnmpInput;
 
 in {
   /* Lenovo storage SNMP options. */
@@ -50,6 +49,6 @@ in {
     '';
 
   config = {
-    services.telegraf.extraConfig.inputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
+    senpro.monitoring.telegraf.rawInputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
   };
 }

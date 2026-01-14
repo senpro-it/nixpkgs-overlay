@@ -6,13 +6,13 @@ let
   /* Global SNMP input toggle. */
   snmpCfg = config.senpro.monitoring.telegraf.inputs.snmp;
   /* Synology DSM config subtree. */
-  deviceCfg = config.senpro.monitoring.telegraf.inputs.snmp.vendors.synology.dsm;
+  deviceCfg = snmpCfg.vendors.synology.dsm;
 
   /* Build the Telegraf SNMP input for one Synology DSM agent.
      @param agent: SNMP agent address.
      @return Sanitized Telegraf input configuration.
   */
-  mkSnmpInput = agent: telegrafOptions.sanitizeToml {
+  mkSnmpInput = agent: {
     name = "synology.dsm";
     path = [ "${pkgs.mib-library}/opt/mib-library/" ];
     agents = [ agent ];
@@ -73,8 +73,7 @@ let
   };
 
   /* Assemble all configured SNMP inputs for Synology DSM devices. */
-  snmpInputs = lib.optionals deviceCfg.endpoints.self.enable
-    (map mkSnmpInput deviceCfg.endpoints.self.agents);
+  snmpInputs = telegrafOptions.mkSnmpInputs deviceCfg.endpoints.self mkSnmpInput;
 
 in {
   /* Synology DSM SNMP options. */
@@ -84,6 +83,6 @@ in {
     '';
 
   config = {
-    services.telegraf.extraConfig.inputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
+    senpro.monitoring.telegraf.rawInputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
   };
 }

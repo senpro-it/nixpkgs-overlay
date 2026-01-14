@@ -1,4 +1,4 @@
-{ config, lib, mkInputConfig, telegrafOptions, ... }:
+{ config, lib, telegrafOptions, ... }:
 
 with lib;
 
@@ -17,10 +17,10 @@ let
   };
   /* Merge defaults with user-specified overrides. */
   speedSettings = speedDefaults // internetSpeedCfg.settings;
-  /* Sanitized Telegraf config for the input. */
-  speedInputConfig = mkInputConfig speedSettings;
+  /* Telegraf config for the input. */
+  speedInputConfig = speedSettings;
   /* Converter processor to coerce tags into strings. */
-  converterConfig = mkInputConfig {
+  converterConfig = {
     namepass = [ speedSettings.name_override ];
     tags = { string = [ "source" "server_id" "test_mode" ]; };
   };
@@ -40,7 +40,7 @@ in {
       converterConfig
     ];
 
-    services.telegraf.extraConfig.inputs.internet_speed = lib.mkIf internetSpeedCfg.enable [
+    senpro.monitoring.telegraf.rawInputs.internet_speed = lib.mkIf internetSpeedCfg.enable [
       speedInputConfig
     ];
   };

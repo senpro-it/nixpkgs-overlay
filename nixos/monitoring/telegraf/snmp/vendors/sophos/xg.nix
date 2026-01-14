@@ -6,13 +6,13 @@ let
   /* Global SNMP input toggle. */
   snmpCfg = config.senpro.monitoring.telegraf.inputs.snmp;
   /* Sophos XG/XGS config subtree. */
-  deviceCfg = config.senpro.monitoring.telegraf.inputs.snmp.vendors.sophos.xg;
+  deviceCfg = snmpCfg.vendors.sophos.xg;
 
   /* Build the Telegraf SNMP input for one Sophos XG/XGS agent.
      @param agent: SNMP agent address.
      @return Sanitized Telegraf input configuration.
   */
-  mkSnmpInput = agent: telegrafOptions.sanitizeToml {
+  mkSnmpInput = agent: {
     name = "sophos.xg";
     path = [ "${pkgs.mib-library}/opt/mib-library/" ];
     agents = [ agent ];
@@ -97,8 +97,7 @@ let
   };
 
   /* Assemble all configured SNMP inputs for Sophos XG/XGS devices. */
-  snmpInputs = lib.optionals deviceCfg.endpoints.self.enable
-    (map mkSnmpInput deviceCfg.endpoints.self.agents);
+  snmpInputs = telegrafOptions.mkSnmpInputs deviceCfg.endpoints.self mkSnmpInput;
 
 in {
   /* Sophos XG/XGS SNMP options. */
@@ -108,6 +107,6 @@ in {
     '';
 
   config = {
-    services.telegraf.extraConfig.inputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
+    senpro.monitoring.telegraf.rawInputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
   };
 }

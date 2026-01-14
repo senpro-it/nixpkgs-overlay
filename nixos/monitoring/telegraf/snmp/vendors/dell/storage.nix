@@ -6,13 +6,13 @@ let
   /* Global SNMP input toggle. */
   snmpCfg = config.senpro.monitoring.telegraf.inputs.snmp;
   /* Dell storage config subtree. */
-  deviceCfg = config.senpro.monitoring.telegraf.inputs.snmp.vendors.dell.storage;
+  deviceCfg = snmpCfg.vendors.dell.storage;
 
   /* Build the Telegraf SNMP input for one storage agent.
      @param agent: SNMP agent address.
      @return Sanitized Telegraf input configuration.
   */
-  mkSnmpInput = agent: telegrafOptions.sanitizeToml {
+  mkSnmpInput = agent: {
     name = "dell.storage";
     path = [ "${pkgs.mib-library}/opt/mib-library/" ];
     agents = [ agent ];
@@ -55,8 +55,7 @@ let
   };
 
   /* Assemble all configured SNMP inputs for Dell storage. */
-  snmpInputs = lib.optionals deviceCfg.endpoints.self.enable
-    (map mkSnmpInput deviceCfg.endpoints.self.agents);
+  snmpInputs = telegrafOptions.mkSnmpInputs deviceCfg.endpoints.self mkSnmpInput;
 
 in {
   /* Dell storage SNMP options. */
@@ -66,6 +65,6 @@ in {
     '';
 
   config = {
-    services.telegraf.extraConfig.inputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
+    senpro.monitoring.telegraf.rawInputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
   };
 }

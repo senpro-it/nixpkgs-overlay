@@ -6,13 +6,13 @@ let
   /* Global SNMP input toggle. */
   snmpCfg = config.senpro.monitoring.telegraf.inputs.snmp;
   /* Aruba Mobility Gateway config subtree. */
-  deviceCfg = config.senpro.monitoring.telegraf.inputs.snmp.vendors.aruba.mobilityGateway;
+  deviceCfg = snmpCfg.vendors.aruba.mobilityGateway;
 
   /* Build the Telegraf SNMP input for the gateway itself.
      @param agent: SNMP agent address.
      @return Sanitized Telegraf input configuration.
   */
-  mkGatewayInput = agent: telegrafOptions.sanitizeToml {
+  mkGatewayInput = agent: {
     name = "aruba.mobilityGateway";
     path = [ "${pkgs.mib-library}/opt/mib-library/" ];
     agents = [ agent ];
@@ -54,7 +54,7 @@ let
      @param agent: SNMP agent address.
      @return Sanitized Telegraf input configuration.
   */
-  mkAccessPointInput = agent: telegrafOptions.sanitizeToml {
+  mkAccessPointInput = agent: {
     name = "aruba.mobilityGateway.accessPoints";
     path = [ "${pkgs.mib-library}/opt/mib-library/" ];
     agents = [ agent ];
@@ -82,10 +82,8 @@ let
   };
 
   /* Assemble SNMP inputs based on enabled endpoints. */
-  snmpInputs = lib.optionals deviceCfg.endpoints.self.enable
-    (map mkGatewayInput deviceCfg.endpoints.self.agents)
-    ++ lib.optionals deviceCfg.endpoints.accessPoints.enable
-    (map mkAccessPointInput deviceCfg.endpoints.accessPoints.agents);
+  snmpInputs = telegrafOptions.mkSnmpInputs deviceCfg.endpoints.self mkGatewayInput
+    ++ telegrafOptions.mkSnmpInputs deviceCfg.endpoints.accessPoints mkAccessPointInput;
 
 in {
   /* Aruba Mobility Gateway SNMP options. */
@@ -103,6 +101,6 @@ in {
     };
 
   config = {
-    services.telegraf.extraConfig.inputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
+    senpro.monitoring.telegraf.rawInputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
   };
 }

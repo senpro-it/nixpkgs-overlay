@@ -16,70 +16,75 @@ let
     let
       list = if isList value then value else [ value ];
     in map sanitizer list;
-  /* Sanitize JSON v2 tag entries.
+  /* Normalize JSON v2 tag entries.
      @param tag: Tag definition attrset.
-     @return Sanitized tag entry without type metadata.
+     @return Tag entry without type metadata.
   */
   sanitizeJsonV2Tag = tag:
-    removeAttrs (telegrafOptions.sanitizeToml tag) [ "type" ];
-  /* Sanitize JSON v2 field entries and validate types.
+    removeAttrs tag [ "type" ];
+  /* Normalize JSON v2 field entries and validate types.
      @param field: Field definition attrset.
-     @return Sanitized field entry with valid type.
+     @return Field entry with valid type.
   */
   sanitizeJsonV2Field = field:
     let
-      sanitized = telegrafOptions.sanitizeToml field;
-    in if sanitized ? type && !(builtins.elem sanitized.type jsonV2FieldTypes)
-      then removeAttrs sanitized [ "type" ]
-      else sanitized;
-  /* Sanitize JSON v2 object entries.
+      typeValue = field.type or null;
+    in if typeValue != null && !(builtins.elem typeValue jsonV2FieldTypes)
+      then removeAttrs field [ "type" ]
+      else field;
+  /* Normalize JSON v2 object entries.
      @param object: Object definition attrset.
-     @return Sanitized object entry with nested lists.
+     @return Object entry with nested lists.
   */
   sanitizeJsonV2Object = object:
     let
-      sanitized = telegrafOptions.sanitizeToml object;
-      tagList = if sanitized ? tag then sanitizeJsonV2Items sanitizeJsonV2Tag sanitized.tag else null;
-      fieldList = if sanitized ? field then sanitizeJsonV2Items sanitizeJsonV2Field sanitized.field else null;
-    in sanitized
+      tagValue = object.tag or null;
+      fieldValue = object.field or null;
+      tagList = if tagValue == null then null else sanitizeJsonV2Items sanitizeJsonV2Tag tagValue;
+      fieldList = if fieldValue == null then null else sanitizeJsonV2Items sanitizeJsonV2Field fieldValue;
+      base = removeAttrs object [ "tag" "field" ];
+    in base
       // optionalAttrs (tagList != null) { tag = tagList; }
       // optionalAttrs (fieldList != null) { field = fieldList; };
-  /* Sanitize JSON v2 top-level entry.
+  /* Normalize JSON v2 top-level entry.
      @param entry: JSON v2 entry attrset.
-     @return Sanitized entry with normalized lists.
+     @return Entry with normalized lists.
   */
   sanitizeJsonV2Entry = entry:
     let
-      sanitized = telegrafOptions.sanitizeToml entry;
-      tagList = if sanitized ? tag then sanitizeJsonV2Items sanitizeJsonV2Tag sanitized.tag else null;
-      fieldList = if sanitized ? field then sanitizeJsonV2Items sanitizeJsonV2Field sanitized.field else null;
-      objectList = if sanitized ? object then sanitizeJsonV2Items sanitizeJsonV2Object sanitized.object else null;
-    in sanitized
+      tagValue = entry.tag or null;
+      fieldValue = entry.field or null;
+      objectValue = entry.object or null;
+      tagList = if tagValue == null then null else sanitizeJsonV2Items sanitizeJsonV2Tag tagValue;
+      fieldList = if fieldValue == null then null else sanitizeJsonV2Items sanitizeJsonV2Field fieldValue;
+      objectList = if objectValue == null then null else sanitizeJsonV2Items sanitizeJsonV2Object objectValue;
+      base = removeAttrs entry [ "tag" "field" "object" ];
+    in base
       // optionalAttrs (tagList != null) { tag = tagList; }
       // optionalAttrs (fieldList != null) { field = fieldList; }
       // optionalAttrs (objectList != null) { object = objectList; };
-  /* Sanitize webhook endpoint definitions for Telegraf.
+  /* Normalize webhook endpoint definitions for Telegraf.
      @param endpoint: Raw endpoint attrset from module options.
-     @return Sanitized endpoint with JSON v2 defaults applied.
+     @return Endpoint with JSON v2 defaults applied.
   */
   sanitizeWebhookEndpoint = endpoint:
     let
-      sanitized = telegrafOptions.sanitizeToml endpoint;
-      jsonV2Value = sanitized.json_v2 or null;
+      jsonV2Value = endpoint.json_v2 or null;
       jsonV2List = if jsonV2Value == null
         then null
         else sanitizeJsonV2Items sanitizeJsonV2Entry jsonV2Value;
-      dataFormat = if jsonV2Value != null && (sanitized.data_format or null) == null
+      dataFormat = if jsonV2Value != null && (endpoint.data_format or null) == null
         then "json_v2"
-        else sanitized.data_format or null;
-      formatOverride = sanitized.format or null;
-      base = sanitized
+        else endpoint.data_format or null;
+      formatOverride = endpoint.format or null;
+      base = removeAttrs endpoint [ "format" "json_v2" "data_format" ];
+      normalized = base
         // optionalAttrs (jsonV2List != null) { json_v2 = jsonV2List; }
         // optionalAttrs (dataFormat != null) { data_format = dataFormat; };
     in if formatOverride != null && dataFormat == null
-      then removeAttrs base [ "format" ] // { data_format = formatOverride; }
-      else removeAttrs base [ "format" ];
-  /* Final list of sanitized webhook endpoints. */
+      then normalized // { data_format = formatOverride; }
+      else normalized;
+  /* Final list of normalized webhook endpoints. */
   webhookEndpoints = map sanitizeWebhookEndpoint webhookCfg.endpoints;
 
 in {
@@ -186,7 +191,7 @@ in {
   };
 
   config = {
-    services.telegraf.extraConfig.inputs.http_listener_v2 = lib.mkIf webhookCfg.enable
+    senpro.monitoring.telegraf.rawInputs.http_listener_v2 = lib.mkIf webhookCfg.enable
       webhookEndpoints;
   };
 }

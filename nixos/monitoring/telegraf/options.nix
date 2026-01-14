@@ -63,6 +63,14 @@ rec {
     credentials = authSNMPv2;
   };
 
+  /* Build a list of SNMP inputs for an endpoint.
+     @param endpoint: Endpoint config with enable/agents.
+     @param mkSnmpInput: Function for input creation.
+     @return List of inputs for enabled agents.
+  */
+  mkSnmpInputs = endpoint: mkSnmpInput:
+    optionals endpoint.enable (map mkSnmpInput endpoint.agents);
+
   /* List of SNMP agent endpoints.
      @return mkOption schema for agent list.
   */

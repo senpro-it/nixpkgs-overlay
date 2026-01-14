@@ -6,13 +6,13 @@ let
   /* Global SNMP input toggle. */
   snmpCfg = config.senpro.monitoring.telegraf.inputs.snmp;
   /* SonicWall TZ/NSa config subtree. */
-  deviceCfg = config.senpro.monitoring.telegraf.inputs.snmp.vendors.sonicWall.fwTzNsa;
+  deviceCfg = snmpCfg.vendors.sonicWall.fwTzNsa;
 
   /* Build the Telegraf SNMP input for the firewall itself.
      @param agent: SNMP agent address.
      @return Sanitized Telegraf input configuration.
   */
-  mkFirewallInput = agent: telegrafOptions.sanitizeToml {
+  mkFirewallInput = agent: {
     name = "sonicWall.fwTzNsa";
     path = [ "${pkgs.mib-library}/opt/mib-library/" ];
     agents = [ agent ];
@@ -61,7 +61,7 @@ let
      @param agent: SNMP agent address.
      @return Sanitized Telegraf input configuration.
   */
-  mkAccessPointInput = agent: telegrafOptions.sanitizeToml {
+  mkAccessPointInput = agent: {
     name = "sonicWall.fwTzNsa.accessPoints";
     path = [ "${pkgs.mib-library}/opt/mib-library/" ];
     agents = [ agent ];
@@ -92,10 +92,8 @@ let
   };
 
   /* Assemble SNMP inputs based on enabled endpoints. */
-  snmpInputs = lib.optionals deviceCfg.endpoints.self.enable
-    (map mkFirewallInput deviceCfg.endpoints.self.agents)
-    ++ lib.optionals deviceCfg.endpoints.accessPoints.enable
-    (map mkAccessPointInput deviceCfg.endpoints.accessPoints.agents);
+  snmpInputs = telegrafOptions.mkSnmpInputs deviceCfg.endpoints.self mkFirewallInput
+    ++ telegrafOptions.mkSnmpInputs deviceCfg.endpoints.accessPoints mkAccessPointInput;
 
 in {
   /* SonicWall TZ/NSa SNMP options. */
@@ -113,6 +111,6 @@ in {
     };
 
   config = {
-    services.telegraf.extraConfig.inputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
+    senpro.monitoring.telegraf.rawInputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
   };
 }

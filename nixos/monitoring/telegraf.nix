@@ -7,16 +7,16 @@ let
   telegrafCfg = config.senpro.monitoring.telegraf;
   /* Shared helpers for building Telegraf option schemas. */
   telegrafOptions = import ./telegraf/options.nix { inherit lib; };
-  /* Helper for sanitizing Telegraf input payloads. */
-  mkInputConfig = settings: telegrafOptions.sanitizeToml settings;
   /* TOML format helper for output options. */
   settingsFormat = pkgs.formats.toml {};
   /* Sanitized Telegraf output configuration. */
   outputsCfg = telegrafOptions.sanitizeToml telegrafCfg.outputs;
+  /* Sanitized Telegraf input configuration. */
+  inputsCfg = telegrafOptions.sanitizeToml telegrafCfg.rawInputs;
 
 in {
   _module.args = {
-    inherit telegrafOptions mkInputConfig;
+    inherit telegrafOptions;
   };
 
   imports = [
@@ -46,6 +46,12 @@ in {
         };
       };
     };
+    rawInputs = mkOption {
+      default = {};
+      internal = true;
+      description = "Unsanitized Telegraf input fragments.";
+      type = types.attrsOf types.anything;
+    };
   };
 
   config = {
@@ -57,6 +63,7 @@ in {
           snmp_translator = "gosmi";
         };
         outputs = outputsCfg;
+        inputs = inputsCfg;
       };
     };
   };

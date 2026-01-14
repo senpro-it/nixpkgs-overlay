@@ -1,4 +1,4 @@
-{ config, lib, mkInputConfig, telegrafOptions, pkgs, ... }:
+{ config, lib, telegrafOptions, pkgs, ... }:
 
 with lib;
 
@@ -12,8 +12,8 @@ let
     interval = "900s";
     data_format = "influx";
   };
-  /* Sanitized Telegraf exec input configuration. */
-  execInputConfig = mkInputConfig (execDefaults // sophosCfg.exec);
+  /* Telegraf exec input configuration. */
+  execInputConfig = execDefaults // sophosCfg.exec;
 
 in {
   /* Sophos Central API input options. */
@@ -42,7 +42,7 @@ in {
   };
 
   config = {
-    services.telegraf.extraConfig.inputs.exec = lib.mkIf sophosCfg.enable [
+    senpro.monitoring.telegraf.rawInputs.exec = lib.mkIf sophosCfg.enable [
       execInputConfig
     ];
   };

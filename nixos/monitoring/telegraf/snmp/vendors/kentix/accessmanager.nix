@@ -6,13 +6,13 @@ let
   /* Global SNMP input toggle. */
   snmpCfg = config.senpro.monitoring.telegraf.inputs.snmp;
   /* Kentix AccessManager config subtree. */
-  deviceCfg = config.senpro.monitoring.telegraf.inputs.snmp.vendors.kentix.accessmanager;
+  deviceCfg = snmpCfg.vendors.kentix.accessmanager;
 
   /* Build the Telegraf SNMP input for one AccessManager agent.
      @param agent: SNMP agent address.
      @return Sanitized Telegraf input configuration.
   */
-  mkSnmpInput = agent: telegrafOptions.sanitizeToml {
+  mkSnmpInput = agent: {
     name = "kentix.accessmanager";
     path = [ "${pkgs.mib-library}/opt/mib-library/" ];
     agents = [ agent ];
@@ -44,8 +44,7 @@ let
   };
 
   /* Assemble all configured SNMP inputs for AccessManager devices. */
-  snmpInputs = lib.optionals deviceCfg.endpoints.self.enable
-    (map mkSnmpInput deviceCfg.endpoints.self.agents);
+  snmpInputs = telegrafOptions.mkSnmpInputs deviceCfg.endpoints.self mkSnmpInput;
 
 in {
   /* Kentix AccessManager SNMP options. */
@@ -55,6 +54,6 @@ in {
     '';
 
   config = {
-    services.telegraf.extraConfig.inputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
+    senpro.monitoring.telegraf.rawInputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
   };
 }

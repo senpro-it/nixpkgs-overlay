@@ -1,4 +1,4 @@
-{ config, lib, mkInputConfig, telegrafOptions, ... }:
+{ config, lib, telegrafOptions, ... }:
 
 with lib;
 
@@ -299,16 +299,16 @@ let
   vsphereHistoricalSettings = vsphereHistoricalDefaults // vsphereCfg.historical;
   /* Build the Telegraf vsphere input configuration.
      @param settings: Merged settings for a vsphere input.
-     @return Sanitized settings with credentials injected.
+     @return Settings with credentials injected.
   */
-  mkVsphereConfig = settings: mkInputConfig (settings // {
+  mkVsphereConfig = settings: settings // {
     vcenters = vsphereCfg.sdk.endpoints;
     username = vsphereCfg.sdk.username;
     password = vsphereCfg.sdk.password;
-  });
-  /* Sanitized Telegraf config for realtime collection. */
+  };
+  /* Telegraf config for realtime collection. */
   vsphereRealtimeConfig = mkVsphereConfig vsphereRealtimeSettings;
-  /* Sanitized Telegraf config for historical collection. */
+  /* Telegraf config for historical collection. */
   vsphereHistoricalConfig = mkVsphereConfig vsphereHistoricalSettings;
 
 in {
@@ -349,7 +349,7 @@ in {
   };
 
   config = {
-    services.telegraf.extraConfig.inputs.vsphere = lib.mkIf vsphereCfg.enable [
+    senpro.monitoring.telegraf.rawInputs.vsphere = lib.mkIf vsphereCfg.enable [
       vsphereRealtimeConfig
       vsphereHistoricalConfig
     ];

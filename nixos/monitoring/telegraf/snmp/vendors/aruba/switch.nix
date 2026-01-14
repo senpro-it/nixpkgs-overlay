@@ -6,12 +6,12 @@ let
   /* Global SNMP input toggle. */
   snmpCfg = config.senpro.monitoring.telegraf.inputs.snmp;
   /* Aruba switch config subtree. */
-  deviceCfg = config.senpro.monitoring.telegraf.inputs.snmp.vendors.aruba.switch;
+  deviceCfg = snmpCfg.vendors.aruba.switch;
   /* Build the Telegraf SNMP input for one switch agent.
      @param agent: SNMP agent address.
      @return Sanitized Telegraf input configuration.
   */
-  mkSwitchInput = agent: telegrafOptions.sanitizeToml {
+  mkSwitchInput = agent: {
     name = "aruba.switch";
     path = [ "${pkgs.mib-library}/opt/mib-library/" ];
     agents = [ agent ];
@@ -36,8 +36,7 @@ let
     ];
   };
   /* Assemble all configured SNMP inputs for Aruba switches. */
-  snmpInputs = lib.optionals deviceCfg.endpoints.self.enable
-    (map mkSwitchInput deviceCfg.endpoints.self.agents);
+  snmpInputs = telegrafOptions.mkSnmpInputs deviceCfg.endpoints.self mkSwitchInput;
 
 in {
   /* Aruba switch SNMP options. */
@@ -47,6 +46,6 @@ in {
     '';
 
   config = {
-    services.telegraf.extraConfig.inputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
+    senpro.monitoring.telegraf.rawInputs.snmp = lib.mkIf snmpCfg.enable snmpInputs;
   };
 }

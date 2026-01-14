@@ -1,4 +1,4 @@
-{ config, lib, mkInputConfig, telegrafOptions, ... }:
+{ config, lib, telegrafOptions, ... }:
 
 with lib;
 
@@ -10,10 +10,10 @@ let
     name_override = "ping";
     method = "native";
   };
-  /* Sanitized Telegraf config for the ping input. */
-  pingInputConfig = mkInputConfig (pingDefaults // pingCfg.settings // {
+  /* Telegraf config for the ping input. */
+  pingInputConfig = pingDefaults // pingCfg.settings // {
     urls = pingCfg.urls;
-  });
+  };
 
 in {
   /* Ping input options. */
@@ -35,7 +35,7 @@ in {
   };
 
   config = {
-    services.telegraf.extraConfig.inputs.ping = lib.mkIf pingCfg.enable [
+    senpro.monitoring.telegraf.rawInputs.ping = lib.mkIf pingCfg.enable [
       pingInputConfig
     ];
   };
