@@ -15,10 +15,6 @@ let
   inputsCfg = telegrafOptions.sanitizeToml telegrafCfg.rawInputs;
 
 in {
-  _module.args = {
-    inherit telegrafOptions;
-  };
-
   imports = [
     ./telegraf/api.nix
     ./telegraf/internet-speed.nix
@@ -55,6 +51,10 @@ in {
   };
 
   config = {
+    _module.args = {
+      inherit telegrafOptions;
+    };
+
     services.telegraf = lib.mkIf telegrafCfg.enable {
       enable = true;
       extraConfig = {
