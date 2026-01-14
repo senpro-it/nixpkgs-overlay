@@ -16,7 +16,7 @@ in {
 
   config = {
     services.telegraf.extraConfig.inputs.snmp = lib.mkIf (snmpCfg.enable && vendorCfg.endpoints.self.enable) (
-      map (agent: {
+      map (agent: telegrafOptions.sanitizeToml {
         name = "reddoxx";
         path = [ "${pkgs.mib-library}/opt/mib-library/" ];
         agents = [ agent ];

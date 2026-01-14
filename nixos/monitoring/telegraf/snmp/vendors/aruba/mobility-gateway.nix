@@ -24,7 +24,7 @@ in {
 
   config = {
     services.telegraf.extraConfig.inputs.snmp = lib.mkIf snmpCfg.enable (
-      lib.optionals deviceCfg.endpoints.self.enable (map (agent: {
+      lib.optionals deviceCfg.endpoints.self.enable (map (agent: telegrafOptions.sanitizeToml {
         name = "aruba.mobilityGateway";
         path = [ "${pkgs.mib-library}/opt/mib-library/" ];
         agents = [ agent ];
@@ -61,7 +61,7 @@ in {
           { name = "aruba.mobilityGateway.ipAddrTable"; oid = "IP-MIB::ipAddrTable"; inherit_tags = [ "host" ]; }
         ];
       }) deviceCfg.endpoints.self.agents)
-      ++ lib.optionals deviceCfg.endpoints.accessPoints.enable (map (agent: {
+      ++ lib.optionals deviceCfg.endpoints.accessPoints.enable (map (agent: telegrafOptions.sanitizeToml {
         name = "aruba.mobilityGateway.accessPoints";
         path = [ "${pkgs.mib-library}/opt/mib-library/" ];
         agents = [ agent ];

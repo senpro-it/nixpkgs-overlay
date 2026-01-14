@@ -40,6 +40,8 @@ in {
   };
 
   config = {
-    services.telegraf.extraConfig.inputs.exec = lib.mkIf sophosCfg.enable [ execConfig ];
+    services.telegraf.extraConfig.inputs.exec = lib.mkIf sophosCfg.enable [
+      (telegrafOptions.sanitizeToml execConfig)
+    ];
   };
 }

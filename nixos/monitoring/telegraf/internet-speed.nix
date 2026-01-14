@@ -29,12 +29,14 @@ in {
 
   config = {
     services.telegraf.extraConfig.processors.converter = lib.mkIf internetSpeedCfg.enable [
-      {
+      (telegrafOptions.sanitizeToml {
         namepass = [ speedSettings.name_override ];
         tags = { string = [ "source" "server_id" "test_mode" ]; };
-      }
+      })
     ];
 
-    services.telegraf.extraConfig.inputs.internet_speed = lib.mkIf internetSpeedCfg.enable [ speedConfig ];
+    services.telegraf.extraConfig.inputs.internet_speed = lib.mkIf internetSpeedCfg.enable [
+      (telegrafOptions.sanitizeToml speedConfig)
+    ];
   };
 }

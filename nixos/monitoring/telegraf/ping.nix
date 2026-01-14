@@ -34,6 +34,8 @@ in {
   };
 
   config = {
-    services.telegraf.extraConfig.inputs.ping = lib.mkIf pingCfg.enable [ pingConfig ];
+    services.telegraf.extraConfig.inputs.ping = lib.mkIf pingCfg.enable [
+      (telegrafOptions.sanitizeToml pingConfig)
+    ];
   };
 }

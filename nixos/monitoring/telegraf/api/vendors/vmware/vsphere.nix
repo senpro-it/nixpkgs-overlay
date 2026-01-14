@@ -337,8 +337,8 @@ in {
 
   config = {
     services.telegraf.extraConfig.inputs.vsphere = lib.mkIf vsphereCfg.enable [
-      (mkVsphereConfig vsphereRealtimeSettings)
-      (mkVsphereConfig vsphereHistoricalSettings)
+      (telegrafOptions.sanitizeToml (mkVsphereConfig vsphereRealtimeSettings))
+      (telegrafOptions.sanitizeToml (mkVsphereConfig vsphereHistoricalSettings))
     ];
   };
 }

@@ -24,7 +24,7 @@ in {
 
   config = {
     services.telegraf.extraConfig.inputs.snmp = lib.mkIf snmpCfg.enable (
-      lib.optionals deviceCfg.endpoints.self.enable (map (agent: {
+      lib.optionals deviceCfg.endpoints.self.enable (map (agent: telegrafOptions.sanitizeToml {
         name = "sonicWall.fwTzNsa";
         path = [ "${pkgs.mib-library}/opt/mib-library/" ];
         agents = [ agent ];
@@ -68,7 +68,7 @@ in {
           { name = "sonicWall.fwTzNsa.zoneStats"; oid = "SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicwallFwZoneTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
         ];
       }) deviceCfg.endpoints.self.agents)
-      ++ lib.optionals deviceCfg.endpoints.accessPoints.enable (map (agent: {
+      ++ lib.optionals deviceCfg.endpoints.accessPoints.enable (map (agent: telegrafOptions.sanitizeToml {
         name = "sonicWall.fwTzNsa.accessPoints";
         path = [ "${pkgs.mib-library}/opt/mib-library/" ];
         agents = [ agent ];

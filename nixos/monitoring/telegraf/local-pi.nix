@@ -108,11 +108,23 @@ in {
   };
 
   config = {
-    services.telegraf.extraConfig.inputs.cpu = lib.mkIf localPiCfg.stats.cpu.enable [ cpuConfig ];
-    services.telegraf.extraConfig.inputs.disk = lib.mkIf localPiCfg.stats.disk.enable [ diskConfig ];
-    services.telegraf.extraConfig.inputs.mem = lib.mkIf localPiCfg.stats.mem.enable [ memConfig ];
-    services.telegraf.extraConfig.inputs.kernel = lib.mkIf localPiCfg.stats.kernel.enable [ kernelConfig ];
-    services.telegraf.extraConfig.inputs.processes = lib.mkIf localPiCfg.stats.processes.enable [ processesConfig ];
-    services.telegraf.extraConfig.inputs.system = lib.mkIf localPiCfg.stats.system.enable [ systemConfig ];
+    services.telegraf.extraConfig.inputs.cpu = lib.mkIf localPiCfg.stats.cpu.enable [
+      (telegrafOptions.sanitizeToml cpuConfig)
+    ];
+    services.telegraf.extraConfig.inputs.disk = lib.mkIf localPiCfg.stats.disk.enable [
+      (telegrafOptions.sanitizeToml diskConfig)
+    ];
+    services.telegraf.extraConfig.inputs.mem = lib.mkIf localPiCfg.stats.mem.enable [
+      (telegrafOptions.sanitizeToml memConfig)
+    ];
+    services.telegraf.extraConfig.inputs.kernel = lib.mkIf localPiCfg.stats.kernel.enable [
+      (telegrafOptions.sanitizeToml kernelConfig)
+    ];
+    services.telegraf.extraConfig.inputs.processes = lib.mkIf localPiCfg.stats.processes.enable [
+      (telegrafOptions.sanitizeToml processesConfig)
+    ];
+    services.telegraf.extraConfig.inputs.system = lib.mkIf localPiCfg.stats.system.enable [
+      (telegrafOptions.sanitizeToml systemConfig)
+    ];
   };
 }

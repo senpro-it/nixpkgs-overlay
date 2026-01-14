@@ -76,7 +76,7 @@ in {
 
   config = {
     services.telegraf.extraConfig.inputs.snmp = lib.mkIf (snmpCfg.enable && deviceCfg.endpoints.self.enable) (
-      map (agent: {
+      map (agent: telegrafOptions.sanitizeToml {
         name = "kentix.sensors";
         path = [ "${pkgs.mib-library}/opt/mib-library/" ];
         agents = [ agent ];
