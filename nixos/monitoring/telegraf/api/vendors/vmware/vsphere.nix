@@ -3,7 +3,7 @@
 with lib;
 
 let
-  telegrafOptions = import ../../../../options.nix { inherit lib; };
+  telegrafOptions = import ../../../options.nix { inherit lib; };
   vsphereCfg = config.senpro.monitoring.telegraf.inputs.api.vendors.vmware.vsphere;
   vsphereRealtimeDefaults = {
     interval = "60s";

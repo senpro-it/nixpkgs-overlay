@@ -3,7 +3,7 @@
 with lib;
 
 let
-  telegrafOptions = import ../../../../options.nix { inherit lib; };
+  telegrafOptions = import ../../../options.nix { inherit lib; };
   sophosCfg = config.senpro.monitoring.telegraf.inputs.api.vendors.sophos.central;
   execDefaults = {
     commands = [ "${pkgs.line-exporters}/bin/lxp-sophos-central '${sophosCfg.client.id}' '${sophosCfg.client.secret}'" ];
