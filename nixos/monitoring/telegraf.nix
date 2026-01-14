@@ -46,7 +46,7 @@ in {
       default = {};
       internal = true;
       description = "Unsanitized Telegraf input fragments.";
-      type = types.attrsOf types.anything;
+      type = types.attrsOf (types.listOf types.anything);
     };
   };
 
