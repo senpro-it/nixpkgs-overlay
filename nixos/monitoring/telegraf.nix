@@ -13,6 +13,17 @@ let
   outputsCfg = telegrafOptions.sanitizeToml telegrafCfg.outputs;
   /* Sanitized Telegraf input configuration. */
   inputsCfg = telegrafOptions.sanitizeToml telegrafCfg.rawInputs;
+  /* Base Telegraf extraConfig before sanitation. */
+  baseExtraConfig = {
+    agent = {
+      interval = "60s";
+      snmp_translator = "gosmi";
+    };
+    outputs = outputsCfg;
+    inputs = inputsCfg;
+  };
+  /* Sanitized Telegraf extraConfig, including module additions. */
+  extraConfig = telegrafOptions.sanitizeToml (recursiveUpdate baseExtraConfig telegrafCfg.extraConfig);
 
 in {
   imports = [
@@ -48,6 +59,12 @@ in {
       description = "Unsanitized Telegraf input fragments.";
       type = types.attrsOf (types.listOf types.anything);
     };
+    extraConfig = mkOption {
+      default = {};
+      internal = true;
+      description = "Unsanitized Telegraf extraConfig fragments.";
+      type = types.attrsOf types.anything;
+    };
   };
 
   config = {
@@ -57,14 +74,7 @@ in {
 
     services.telegraf = lib.mkIf telegrafCfg.enable {
       enable = true;
-      extraConfig = {
-        agent = {
-          interval = "60s";
-          snmp_translator = "gosmi";
-        };
-        outputs = outputsCfg;
-        inputs = inputsCfg;
-      };
+      extraConfig = extraConfig;
     };
   };
 }
