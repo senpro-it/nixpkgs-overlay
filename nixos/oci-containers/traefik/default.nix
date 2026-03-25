@@ -42,7 +42,7 @@ let cfg = config.senpro; in {
             description = "Environment variables to set for the Traefik container.";
             example = literalExpression ''
               {
-                IONOS_API_KEY = "43swm2sdxiamsa0djssd6435ccss";
+                IONOS_API_KEY = "43swm2sdxiamsaghgh0djssd6435ccss";
               }
             '';
           };
