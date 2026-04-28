@@ -2219,7 +2219,9 @@ in {
                   { oid = "IF-MIB::ifName"; is_tag = true; }
                 ]; }
                 { name = "zyxel.accessPoints.wlanRadioTable"; oid = "ZYXEL-ES-WIRELESS::wlanRadioTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
-                { name = "zyxel.accessPoints.wlanStationTable"; oid = "ZYXEL-ES-WIRELESS::wlanStationTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+                { name = "zyxel.accessPoints.wlanStationTable"; oid = "ZYXEL-ES-WIRELESS::wlanStationTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
+                  { oid = "ZYXEL-ES-WIRELESS::stationMacAddress"; is_tag = true; }
+                ]; }
               ];
             }) cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.accessPoints.endpoints.self.agents))
           #]));
