@@ -782,6 +782,17 @@ in {
                   };
                   credentials = telegrafOptions.authSNMPv3;
                 };
+                accessPoints = {
+                  endpoints = {
+                    self = {
+                      enable = mkEnableOption ''
+                        Whether to enable the Zyxel (Nebula) access point monitoring via SNMP.
+                      '';
+                      agents = telegrafOptions.agentConfig;
+                    };
+                  };
+                  credentials = telegrafOptions.authSNMPv2;
+                };
               };
             };
           };
