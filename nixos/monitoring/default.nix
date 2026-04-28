@@ -2188,6 +2188,8 @@ in {
                 { name = "description"; oid = "SNMPv2-MIB::sysDescr.0"; }
                 { name = "location"; oid = "SNMPv2-MIB::sysLocation.0"; }
                 { name = "memorySize"; oid = "HOST-RESOURCES-MIB::hrMemorySize.0"; }
+                { name = "operationMode"; oid = "ZYXEL-ES-ZyxelAPMgmt::operationMode.0"; }
+                { name = "wlanTotalStationCount"; oid = "ZYXEL-ES-WIRELESS::wlanTotalStationCount.0"; }
                 { name = "sysSwPlatform"; oid = "ZYXEL-ES-COMMON-INFO::sysSwPlatform.0"; }
                 { name = "sysSwMajorVersion"; oid = "ZYXEL-ES-COMMON-INFO::sysSwMajorVersion.0"; }
                 { name = "sysSwMinorVersion"; oid = "ZYXEL-ES-COMMON-INFO::sysSwMinorVersion.0"; }
@@ -2216,6 +2218,8 @@ in {
                 { name = "zyxel.accessPoints.ifXTable"; oid = "IF-MIB::ifXTable"; index_as_tag = true; inherit_tags = [ "host" ]; field = [
                   { oid = "IF-MIB::ifName"; is_tag = true; }
                 ]; }
+                { name = "zyxel.accessPoints.wlanRadioTable"; oid = "ZYXEL-ES-WIRELESS::wlanRadioTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
+                { name = "zyxel.accessPoints.wlanStationTable"; oid = "ZYXEL-ES-WIRELESS::wlanStationTable"; index_as_tag = true; inherit_tags = [ "host" ]; }
               ];
             }) cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.accessPoints.endpoints.self.agents))
           #]));
