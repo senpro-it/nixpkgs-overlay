@@ -2174,7 +2174,7 @@ in {
               ];
             }) cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.switch.endpoints.self.agents))
             (lib.optionals cfg.monitoring.telegraf.inputs.snmp.vendors.zyxel.accessPoints.endpoints.self.enable (map (agent: {
-              name = "zyxel.switch";
+              name = "zyxel.accessPoints";
               path = [ "${pkgs.mib-library}/opt/mib-library/" ];
               agents = [ agent ];
               timeout = "20s";
